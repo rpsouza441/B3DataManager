@@ -1,0 +1,41 @@
+@import url('./main-layout.css');
+@import url('./views/shared-styles.css');
+@import url('./views/dashboard-view.css');
+@import url('./views/data-grid-view.css');
+@import url('./views/gridwith-filters-view.css');
+@import url('./views/operacoes-view.css');
+@import url('./views/importar-view.css');
+@import url('@fontsource/roboto-condensed/index.css');    html {
+--lumo-font-family: Roboto Condensed;
+
+    }
+
+/* Tema Dark */
+html[theme="dark"] {
+/*background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px), radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px);*/
+background-size: 10px 10px;
+background-position: 0 0, 5px 5px;
+background-color: #000121;
+}
+
+/* Tema Light */
+html[theme="light"] {
+        /*background-image:
+               radial-gradient(rgba(0, 0, 0, 0.15) 1px, transparent 1px),
+               radial-gradient(rgba(0, 0, 0, 0.15) 1px, transparent 1px);
+           background-size: 10px 10px;
+           background-position: 0 0, 5px 5px;
+           background-color: rgba(255, 255, 255, 0.31);*/
+}
+
+    /* Garante que os divs internos tenham um fundo sólido */
+    body > div {
+        background-color: transparent; /* Torna o fundo transparente se necessário */
+    }
+
+    .form-container {
+         background-color: var(--lumo-base-color); /* Cor base do Vaadin */
+          box-shadow: 0 2px 4px var(--lumo-shade-20pct); /* Sombras padrão */
+        border-radius: 8px;
+        padding: 16px
+}

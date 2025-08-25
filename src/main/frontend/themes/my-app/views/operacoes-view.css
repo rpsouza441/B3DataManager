@@ -1,0 +1,138 @@
+/* Layout dos filtros */
+.operacao-view .filter-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Reduzimos o min-width para 200px */
+  align-items: end;
+  gap: var(--lumo-space-m); /* Espaçamento entre os filtros */
+  padding: var(--lumo-space-l); /* Espaçamento ao redor do container */
+  width: 100%; /* Garante que o container ocupe toda a largura disponível */
+  box-sizing: border-box; /* Inclui padding na largura total */
+}
+
+.paginator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.paginator button {
+    min-width: 100px;
+}
+
+.responsive-grid {
+    min-height: 300px; /* Define uma altura mínima */
+    flex-grow: 1; /* Permite que o grid cresça para ocupar o espaço disponível */
+    overflow: auto; /* Permite rolagem se necessário */
+}
+
+@media (max-width: 768px) {
+    .responsive-grid {
+        min-height: 200px; /* Altura menor para telas pequenas */
+    }
+}
+
+
+/* Botões de ação */
+.operacao-view .filter-layout .actions {
+  display: flex;
+  justify-content: flex-end; /* Alinha os botões à direita */
+  align-items: center; /* Centraliza verticalmente */
+  grid-column: 1 / -1; /* Garante que os botões ocupem uma linha inteira */
+  margin-top: var(--lumo-space-m); /* Espaçamento superior para separar dos filtros */
+  gap: var(--lumo-space-m); /* Espaçamento entre os botões */
+}
+.paginator-button {
+    margin-right: 8px;
+}
+
+
+/* Estilo para os botões */
+.operacao-view .filter-layout .actions button {
+  min-width: 150px; /* Define uma largura mínima maior para os botões */
+  padding: var(--lumo-space-s) var(--lumo-space-m); /* Ajusta o padding interno dos botões */
+}
+
+/* Estilo para os componentes */
+.operacao-view .filter-layout vaadin-date-picker,
+.operacao-view .filter-layout vaadin-combo-box,
+.operacao-view .filter-layout vaadin-text-field {
+  --vaadin-field-default-width: 100%; /* Garante que os campos ocupem toda a largura */
+  min-width: 0; /* Evita largura mínima que cause barra de rolagem */
+}
+
+.operacao-view .filter-layout vaadin-date-picker {
+  --vaadin-field-default-width: auto;
+}
+
+.operacao-view .filter-layout vaadin-combo-box {
+  --vaadin-field-default-width: auto;
+}
+
+/* Layout responsivo para dispositivos móveis */
+@media screen and (max-width: 800px) {
+  .operacao-view .filter-layout {
+    grid-template-columns: 1fr; /* Todos os filtros em uma coluna no modo mobile */
+    gap: var(--lumo-space-m);
+  }
+
+  .operacao-view .filter-layout .actions {
+    justify-content: center; /* Centraliza os botões no modo mobile */
+    grid-column: 1 / -1; /* Garante que os botões ocupem a largura total */
+  }
+}
+.operacao-view .filter-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  align-items: end;
+  gap: var(--lumo-space-m);
+}
+
+.operacao-view .mobile-filters {
+  display: none;
+  position: relative;
+  cursor: pointer;
+  color: var(--lumo-secondary-text-color);
+}
+
+.operacao-view .mobile-filters span {
+  font-size: var(--lumo-font-size-m);
+  font-weight: 500;
+}
+
+.operacao-view .mobile-filters:hover {
+  color: var(--lumo-body-text-color);
+}
+
+@media screen and (max-width: 800px) {
+  .operacao-view .filter-layout {
+    display: none;
+  }
+
+  .operacao-view .filter-layout.visible {
+    display: grid;
+  }
+
+  .operacao-view .mobile-filters {
+    display: flex;
+  }
+}
+
+.paginator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.page-indicator {
+  font-size: var(--lumo-font-size-m);
+  margin: 0 8px;
+  display: flex;
+  align-items: center; /* Alinhamento vertical */
+  justify-content: center; /* Alinhamento horizontal */
+  text-align: center; /* Centraliza o texto */
+  font-size: 14px; /* Ajuste opcional do tamanho da fonte */
+}

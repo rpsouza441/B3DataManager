@@ -1,0 +1,29 @@
+--- a/src/main/java/br/dev/rodrigopinheiro/B3DataManager/presentation/security/SecurityConfig.java
++++ b/src/main/java/br/dev/rodrigopinheiro/B3DataManager/presentation/security/SecurityConfig.java
+@@ -41,7 +41,12 @@
+         });
+         http.authorizeHttpRequests(registry -> registry.requestMatchers(
+                 routeUtil::isRouteAllowed).permitAll());
+-        http.headers(configurer -> configurer.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
++        
++        // Configuracao de seguranca de headers
++        http.headers(headers -> headers
++            .frameOptions().sameOrigin()
++            .contentTypeOptions().and()
++            .httpStrictTransportSecurity(hsts -> hsts.maxAgeInSeconds(31536000)));
++        
+         super.configure(http);        // use a custom login view and redirect to root on logout
+         setLoginView(http, "/login", "/");
+     }
+--- a/src/main/resources/application.properties
++++ b/src/main/resources/application.properties
+@@ -56,3 +56,9 @@
+ # Configuracao de retries (pode ser sobrescrito por variavel de ambiente)
+ batch.scheduler.retry.maxAttempts=${BATCH_SCHEDULER_RETRY_MAX_ATTEMPTS:3}
+ batch.scheduler.retry.waitDuration=${BATCH_SCHEDULER_RETRY_WAIT_DURATION:5000}
++
++# Configuracoes de seguranca
++server.servlet.session.timeout=30m
++server.servlet.session.cookie.http-only=true
++server.servlet.session.cookie.secure=true
++spring.jpa.open-in-view=false

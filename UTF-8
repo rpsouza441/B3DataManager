@@ -1,0 +1,277 @@
+2025-08-25 16:39:23 [restartedMain] INFO  b.d.r.B.B3DataManagerApplication - Starting B3DataManagerApplication using Java 21.0.7 with PID 9656 (C:\ws\B3DataManager\target\classes started by Rodrigo in C:\ws\B3DataManager)
+2025-08-25 16:39:23 [restartedMain] DEBUG b.d.r.B.B3DataManagerApplication - Running with Spring Boot v3.5.5, Spring v6.2.10
+2025-08-25 16:39:23 [restartedMain] INFO  b.d.r.B.B3DataManagerApplication - No active profile set, falling back to 1 default profile: "default"
+2025-08-25 16:39:23 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-08-25 16:39:23 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-08-25 16:39:24 [restartedMain] INFO  o.s.b.c.c.annotation.BatchRegistrar - Finished Spring Batch infrastructure beans configuration in 4 ms.
+2025-08-25 16:39:24 [restartedMain] INFO  o.s.b.c.c.annotation.BatchRegistrar - Bean jobRepository already defined in the application context, skipping the registration of a jobRepository
+2025-08-25 16:39:24 [restartedMain] INFO  o.s.b.c.c.annotation.BatchRegistrar - Bean jobExplorer already defined in the application context, skipping the registration of a jobExplorer
+2025-08-25 16:39:24 [restartedMain] INFO  o.s.b.c.c.annotation.BatchRegistrar - Bean jobLauncher already defined in the application context, skipping the registration of a jobLauncher
+2025-08-25 16:39:24 [restartedMain] INFO  o.s.b.c.c.annotation.BatchRegistrar - Bean jobRegistry already defined in the application context, skipping the registration of a jobRegistry
+2025-08-25 16:39:24 [restartedMain] INFO  o.s.b.c.c.annotation.BatchRegistrar - Bean jobRegistrySmartInitializingSingleton already defined in the application context, skipping the registration of a jobRegistrySmartInitializingSingleton
+2025-08-25 16:39:24 [restartedMain] INFO  o.s.b.c.c.annotation.BatchRegistrar - Bean jobOperator already defined in the application context, skipping the registration of a jobOperator
+2025-08-25 16:39:24 [restartedMain] INFO  o.s.b.c.c.annotation.BatchRegistrar - Finished Spring Batch infrastructure beans configuration in 1 ms.
+2025-08-25 16:39:24 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-08-25 16:39:24 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 209 ms. Found 9 JPA repository interfaces.
+2025-08-25 16:39:25 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-08-25 16:39:25 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-08-25 16:39:25 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.44]
+2025-08-25 16:39:26 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-08-25 16:39:26 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2819 ms
+2025-08-25 16:39:26 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereHandler com.vaadin.hilla.push.PushEndpoint mapped to context-path: /HILLA/push
+2025-08-25 16:39:26 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed the following AtmosphereInterceptor mapped to AtmosphereHandler com.vaadin.hilla.push.PushEndpoint
+2025-08-25 16:39:26 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor : Atmosphere LifeCycle
+2025-08-25 16:39:26 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.client.TrackMessageSizeInterceptor :  Track Message Size Interceptor using |
+2025-08-25 16:39:26 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.SuspendTrackerInterceptor : UUID Tracking Interceptor
+2025-08-25 16:39:26 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing AtmosphereFramework
+2025-08-25 16:39:30 [restartedMain] INFO  c.v.f.s.VaadinServletContextInitializer - Search for subclasses and classes with annotations took 3349 ms
+2025-08-25 16:39:30 [restartedMain] INFO  c.v.b.d.s.DevModeStartupListener - Starting dev-mode updaters in C:\ws\B3DataManager folder.
+2025-08-25 16:39:30 [restartedMain] INFO  c.v.f.s.f.s.FullDependenciesScanner - Visited 108 classes. Took 25 ms.
+2025-08-25 16:39:30 [restartedMain] INFO  c.v.f.s.f.BundleValidationUtil - Checking if a development mode bundle build is needed
+2025-08-25 16:39:30 [restartedMain] INFO  c.v.f.s.f.BundleValidationUtil - Dependency react-router is missing from the bundle
+2025-08-25 16:39:30 [restartedMain] INFO  c.v.f.s.f.BundleValidationUtil - A development mode bundle build is needed
+2025-08-25 16:39:31 [restartedMain] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-08-25 16:39:31 [restartedMain] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.26.Final
+2025-08-25 16:39:31 [restartedMain] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-08-25 16:39:31 [vaadin-dev-server-1] INFO  c.v.f.s.frontend.TaskUpdatePackages - Running `npm install` to resolve and optionally download frontend dependencies. This may take a moment, please stand by...
+2025-08-25 16:39:31 [vaadin-dev-server-1] INFO  c.v.f.server.frontend.FrontendTools - Couldn't find node.exe. Installing Node and npm to C:\Users\Rodrigo\.vaadin.
+2025-08-25 16:39:31 [vaadin-dev-server-1] INFO  NodeInstaller - Installing node version v22.17.0
+2025-08-25 16:39:31 [vaadin-dev-server-1] INFO  NodeInstaller - Downloading https://nodejs.org/dist/v22.17.0/node-v22.17.0-win-x64.zip to C:\Users\Rodrigo\.vaadin\node-v22.17.0-win-x64.zip
+2025-08-25 16:39:31 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-08-25 16:39:31 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool - Starting...
+2025-08-25 16:39:31 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool - Added connection org.mariadb.jdbc.Connection@14e388cd
+2025-08-25 16:39:31 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool - Start completed.
+2025-08-25 16:39:31 [restartedMain] WARN  org.hibernate.orm.deprecation - HHH90000025: MariaDBDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-08-25 16:39:31 [restartedMain] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool)']
+	Database driver: undefined/unknown
+	Database version: 11.7.2
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-08-25 16:39:32 [restartedMain] INFO  o.h.id.enhanced.TableGenerator - HHH000398: Explicit segment value for id generator [hibernate_sequences.sequence_name] suggested; using default [default]
+2025-08-25 16:39:33 [restartedMain] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-08-25 16:39:33 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-08-25 16:39:33 [restartedMain] INFO  o.s.b.c.r.s.JobRepositoryFactoryBean - No database type set, using meta data indicating: MARIADB
+2025-08-25 16:39:33 [vaadin-dev-server-1] INFO  NodeInstaller - Unpacking C:\Users\Rodrigo\.vaadin\node-v22.17.0-win-x64.zip (35506792 bytes) into C:\Users\Rodrigo\.vaadin\node\tmp
+2025-08-25 16:39:33 [restartedMain] INFO  o.s.b.c.l.s.TaskExecutorJobLauncher - No TaskExecutor has been set, defaulting to synchronous executor.
+2025-08-25 16:39:33 [restartedMain] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-08-25 16:39:35 [restartedMain] INFO  o.s.b.c.c.a.BatchObservabilityBeanPostProcessor - No Micrometer observation registry found, defaulting to ObservationRegistry.NOOP
+2025-08-25 16:39:35 [restartedMain] INFO  o.s.b.c.c.a.BatchObservabilityBeanPostProcessor - No Micrometer observation registry found, defaulting to ObservationRegistry.NOOP
+2025-08-25 16:39:35 [restartedMain] INFO  b.d.r.B.i.c.InfrastructureConfig - RestTemplate configurado com o token de autorização.
+2025-08-25 16:39:35 [vaadin-dev-server-1] INFO  NodeInstaller - Copying node binary from C:\Users\Rodrigo\.vaadin\node\tmp\node-v22.17.0-win-x64\node.exe to C:\Users\Rodrigo\.vaadin\node\node.exe
+2025-08-25 16:39:35 [vaadin-dev-server-1] INFO  NodeInstaller - Extracting npm
+2025-08-25 16:39:36 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-08-25 16:39:36 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name userCustomService
+2025-08-25 16:39:37 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereHandler com.vaadin.flow.server.communication.PushAtmosphereHandler mapped to context-path: /*
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed the following AtmosphereInterceptor mapped to AtmosphereHandler com.vaadin.flow.server.communication.PushAtmosphereHandler
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Atmosphere is using org.atmosphere.util.VoidAnnotationProcessor for processing annotation
+2025-08-25 16:39:37 [restartedMain] INFO  org.atmosphere.util.ForkJoinPool - Using ForkJoinPool  java.util.concurrent.ForkJoinPool. Set the org.atmosphere.cpr.broadcaster.maxAsyncWriteThreads to -1 to fully use its power.
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed WebSocketProtocol org.atmosphere.websocket.protocol.SimpleHttpProtocol 
+2025-08-25 16:39:37 [restartedMain] INFO  o.a.container.JSR356AsyncSupport - JSR 356 Mapping path /VAADIN/push
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installing Default AtmosphereInterceptors
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.CorsInterceptor : CORS Interceptor Support
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.CacheHeadersInterceptor : Default Response's Headers Interceptor
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.PaddingAtmosphereInterceptor : Browser Padding Interceptor Support
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.AndroidAtmosphereInterceptor : Android Interceptor Support
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.HeartbeatInterceptor : Heartbeat Interceptor Support
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.SSEAtmosphereInterceptor : SSE Interceptor Support
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.JSONPAtmosphereInterceptor : JSONP Interceptor Support
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.JavaScriptProtocol : Atmosphere JavaScript Protocol
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.WebSocketMessageSuspendInterceptor : org.atmosphere.interceptor.WebSocketMessageSuspendInterceptor
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.OnDisconnectInterceptor : Browser disconnection detection
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.IdleResourceInterceptor : org.atmosphere.interceptor.IdleResourceInterceptor
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Set org.atmosphere.cpr.AtmosphereInterceptor.disableDefaults to disable them.
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor CORS Interceptor Support with priority FIRST_BEFORE_DEFAULT 
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor Default Response's Headers Interceptor with priority AFTER_DEFAULT 
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor Browser Padding Interceptor Support with priority AFTER_DEFAULT 
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor Android Interceptor Support with priority AFTER_DEFAULT 
+2025-08-25 16:39:37 [restartedMain] INFO  o.a.interceptor.HeartbeatInterceptor - HeartbeatInterceptor configured with padding value 'X', client frequency 0 seconds and server frequency 60 seconds
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor Heartbeat Interceptor Support with priority AFTER_DEFAULT 
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor SSE Interceptor Support with priority AFTER_DEFAULT 
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor JSONP Interceptor Support with priority AFTER_DEFAULT 
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor Atmosphere JavaScript Protocol with priority AFTER_DEFAULT 
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor org.atmosphere.interceptor.WebSocketMessageSuspendInterceptor with priority AFTER_DEFAULT 
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor Browser disconnection detection with priority AFTER_DEFAULT 
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor org.atmosphere.interceptor.IdleResourceInterceptor with priority BEFORE_DEFAULT 
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Using EndpointMapper class org.atmosphere.util.DefaultEndpointMapper
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Using BroadcasterCache: org.atmosphere.cache.UUIDBroadcasterCache
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Default Broadcaster Class: org.atmosphere.cpr.DefaultBroadcaster
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Broadcaster Shared List Resources: false
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Broadcaster Polling Wait Time 100
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Shared ExecutorService supported: true
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Messaging ExecutorService Pool Size unavailable - Not instance of ThreadPoolExecutor
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Async I/O Thread Pool Size: 200
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Using BroadcasterFactory: org.atmosphere.cpr.DefaultBroadcasterFactory
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Using AtmosphereResurceFactory: org.atmosphere.cpr.DefaultAtmosphereResourceFactory
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Using WebSocketProcessor: org.atmosphere.websocket.DefaultWebSocketProcessor
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Invoke AtmosphereInterceptor on WebSocket message true
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - HttpSession supported: true
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Atmosphere is using org.atmosphere.inject.InjectableObjectFactory for dependency injection and object creation
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Atmosphere is using async support: org.atmosphere.container.JSR356AsyncSupport running under container: Apache Tomcat/10.1.44 using jakarta.servlet/3.0 and jsr356/WebSocket API
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Atmosphere Framework 3.0.5.slf4jvaadin1 started.
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor  Track Message Size Interceptor using | with priority BEFORE_DEFAULT 
+2025-08-25 16:39:37 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Atmosphere is using org.atmosphere.cpr.DefaultAnnotationProcessor for processing annotation
+2025-08-25 16:39:37 [restartedMain] INFO  o.a.cpr.DefaultAnnotationProcessor - AnnotationProcessor class org.atmosphere.cpr.DefaultAnnotationProcessor$BytecodeBasedAnnotationProcessor being used
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Auto detecting WebSocketHandler in /WEB-INF/classes/
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed WebSocketProtocol org.atmosphere.websocket.protocol.SimpleHttpProtocol 
+2025-08-25 16:39:40 [restartedMain] INFO  o.a.container.JSR356AsyncSupport - JSR 356 Mapping path /HILLA/push
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installing Default AtmosphereInterceptors
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.CorsInterceptor : CORS Interceptor Support
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.CacheHeadersInterceptor : Default Response's Headers Interceptor
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.PaddingAtmosphereInterceptor : Browser Padding Interceptor Support
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.AndroidAtmosphereInterceptor : Android Interceptor Support
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.HeartbeatInterceptor : Heartbeat Interceptor Support
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.SSEAtmosphereInterceptor : SSE Interceptor Support
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.JSONPAtmosphereInterceptor : JSONP Interceptor Support
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.JavaScriptProtocol : Atmosphere JavaScript Protocol
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.WebSocketMessageSuspendInterceptor : org.atmosphere.interceptor.WebSocketMessageSuspendInterceptor
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.OnDisconnectInterceptor : Browser disconnection detection
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - 	org.atmosphere.interceptor.IdleResourceInterceptor : org.atmosphere.interceptor.IdleResourceInterceptor
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Set org.atmosphere.cpr.AtmosphereInterceptor.disableDefaults to disable them.
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor CORS Interceptor Support with priority FIRST_BEFORE_DEFAULT 
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor Default Response's Headers Interceptor with priority AFTER_DEFAULT 
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor Browser Padding Interceptor Support with priority AFTER_DEFAULT 
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor Android Interceptor Support with priority AFTER_DEFAULT 
+2025-08-25 16:39:40 [restartedMain] INFO  o.a.interceptor.HeartbeatInterceptor - HeartbeatInterceptor configured with padding value 'X', client frequency 0 seconds and server frequency 60 seconds
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor Heartbeat Interceptor Support with priority AFTER_DEFAULT 
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor SSE Interceptor Support with priority AFTER_DEFAULT 
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor JSONP Interceptor Support with priority AFTER_DEFAULT 
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor Atmosphere JavaScript Protocol with priority AFTER_DEFAULT 
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor org.atmosphere.interceptor.WebSocketMessageSuspendInterceptor with priority AFTER_DEFAULT 
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor Browser disconnection detection with priority AFTER_DEFAULT 
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Installed AtmosphereInterceptor org.atmosphere.interceptor.IdleResourceInterceptor with priority BEFORE_DEFAULT 
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Using EndpointMapper class org.atmosphere.util.DefaultEndpointMapper
+2025-08-25 16:39:40 [restartedMain] WARN  o.atmosphere.cpr.AtmosphereFramework - No BroadcasterCache configured. Broadcasted message between client reconnection will be LOST. It is recommended to configure the org.atmosphere.cache.UUIDBroadcasterCache
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Default Broadcaster Class: org.atmosphere.util.SimpleBroadcaster
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Broadcaster Shared List Resources: false
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Broadcaster Polling Wait Time 100
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Shared ExecutorService supported: true
+2025-08-25 16:39:40 [restartedMain] INFO  org.atmosphere.util.ForkJoinPool - Using ForkJoinPool  java.util.concurrent.ForkJoinPool. Set the org.atmosphere.cpr.broadcaster.maxAsyncWriteThreads to -1 to fully use its power.
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Messaging ExecutorService Pool Size unavailable - Not instance of ThreadPoolExecutor
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Async I/O Thread Pool Size: 200
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Using BroadcasterFactory: org.atmosphere.cpr.DefaultBroadcasterFactory
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Using AtmosphereResurceFactory: org.atmosphere.cpr.DefaultAtmosphereResourceFactory
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Using WebSocketProcessor: org.atmosphere.websocket.DefaultWebSocketProcessor
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Invoke AtmosphereInterceptor on WebSocket message true
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - HttpSession supported: false
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Atmosphere is using org.atmosphere.inject.InjectableObjectFactory for dependency injection and object creation
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Atmosphere is using async support: org.atmosphere.container.JSR356AsyncSupport running under container: Apache Tomcat/10.1.44 using jakarta.servlet/3.0 and jsr356/WebSocket API
+2025-08-25 16:39:40 [restartedMain] INFO  o.atmosphere.cpr.AtmosphereFramework - Atmosphere Framework 3.0.5.slf4jvaadin1 started.
+2025-08-25 16:39:40 [restartedMain] INFO  c.v.f.s.DefaultDeploymentConfiguration - 
+Vaadin is running in DEVELOPMENT mode - do not use for production deployments.
+2025-08-25 16:39:40 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2025-08-25 16:39:40 [restartedMain] INFO  b.d.r.B.B3DataManagerApplication - Started B3DataManagerApplication in 17.835 seconds (process running for 18.506)
+2025-08-25 16:39:43 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-08-25 16:39:43 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-08-25 16:39:43 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2025-08-25 16:39:44 [vaadin-dev-server-1] INFO  NodeInstaller - Local node installation successful.
+2025-08-25 16:39:46 [vaadin-dev-server-1] INFO  c.v.f.s.frontend.TaskUpdatePackages - using 'C:\Users\Rodrigo\.vaadin\node\node.exe C:\Users\Rodrigo\.vaadin\node\node_modules\npm\bin\npm-cli.js --no-update-notifier --no-audit --scripts-prepend-node-path=true --ignore-scripts install' for frontend package installation
+2025-08-25 16:41:27 [vaadin-dev-server-1] INFO  c.v.f.s.frontend.TaskUpdatePackages - Frontend dependencies resolved successfully.
+2025-08-25 16:41:28 [vaadin-dev-server-1] INFO  c.v.f.s.f.TaskCopyFrontendFiles - Copying frontend resources from jar files ...
+2025-08-25 16:41:28 [vaadin-dev-server-1] INFO  c.v.f.s.f.TaskCopyLocalFrontendFiles - Copied 1 local frontend files. Took 67 ms.
+2025-08-25 16:41:28 [vaadin-dev-server-1] INFO  c.v.f.s.f.TaskCopyLocalFrontendFiles - Copied 1 local frontend files. Took 84 ms.
+2025-08-25 16:41:28 [vaadin-dev-server-1] INFO  c.v.f.s.f.TaskCopyFrontendFiles - Visited 20 resources. Took 248 ms.
+2025-08-25 16:41:29 [vaadin-dev-server-1] INFO  c.v.f.s.f.TaskRunDevBundleBuild - Creating a new development mode bundle. This can take a while but will only run when the project setup is changed, addons are added or frontend files are modified
+2025-08-25 16:42:00 [vaadin-dev-server-1] INFO  c.v.f.s.f.TaskRunDevBundleBuild - Development frontend bundle built
+2025-08-25 16:42:02 [vaadin-dev-server-2] INFO  c.v.b.d.DevModeHandlerManagerImpl - Application running at http://localhost:8080/
+2025-08-25 16:42:12 [http-nio-8080-exec-10] INFO  b.d.r.B.p.v.f.GridwithFiltersFiiView - Atualizando grid com 25 itens por página na página 1
+2025-08-25 16:42:12 [http-nio-8080-exec-10] DEBUG b.d.r.B.a.security.SecurityService - Authentication encontrado: UsernamePasswordAuthenticationToken [Principal=br.dev.rodrigopinheiro.B3DataManager.application.security.CustomUserDetails@6b2f7a7e, Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=127.0.0.1, SessionId=293595473437E6CAE48430577FA4AD96], Granted Authorities=[br.dev.rodrigopinheiro.B3DataManager.application.security.CustomUserDetails$$Lambda/0x0000025828d77d28@65896598]]
+2025-08-25 16:42:12 [http-nio-8080-exec-10] DEBUG b.d.r.B.a.security.SecurityService - Principal encontrado: br.dev.rodrigopinheiro.B3DataManager.application.security.CustomUserDetails@6b2f7a7e
+2025-08-25 16:42:12 [http-nio-8080-exec-10] INFO  b.d.r.B.a.security.SecurityService - ID do usuário autenticado recuperado com sucesso: 1
+2025-08-25 16:42:12 [http-nio-8080-exec-10] INFO  b.d.r.B.a.s.RendaVariavelService - Contando FIIs com filtros: tipo=FII, nome=, startDate=null, endDate=null, precoMedioMin=null, precoMedioMax=null, usuarioId=1
+2025-08-25 16:42:12 [http-nio-8080-exec-10] INFO  b.d.r.B.a.s.RendaVariavelService - Aplicando filtros para FIIs: tipo=FII, nome=, startDate=null, endDate=null, precoMedioMin=null, precoMedioMax=null, usuarioId=1
+2025-08-25 16:42:13 [http-nio-8080-exec-10] WARN  b.d.r.B.p.v.f.GridwithFiltersFiiView - pageIndicator está nulo. O indicador de página não será atualizado.
+2025-08-25 16:42:13 [ForkJoinPool.commonPool-worker-1] INFO  b.d.r.B.i.api.AbstractApiClient - Iniciando chamada à API para os tickers: [GARE11, LVBI11, BTLG11, MXRF11, RBVA11, VRTA11, ALZR11, XPML11]
+2025-08-25 16:42:13 [ForkJoinPool.commonPool-worker-1] INFO  b.d.r.B.i.api.AbstractApiClient - Enviando requisição para a API em http://192.168.22.245:5322/fetch_market_price
+2025-08-25 16:42:13 [http-nio-8080-exec-10] INFO  b.d.r.B.p.v.f.GridwithFiltersFiiView - GridwithFiltersFiiView inicializado com locale: pt_BR
+2025-08-25 16:42:13 [ForkJoinPool.commonPool-worker-1] DEBUG b.d.r.B.i.c.InfrastructureConfig - Adicionando Authorization Token: TQXPjrLd8xkQHm66ioF4EL8dWw
+2025-08-25 16:42:13 [ForkJoinPool.commonPool-worker-1] DEBUG b.d.r.B.i.c.InfrastructureConfig - Request URI: http://192.168.22.245:5322/fetch_market_price
+2025-08-25 16:42:13 [ForkJoinPool.commonPool-worker-1] DEBUG b.d.r.B.i.c.InfrastructureConfig - Request Headers: [Accept:"text/plain, application/json, application/yaml, application/*+json, */*", Content-Type:"application/json", Content-Length:"85", Authorization:"TQXPjrLd8xkQHm66ioF4EL8dWw"]
+2025-08-25 16:42:15 [http-nio-8080-exec-6] INFO  b.d.r.B.p.v.a.GridwithFiltersAcoesView - GridwithFiltersAcoesView inicializado com locale: pt_BR
+2025-08-25 16:42:15 [http-nio-8080-exec-6] INFO  b.d.r.B.p.v.a.GridwithFiltersAcoesView - Atualizando grid de Ações com 50 itens por página na página 1
+2025-08-25 16:42:15 [http-nio-8080-exec-6] DEBUG b.d.r.B.a.security.SecurityService - Authentication encontrado: UsernamePasswordAuthenticationToken [Principal=br.dev.rodrigopinheiro.B3DataManager.application.security.CustomUserDetails@6b2f7a7e, Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=127.0.0.1, SessionId=293595473437E6CAE48430577FA4AD96], Granted Authorities=[br.dev.rodrigopinheiro.B3DataManager.application.security.CustomUserDetails$$Lambda/0x0000025828d77d28@65896598]]
+2025-08-25 16:42:15 [http-nio-8080-exec-6] DEBUG b.d.r.B.a.security.SecurityService - Principal encontrado: br.dev.rodrigopinheiro.B3DataManager.application.security.CustomUserDetails@6b2f7a7e
+2025-08-25 16:42:15 [http-nio-8080-exec-6] INFO  b.d.r.B.a.security.SecurityService - ID do usuário autenticado recuperado com sucesso: 1
+2025-08-25 16:42:15 [http-nio-8080-exec-6] INFO  b.d.r.B.a.s.RendaVariavelService - Contando com filtros (IN): tipos=[ACAO_ON, ACAO_PN, ACAO_UNIT, ETF], nome=, datas=null->null, preços=null->null, user=1
+2025-08-25 16:42:15 [http-nio-8080-exec-6] INFO  b.d.r.B.a.s.RendaVariavelService - Aplicando filtros (IN) para tipos=[ACAO_ON, ACAO_PN, ACAO_UNIT, ETF]
+2025-08-25 16:42:15 [ForkJoinPool.commonPool-worker-2] INFO  b.d.r.B.i.api.AbstractApiClient - Iniciando chamada à API para os tickers: [BPAC11, EGIE3, BBSE3, SAPR4, JHSF3, BBDC3, ITSA4, SAPR11, BBAS3, ITUB3]
+2025-08-25 16:42:15 [ForkJoinPool.commonPool-worker-2] INFO  b.d.r.B.i.api.AbstractApiClient - Enviando requisição para a API em http://192.168.22.245:5322/fetch_market_price
+2025-08-25 16:42:15 [ForkJoinPool.commonPool-worker-2] DEBUG b.d.r.B.i.c.InfrastructureConfig - Adicionando Authorization Token: TQXPjrLd8xkQHm66ioF4EL8dWw
+2025-08-25 16:42:15 [ForkJoinPool.commonPool-worker-2] DEBUG b.d.r.B.i.c.InfrastructureConfig - Request URI: http://192.168.22.245:5322/fetch_market_price
+2025-08-25 16:42:15 [ForkJoinPool.commonPool-worker-2] DEBUG b.d.r.B.i.c.InfrastructureConfig - Request Headers: [Accept:"text/plain, application/json, application/yaml, application/*+json, */*", Content-Type:"application/json", Content-Length:"95", Authorization:"TQXPjrLd8xkQHm66ioF4EL8dWw"]
+2025-08-25 16:42:17 [http-nio-8080-exec-4] INFO  b.d.r.B.p.v.f.GridwithFiltersFiiView - Atualizando grid com 25 itens por página na página 1
+2025-08-25 16:42:17 [http-nio-8080-exec-4] DEBUG b.d.r.B.a.security.SecurityService - Authentication encontrado: UsernamePasswordAuthenticationToken [Principal=br.dev.rodrigopinheiro.B3DataManager.application.security.CustomUserDetails@6b2f7a7e, Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=127.0.0.1, SessionId=293595473437E6CAE48430577FA4AD96], Granted Authorities=[br.dev.rodrigopinheiro.B3DataManager.application.security.CustomUserDetails$$Lambda/0x0000025828d77d28@65896598]]
+2025-08-25 16:42:17 [http-nio-8080-exec-4] DEBUG b.d.r.B.a.security.SecurityService - Principal encontrado: br.dev.rodrigopinheiro.B3DataManager.application.security.CustomUserDetails@6b2f7a7e
+2025-08-25 16:42:17 [http-nio-8080-exec-4] INFO  b.d.r.B.a.security.SecurityService - ID do usuário autenticado recuperado com sucesso: 1
+2025-08-25 16:42:17 [http-nio-8080-exec-4] INFO  b.d.r.B.a.s.RendaVariavelService - Contando FIIs com filtros: tipo=FII, nome=, startDate=null, endDate=null, precoMedioMin=null, precoMedioMax=null, usuarioId=1
+2025-08-25 16:42:17 [http-nio-8080-exec-4] INFO  b.d.r.B.a.s.RendaVariavelService - Aplicando filtros para FIIs: tipo=FII, nome=, startDate=null, endDate=null, precoMedioMin=null, precoMedioMax=null, usuarioId=1
+2025-08-25 16:42:17 [http-nio-8080-exec-4] WARN  b.d.r.B.p.v.f.GridwithFiltersFiiView - pageIndicator está nulo. O indicador de página não será atualizado.
+2025-08-25 16:42:17 [ForkJoinPool.commonPool-worker-3] INFO  b.d.r.B.i.api.AbstractApiClient - Iniciando chamada à API para os tickers: [GARE11, LVBI11, BTLG11, MXRF11, RBVA11, VRTA11, ALZR11, XPML11]
+2025-08-25 16:42:17 [ForkJoinPool.commonPool-worker-3] INFO  b.d.r.B.i.api.AbstractApiClient - Enviando requisição para a API em http://192.168.22.245:5322/fetch_market_price
+2025-08-25 16:42:17 [ForkJoinPool.commonPool-worker-3] DEBUG b.d.r.B.i.c.InfrastructureConfig - Adicionando Authorization Token: TQXPjrLd8xkQHm66ioF4EL8dWw
+2025-08-25 16:42:17 [ForkJoinPool.commonPool-worker-3] DEBUG b.d.r.B.i.c.InfrastructureConfig - Request URI: http://192.168.22.245:5322/fetch_market_price
+2025-08-25 16:42:17 [ForkJoinPool.commonPool-worker-3] DEBUG b.d.r.B.i.c.InfrastructureConfig - Request Headers: [Accept:"text/plain, application/json, application/yaml, application/*+json, */*", Content-Type:"application/json", Content-Length:"85", Authorization:"TQXPjrLd8xkQHm66ioF4EL8dWw"]
+2025-08-25 16:42:17 [http-nio-8080-exec-4] INFO  b.d.r.B.p.v.f.GridwithFiltersFiiView - GridwithFiltersFiiView inicializado com locale: pt_BR
+2025-08-25 16:42:30 [ForkJoinPool.commonPool-worker-2] DEBUG b.d.r.B.i.api.AbstractApiClient - Resposta recebida da API: [{"price":43.15,"ticker":"BPAC11.SA"},{"price":39.19,"ticker":"EGIE3.SA"},{"price":32.08,"ticker":"BBSE3.SA"},{"price":6.47,"ticker":"SAPR4.SA"},{"price":5.5,"ticker":"JHSF3.SA"},{"price":13.98,"ticker":"BBDC3.SA"},{"price":10.97,"ticker":"ITSA4.SA"},{"price":33.68,"ticker":"SAPR11.SA"},{"price":20.08,"ticker":"BBAS3.SA"},{"price":33.12,"ticker":"ITUB3.SA"}]
+
+2025-08-25 16:42:30 [ForkJoinPool.commonPool-worker-2] INFO  b.d.r.B.i.api.AbstractApiClient - Processamento concluído. Total de itens processados: 10
+2025-08-25 16:42:30 [ForkJoinPool.commonPool-worker-1] DEBUG b.d.r.B.i.api.AbstractApiClient - Resposta recebida da API: [{"error":"No valid data found","ticker":"GARE11.SA"},{"error":"No valid data found","ticker":"LVBI11.SA"},{"error":"No valid data found","ticker":"BTLG11.SA"},{"error":"No valid data found","ticker":"MXRF11.SA"},{"error":"No valid data found","ticker":"RBVA11.SA"},{"error":"No valid data found","ticker":"VRTA11.SA"},{"error":"No valid data found","ticker":"ALZR11.SA"},{"error":"No valid data found","ticker":"XPML11.SA"}]
+
+2025-08-25 16:42:30 [ForkJoinPool.commonPool-worker-2] INFO  b.d.r.B.a.s.RendaVariavelService - Preços de ações atualizados via API.
+2025-08-25 16:42:30 [ForkJoinPool.commonPool-worker-1] INFO  b.d.r.B.i.api.AbstractApiClient - Processamento concluído. Total de itens processados: 8
+2025-08-25 16:42:30 [ForkJoinPool.commonPool-worker-1] INFO  b.d.r.B.a.s.RendaVariavelService - Dados retornados
+2025-08-25 16:42:34 [ForkJoinPool.commonPool-worker-3] DEBUG b.d.r.B.i.api.AbstractApiClient - Resposta recebida da API: [{"error":"No valid data found","ticker":"GARE11.SA"},{"error":"No valid data found","ticker":"LVBI11.SA"},{"error":"No valid data found","ticker":"BTLG11.SA"},{"error":"No valid data found","ticker":"MXRF11.SA"},{"error":"No valid data found","ticker":"RBVA11.SA"},{"error":"No valid data found","ticker":"VRTA11.SA"},{"error":"No valid data found","ticker":"ALZR11.SA"},{"error":"No valid data found","ticker":"XPML11.SA"}]
+
+2025-08-25 16:42:34 [ForkJoinPool.commonPool-worker-3] INFO  b.d.r.B.i.api.AbstractApiClient - Processamento concluído. Total de itens processados: 8
+2025-08-25 16:42:34 [ForkJoinPool.commonPool-worker-3] INFO  b.d.r.B.a.s.RendaVariavelService - Dados retornados
+2025-08-25 16:42:34 [ForkJoinPool.commonPool-worker-3] INFO  b.d.r.B.p.v.f.GridwithFiltersFiiView - Preços atualizados via API, recarregando Grid...
+2025-08-25 16:44:34 [http-nio-8080-exec-9] INFO  b.d.r.B.p.v.f.GridwithFiltersFiiView - Atualizando grid com 25 itens por página na página 1
+2025-08-25 16:44:34 [http-nio-8080-exec-9] DEBUG b.d.r.B.a.security.SecurityService - Authentication encontrado: UsernamePasswordAuthenticationToken [Principal=br.dev.rodrigopinheiro.B3DataManager.application.security.CustomUserDetails@6b2f7a7e, Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=127.0.0.1, SessionId=293595473437E6CAE48430577FA4AD96], Granted Authorities=[br.dev.rodrigopinheiro.B3DataManager.application.security.CustomUserDetails$$Lambda/0x0000025828d77d28@65896598]]
+2025-08-25 16:44:34 [http-nio-8080-exec-9] DEBUG b.d.r.B.a.security.SecurityService - Principal encontrado: br.dev.rodrigopinheiro.B3DataManager.application.security.CustomUserDetails@6b2f7a7e
+2025-08-25 16:44:34 [http-nio-8080-exec-9] INFO  b.d.r.B.a.security.SecurityService - ID do usuário autenticado recuperado com sucesso: 1
+2025-08-25 16:44:34 [http-nio-8080-exec-9] INFO  b.d.r.B.a.s.RendaVariavelService - Contando FIIs com filtros: tipo=FII, nome=, startDate=null, endDate=null, precoMedioMin=null, precoMedioMax=null, usuarioId=1
+2025-08-25 16:44:34 [http-nio-8080-exec-9] INFO  b.d.r.B.a.s.RendaVariavelService - Aplicando filtros para FIIs: tipo=FII, nome=, startDate=null, endDate=null, precoMedioMin=null, precoMedioMax=null, usuarioId=1
+2025-08-25 16:44:35 [http-nio-8080-exec-9] WARN  b.d.r.B.p.v.f.GridwithFiltersFiiView - pageIndicator está nulo. O indicador de página não será atualizado.
+2025-08-25 16:44:35 [ForkJoinPool.commonPool-worker-2] INFO  b.d.r.B.i.api.AbstractApiClient - Iniciando chamada à API para os tickers: [GARE11, LVBI11, BTLG11, MXRF11, RBVA11, VRTA11, ALZR11, XPML11]
+2025-08-25 16:44:35 [ForkJoinPool.commonPool-worker-2] INFO  b.d.r.B.i.api.AbstractApiClient - Enviando requisição para a API em http://192.168.22.245:5322/fetch_market_price
+2025-08-25 16:44:35 [ForkJoinPool.commonPool-worker-2] DEBUG b.d.r.B.i.c.InfrastructureConfig - Adicionando Authorization Token: TQXPjrLd8xkQHm66ioF4EL8dWw
+2025-08-25 16:44:35 [ForkJoinPool.commonPool-worker-2] DEBUG b.d.r.B.i.c.InfrastructureConfig - Request URI: http://192.168.22.245:5322/fetch_market_price
+2025-08-25 16:44:35 [ForkJoinPool.commonPool-worker-2] DEBUG b.d.r.B.i.c.InfrastructureConfig - Request Headers: [Accept:"text/plain, application/json, application/yaml, application/*+json, */*", Content-Type:"application/json", Content-Length:"85", Authorization:"TQXPjrLd8xkQHm66ioF4EL8dWw"]
+2025-08-25 16:44:35 [http-nio-8080-exec-9] INFO  b.d.r.B.p.v.f.GridwithFiltersFiiView - GridwithFiltersFiiView inicializado com locale: pt_BR
+2025-08-25 16:44:35 [http-nio-8080-exec-10] INFO  b.d.r.B.p.v.a.GridwithFiltersAcoesView - GridwithFiltersAcoesView inicializado com locale: pt_BR
+2025-08-25 16:44:35 [http-nio-8080-exec-10] INFO  b.d.r.B.p.v.a.GridwithFiltersAcoesView - Atualizando grid de Ações com 50 itens por página na página 1
+2025-08-25 16:44:35 [http-nio-8080-exec-10] DEBUG b.d.r.B.a.security.SecurityService - Authentication encontrado: UsernamePasswordAuthenticationToken [Principal=br.dev.rodrigopinheiro.B3DataManager.application.security.CustomUserDetails@6b2f7a7e, Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=127.0.0.1, SessionId=293595473437E6CAE48430577FA4AD96], Granted Authorities=[br.dev.rodrigopinheiro.B3DataManager.application.security.CustomUserDetails$$Lambda/0x0000025828d77d28@65896598]]
+2025-08-25 16:44:35 [http-nio-8080-exec-10] DEBUG b.d.r.B.a.security.SecurityService - Principal encontrado: br.dev.rodrigopinheiro.B3DataManager.application.security.CustomUserDetails@6b2f7a7e
+2025-08-25 16:44:35 [http-nio-8080-exec-10] INFO  b.d.r.B.a.security.SecurityService - ID do usuário autenticado recuperado com sucesso: 1
+2025-08-25 16:44:35 [http-nio-8080-exec-10] INFO  b.d.r.B.a.s.RendaVariavelService - Contando com filtros (IN): tipos=[ACAO_ON, ACAO_PN, ACAO_UNIT, ETF], nome=, datas=null->null, preços=null->null, user=1
+2025-08-25 16:44:35 [http-nio-8080-exec-10] INFO  b.d.r.B.a.s.RendaVariavelService - Aplicando filtros (IN) para tipos=[ACAO_ON, ACAO_PN, ACAO_UNIT, ETF]
+2025-08-25 16:44:35 [ForkJoinPool.commonPool-worker-4] INFO  b.d.r.B.i.api.AbstractApiClient - Iniciando chamada à API para os tickers: [BPAC11, EGIE3, BBSE3, SAPR4, JHSF3, BBDC3, ITSA4, SAPR11, BBAS3, ITUB3]
+2025-08-25 16:44:35 [ForkJoinPool.commonPool-worker-4] INFO  b.d.r.B.i.api.AbstractApiClient - Enviando requisição para a API em http://192.168.22.245:5322/fetch_market_price
+2025-08-25 16:44:35 [ForkJoinPool.commonPool-worker-4] DEBUG b.d.r.B.i.c.InfrastructureConfig - Adicionando Authorization Token: TQXPjrLd8xkQHm66ioF4EL8dWw
+2025-08-25 16:44:35 [ForkJoinPool.commonPool-worker-4] DEBUG b.d.r.B.i.c.InfrastructureConfig - Request URI: http://192.168.22.245:5322/fetch_market_price
+2025-08-25 16:44:35 [ForkJoinPool.commonPool-worker-4] DEBUG b.d.r.B.i.c.InfrastructureConfig - Request Headers: [Accept:"text/plain, application/json, application/yaml, application/*+json, */*", Content-Type:"application/json", Content-Length:"95", Authorization:"TQXPjrLd8xkQHm66ioF4EL8dWw"]
+2025-08-25 16:44:35 [ForkJoinPool.commonPool-worker-4] DEBUG b.d.r.B.i.api.AbstractApiClient - Resposta recebida da API: [{"price":43.15,"ticker":"BPAC11.SA"},{"price":39.19,"ticker":"EGIE3.SA"},{"price":32.08,"ticker":"BBSE3.SA"},{"price":6.47,"ticker":"SAPR4.SA"},{"price":5.5,"ticker":"JHSF3.SA"},{"price":13.98,"ticker":"BBDC3.SA"},{"price":10.97,"ticker":"ITSA4.SA"},{"price":33.68,"ticker":"SAPR11.SA"},{"price":20.08,"ticker":"BBAS3.SA"},{"price":33.12,"ticker":"ITUB3.SA"}]
+
+2025-08-25 16:44:35 [ForkJoinPool.commonPool-worker-4] INFO  b.d.r.B.i.api.AbstractApiClient - Processamento concluído. Total de itens processados: 10
+2025-08-25 16:44:35 [ForkJoinPool.commonPool-worker-4] INFO  b.d.r.B.a.s.RendaVariavelService - Preços de ações atualizados via API.
+2025-08-25 16:44:35 [ForkJoinPool.commonPool-worker-4] INFO  b.d.r.B.p.v.a.GridwithFiltersAcoesView - Preços de ações atualizados via API, recarregando Grid...
+2025-08-25 16:44:36 [http-nio-8080-exec-1] INFO  b.d.r.B.p.v.i.ImportXlsxView - Iniciando configuração da interface de upload.
+2025-08-25 16:44:37 [http-nio-8080-exec-4] INFO  b.d.r.B.a.service.OperacaoService - Contando operações com filtros: entradaSaida=null, startDate=null, endDate=null, movimentacao=, produto=, instituicao=, duplicado=null, dimensionado=null
+2025-08-25 16:44:37 [http-nio-8080-exec-4] INFO  b.d.r.B.a.service.OperacaoService - Aplicando filtros: entradaSaida=null, startDate=null, endDate=null, movimentacao=, produto=, instituicao=, duplicado=null, dimensionado=null
+2025-08-25 16:44:37 [http-nio-8080-exec-4] WARN  b.d.r.B.p.view.operacao.OperacaoView - pageIndicator está nulo. O indicador de página não será atualizado.
+2025-08-25 16:44:37 [http-nio-8080-exec-4] INFO  b.d.r.B.a.service.OperacaoService - Contando operações com filtros: entradaSaida=null, startDate=null, endDate=null, movimentacao=, produto=, instituicao=, duplicado=null, dimensionado=null
+2025-08-25 16:44:37 [http-nio-8080-exec-4] INFO  b.d.r.B.a.service.OperacaoService - Aplicando filtros: entradaSaida=null, startDate=null, endDate=null, movimentacao=, produto=, instituicao=, duplicado=null, dimensionado=null
+2025-08-25 16:44:37 [http-nio-8080-exec-4] INFO  b.d.r.B.p.view.operacao.OperacaoView - Título da página configurado como: Operações | B3 Data Manager
+2025-08-25 16:44:41 [http-nio-8080-exec-7] INFO  b.d.r.B.a.service.OperacaoService - Contando operações com filtros: entradaSaida=null, startDate=null, endDate=null, movimentacao=, produto=, instituicao=, duplicado=null, dimensionado=null
+2025-08-25 16:44:41 [http-nio-8080-exec-7] INFO  b.d.r.B.a.service.OperacaoService - Aplicando filtros: entradaSaida=null, startDate=null, endDate=null, movimentacao=, produto=, instituicao=, duplicado=null, dimensionado=null
+2025-08-25 16:44:41 [http-nio-8080-exec-7] WARN  b.d.r.B.p.view.operacao.OperacaoView - pageIndicator está nulo. O indicador de página não será atualizado.
+2025-08-25 16:44:41 [http-nio-8080-exec-7] INFO  b.d.r.B.a.service.OperacaoService - Contando operações com filtros: entradaSaida=null, startDate=null, endDate=null, movimentacao=, produto=, instituicao=, duplicado=null, dimensionado=null
+2025-08-25 16:44:41 [http-nio-8080-exec-7] INFO  b.d.r.B.a.service.OperacaoService - Aplicando filtros: entradaSaida=null, startDate=null, endDate=null, movimentacao=, produto=, instituicao=, duplicado=null, dimensionado=null
+2025-08-25 16:44:41 [http-nio-8080-exec-7] INFO  b.d.r.B.p.view.operacao.OperacaoView - Título da página configurado como: Operações | B3 Data Manager
+2025-08-25 16:44:49 [ForkJoinPool.commonPool-worker-2] DEBUG b.d.r.B.i.api.AbstractApiClient - Resposta recebida da API: [{"price":9.07,"ticker":"GARE11.SA"},{"price":101.31,"ticker":"LVBI11.SA"},{"price":99.15,"ticker":"BTLG11.SA"},{"price":9.51,"ticker":"MXRF11.SA"},{"price":8.45,"ticker":"RBVA11.SA"},{"price":75.65,"ticker":"VRTA11.SA"},{"price":9.99,"ticker":"ALZR11.SA"},{"price":98.72,"ticker":"XPML11.SA"}]
+
+2025-08-25 16:44:49 [ForkJoinPool.commonPool-worker-2] INFO  b.d.r.B.i.api.AbstractApiClient - Processamento concluído. Total de itens processados: 8
+2025-08-25 16:44:49 [ForkJoinPool.commonPool-worker-2] INFO  b.d.r.B.a.s.RendaVariavelService - Dados retornados

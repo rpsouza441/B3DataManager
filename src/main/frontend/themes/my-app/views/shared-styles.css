@@ -1,0 +1,190 @@
+.project-title {
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center;
+    color: transparent;
+    background: linear-gradient(90deg, #4caf50, #2196f3);
+    -webkit-background-clip: text;
+    background-clip: text;
+    margin-bottom: 24px;
+}
+/* Estilos globais e de layout */
+.centered-container {
+    width: 100%;
+    text-align: center;
+    margin-top: 24px;
+    margin-bottom: 16px;
+}
+
+.error-notification {
+    color: var(--lumo-error-text-color);
+    background-color: var(--lumo-error-color-10);
+    padding: 8px;
+    border-radius: 5px;
+    text-align: center;
+    margin: 8px 0;
+    display: none; /* Escondido inicialmente */
+}
+
+.form-container {
+    width: 90%;
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: var(--view-background-color);
+
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+
+/* Contêiner interno do formulário */
+.inner-form-container {
+    width: 100%; /* Ocupa toda a largura disponível no contêiner externo */
+    max-width: 400px; /* Limita a largura máxima */
+    padding: 16px; /* Espaçamento interno */
+    box-sizing: border-box; /* Inclui padding e borda no cálculo do tamanho */
+    display: flex;
+    flex-direction: column; /* Organiza os elementos verticalmente */
+    gap: 0px; /* Espaçamento vertical entre os elementos (diminuiu de 16px para 8px) */
+}
+
+
+/* Estilos para título e subtítulo */
+.main-title {
+    font-size: 24px;
+    color: var(--text-color);
+    font-weight: bold;
+}
+
+.sub-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--text-color);
+    margin-bottom: 8px;
+    text-align: left;
+    display: block;
+}
+
+/* Estilos para força da senha */
+.strength-container {
+    margin-bottom: 16px;
+}
+
+.strength-label {
+    color: var(--text-color);
+}
+
+/* Estilos do botão de registro */
+.register-button {
+    background-color: var(--primary-color);
+    color: var(--button-text-color);
+    width: 100%;
+}
+/* Estilos do botão de registro quando está desativado */
+.register-button[disabled] {
+    background-color: --lumo-contrast-70pct; /* cinza claro */
+    color: --lumo-contrast-5pct; /* cinza escuro */
+    cursor: not-allowed; /* Indica que o botão está desativado */
+}
+
+
+/* Estilos do link para login */
+.login-redirect {
+    margin-top: 16px;
+    text-align: center;
+}
+
+.register-login-link {
+    color: var(--primary-color);
+}
+
+/* Estilos para notificações inline */
+.inline-notification-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #de450c;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.inline-notification-message {
+    font-size: 14px;
+    color: #b71c1c;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.inline-notification-container {
+    display: block;
+    background-color: #ffebee;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+    line-height: 1.5;
+}
+/* Estilos para a tela de login */
+
+.login-view {
+    background-color: var(--view-background-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+}
+
+
+.form-container {
+    width: 90%;
+    max-width: 400px;
+    margin: 0 auto;
+    background-color: var(--view-background-color);
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.form-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-color);
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.link-container {
+    text-align: center;
+    margin-top: 16px;
+}
+
+.register-link {
+    color: var(--primary-color);
+    font-weight: bold;
+    text-decoration: none;
+    margin-top: 16px;
+}
+
+.register-link:hover {
+    text-decoration: underline;
+}
+
+/* Garante que os inputs ocupem toda a largura do contêiner */
+vaadin-login-form-wrapper vaadin-text-field,
+vaadin-login-form-wrapper vaadin-password-field {
+    background: transparent; /* Remove o fundo */
+    width: 100%; /* Ocupa 100% da largura do contêiner */
+    box-sizing: border-box; /* Inclui padding e bordas no cálculo da largura */
+}
+
+/* Para garantir que o contêiner externo também expanda */
+vaadin-login-form-wrapper {
+    background: transparent; /* Remove o fundo */
+
+    width: 100%; /* Garante que o wrapper ocupe toda a largura */
+    max-width: 400px; /* Define um limite opcional */
+    padding: 0; /* Remove qualquer padding */
+    box-sizing: border-box; /* Evita que bordas/padding causem overflow */
+}

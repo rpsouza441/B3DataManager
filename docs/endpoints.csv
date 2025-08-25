@@ -1,0 +1,16 @@
+metodo;path;auth;handler;observacoes
+GET;/;REQUIRED;DashboardView;Dashboard principal - requer autenticacao
+GET;/login;ANONYMOUS;LoginView;Pagina de login - acesso anonimo
+GET;/register;ANONYMOUS;RegisterView;Registro de usuarios - acesso anonimo
+GET;/acoes;REQUIRED;GridwithFiltersAcoesView;Listagem de acoes - requer autenticacao
+GET;/fii;REQUIRED;GridwithFiltersFiiView;Listagem de FIIs - requer autenticacao
+GET;/operacoes;REQUIRED;OperacaoView;Listagem de operacoes - requer autenticacao
+GET;/importar;REQUIRED;ImportXlsxView;Importacao de arquivos Excel - requer autenticacao
+GET;/person-form;REQUIRED;PersonFormView;Formulario de pessoa - requer autenticacao
+GET;/images/*.png;ANONYMOUS;StaticResource;Recursos estaticos de imagem - acesso publico
+GET;/line-awesome/svg/*.svg;ANONYMOUS;StaticResource;Icones SVG - acesso publico
+GET;/@fontsource/roboto-condensed/*.css;ANONYMOUS;StaticResource;Fontes CSS - acesso publico
+POST;/api/external/market-price;INTERNAL;ApiMarketPriceClient;Chamada API externa para precos - uso interno
+POST;/api/external/stock-info;INTERNAL;ApiStockInfoClient;Chamada API externa para info acoes - uso interno
+POST;/api/external/asset-classification;INTERNAL;ApiClassifyAssetClient;Chamada API externa para classificacao - uso interno
+ALL;/*;VAADIN;VaadinSecurity;Rotas Vaadin gerenciadas pelo framework

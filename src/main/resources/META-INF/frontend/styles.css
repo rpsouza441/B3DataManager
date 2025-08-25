@@ -1,0 +1,33 @@
+:root {
+    /* Paleta de cores padrão (tema claro) */
+    --lumo-primary-color: #219EBC; /* Azul vibrante */
+    --lumo-primary-text-color: #FFFFFF; /* Texto sobre cor primária */
+    --lumo-secondary-color: #8ECAE6; /* Azul claro */
+    --lumo-secondary-text-color: #023047; /* Texto sobre secundária */
+    --lumo-error-color: #FB8500; /* Laranja brilhante */
+    --lumo-error-text-color: #FFFFFF; /* Texto sobre erro */
+    --lumo-success-color: #FFB703; /* Amarelo quente */
+    --lumo-success-text-color: #023047; /* Texto sobre sucesso */
+    --lumo-base-color: #EAF4F9; /* Fundo geral */
+    --lumo-body-text-color: #023047; /* Texto principal */
+    --lumo-border-color: #B0E0E6; /* Azul pálido */
+    --lumo-disabled-text-color: #8C9EA3; /* Cinza azulado */
+    --lumo-disabled-color: #E0F7FA; /* Fundo desabilitado */
+}
+
+/* Tema escuro */
+.dark-theme {
+    --lumo-primary-color: #FB8500; /* Laranja vibrante */
+    --lumo-primary-text-color: #000000; /* Texto escuro */
+    --lumo-secondary-color: #FFB703; /* Amarelo brilhante */
+    --lumo-secondary-text-color: #FFFFFF; /* Texto claro */
+    --lumo-error-color: #D32F2F; /* Vermelho escuro */
+    --lumo-error-text-color: #FFFFFF; /* Texto claro */
+    --lumo-success-color: #00C853; /* Verde brilhante */
+    --lumo-success-text-color: #FFFFFF; /* Texto claro */
+    --lumo-base-color: #121212; /* Fundo escuro */
+    --lumo-body-text-color: #E0E0E0; /* Texto claro */
+    --lumo-border-color: #424242; /* Cinza escuro */
+    --lumo-disabled-text-color: #757575; /* Cinza médio */
+    --lumo-disabled-color: #2C2C2C; /* Fundo desabilitado escuro */
+}

@@ -1,0 +1,55 @@
+.import-xlsx-view .form-container {
+    width: 60%; /* Ajusta o tamanho do container externo */
+    max-width: 600px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--lumo-base-color); /* Fundo claro */
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.import-xlsx-view vaadin-upload {
+    width: 80%; /* Ocupa 80% do div externo */
+}
+
+.import-xlsx-view .download-error-button {
+    display: block;
+    margin: 16px auto;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    background-color: var(--lumo-contrast-10pct);
+    color: var(--lumo-disabled-text-color);
+    cursor: not-allowed; /* Aparência desabilitada */
+}
+
+.import-xlsx-view .download-error-button[enabled="true"] {
+    background-color: var(--lumo-primary-color);
+    color: var(--lumo-primary-contrast-color);
+    cursor: pointer; /* Aparência clicável */
+}
+
+.import-xlsx-view .download-error-link {
+    display: block;
+    margin: 16px auto;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    background-color: var(--lumo-primary-color);
+    color: var(--lumo-primary-contrast-color);
+    text-decoration: none; /* Remove o sublinhado */
+    cursor: pointer;
+}
+
+.import-xlsx-view .download-error-link:hover {
+    background-color: var(--lumo-primary-color-10pct);
+}
+

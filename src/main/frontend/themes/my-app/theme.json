@@ -1,0 +1,9 @@
+{
+  "lumoImports" : [ "typography", "color", "spacing", "badge", "utility" ],
+  "assets" : {
+    "@fontsource/roboto-condensed" : {
+      "*.css" : "@fontsource/roboto-condensed",
+      "files/*" : "@fontsource/roboto-condensed/files"
+    }
+  }
+}
