@@ -2,7 +2,6 @@ package br.dev.rodrigopinheiro.B3DataManager.domain.entity;
 
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroVariavel;
 import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;

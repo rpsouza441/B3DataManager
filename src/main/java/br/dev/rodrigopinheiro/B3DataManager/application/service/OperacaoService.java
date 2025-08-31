@@ -1,15 +1,10 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.service;
 
-import br.dev.rodrigopinheiro.B3DataManager.application.persistence.AggregatePersistenceService;
 import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Operacao;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Portfolio;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Transacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Usuario;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.excel.InvalidDataException;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.operacao.OperacaoNotFoundException;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.operacao.InvalidFilterException;
-import br.dev.rodrigopinheiro.B3DataManager.domain.service.PortfolioSaldoService;
-import br.dev.rodrigopinheiro.B3DataManager.domain.service.TransacaoFactory;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.OperacaoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -17,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -35,18 +29,16 @@ public class OperacaoService {
     private final  UsuarioService usuarioService;
 
     private final TransacaoService transacaoService;
-    private final AtivoFinanceiroService ativoFinanceiroService;
 
 
     public OperacaoService(OperacaoRepository operacaoRepository,
                            MessageSource messageSource,
                            UsuarioService usuarioService,
-                           TransacaoService transacaoService, AtivoFinanceiroService ativoFinanceiroService) {
+                           TransacaoService transacaoService) {
         this.operacaoRepository = operacaoRepository;
         this.messageSource = messageSource;
         this.usuarioService = usuarioService;
         this.transacaoService = transacaoService;
-        this.ativoFinanceiroService = ativoFinanceiroService;
     }
 
     /**

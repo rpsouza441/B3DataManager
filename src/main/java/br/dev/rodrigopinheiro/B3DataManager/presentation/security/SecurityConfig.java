@@ -1,7 +1,6 @@
 package br.dev.rodrigopinheiro.B3DataManager.presentation.security;
 
 
-import br.dev.rodrigopinheiro.B3DataManager.application.service.UserCustomService;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 
 import com.vaadin.hilla.route.RouteUtil;
@@ -15,7 +14,6 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @EnableWebSecurity
 @Configuration
@@ -23,11 +21,9 @@ public class SecurityConfig extends VaadinWebSecurity {
 
     private final RouteUtil routeUtil;
 
-    private final UserDetailsService userDetailsService;
 
-    public SecurityConfig(RouteUtil routeUtil, UserDetailsService userDetailsService) {
+    public SecurityConfig(RouteUtil routeUtil) {
         this.routeUtil = routeUtil;
-        this.userDetailsService = userDetailsService;
     }
 
     @Override

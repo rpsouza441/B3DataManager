@@ -1,6 +1,8 @@
 package br.dev.rodrigopinheiro.B3DataManager.presentation.exception;
 
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.ServiceException;
+import br.dev.rodrigopinheiro.B3DataManager.domain.exception.operacao.OperacaoInvalidaException;
+import br.dev.rodrigopinheiro.B3DataManager.domain.exception.usuario.UsuarioNaoAutorizadoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,6 +12,28 @@ import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(OperacaoInvalidaException.class)
+    public ResponseEntity<ApiError> handleOperacaoInvalidaException(OperacaoInvalidaException ex) {
+        ApiError error = new ApiError(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Operação Inválida",
+                ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(UsuarioNaoAutorizadoException.class)
+    public ResponseEntity<ApiError> handleUsuarioNaoAutorizadoException(UsuarioNaoAutorizadoException ex) {
+        ApiError error = new ApiError(
+                LocalDateTime.now(),
+                HttpStatus.FORBIDDEN.value(),
+                "Acesso Negado",
+                ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
 
     @ExceptionHandler(ServiceException.class)
     public ResponseEntity<ApiError> handleServiceException(ServiceException ex) {

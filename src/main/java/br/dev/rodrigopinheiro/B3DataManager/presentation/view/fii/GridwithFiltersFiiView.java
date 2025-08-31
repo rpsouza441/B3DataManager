@@ -21,7 +21,6 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
@@ -66,7 +65,6 @@ public class GridwithFiltersFiiView extends Div implements HasDynamicTitle, HasU
     private int itemsPerPage = 25;
     private int currentPageNumber = 1;
     private Div pageIndicator;
-    private ListDataProvider<AtivoFiiDTO> dataProvider;
 
 
     /**
