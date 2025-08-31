@@ -1,6 +1,7 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.usecase;
 
 import br.dev.rodrigopinheiro.B3DataManager.application.command.operacao.RegisterOperacaoCommand;
+import br.dev.rodrigopinheiro.B3DataManager.application.criteria.FilterCriteria;
 import br.dev.rodrigopinheiro.B3DataManager.application.port.OperacaoRepository;
 import br.dev.rodrigopinheiro.B3DataManager.application.usecase.operacao.RegisterOperacaoUseCase;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.operacao.OperacaoInvalidaException;
@@ -9,6 +10,8 @@ import br.dev.rodrigopinheiro.B3DataManager.domain.model.Operacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.UsuarioId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -52,19 +55,14 @@ class RegisterOperacaoUseCaseTest {
     
     @Test
     void deveRejeitarOperacaoSemUsuarioId() {
-        // Arrange
-        RegisterOperacaoCommand command = new RegisterOperacaoCommand(
-            "Compra", LocalDate.now(), "Compra à vista", "PETR4", "XP Investimentos",
-            BigDecimal.valueOf(100), BigDecimal.valueOf(10.50), BigDecimal.valueOf(1050.00),
-            false, false, null, false, null
-        );
-        
-        // Act & Assert
-        UsuarioNaoAutorizadoException exception = assertThrows(UsuarioNaoAutorizadoException.class, () -> {
-            useCase.execute(command);
+        // Act & Assert - O command já valida no constructor
+        assertThrows(NullPointerException.class, () -> {
+            new RegisterOperacaoCommand(
+                "Compra", LocalDate.now(), "Compra à vista", "PETR4", "XP Investimentos",
+                BigDecimal.valueOf(100), BigDecimal.valueOf(10.50), BigDecimal.valueOf(1050.00),
+                false, false, null, false, null // usuarioId null
+            );
         });
-        
-        assertEquals("UsuarioId é obrigatório para registrar uma operação", exception.getMessage());
     }
     
     @Test
@@ -166,6 +164,18 @@ class RegisterOperacaoUseCaseTest {
             return operacoes.values().stream()
                 .filter(op -> idOriginal.equals(op.getIdOriginal()) && usuarioId.equals(op.getUsuarioId()))
                 .findFirst();
+        }
+        
+        @Override
+        public Page<Operacao> findByFiltersAndUsuarioId(FilterCriteria criteria, UsuarioId usuarioId, Pageable pageable) {
+            // Implementação simples para testes - retorna lista vazia
+            return Page.empty();
+        }
+        
+        @Override
+        public long countByFiltersAndUsuarioId(FilterCriteria criteria, UsuarioId usuarioId) {
+            // Implementação simples para testes - retorna 0
+            return 0;
         }
         
         public void addExistingOperation(Long idOriginal, UsuarioId usuarioId) {

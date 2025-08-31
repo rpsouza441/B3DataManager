@@ -133,41 +133,48 @@ class OperacaoTest {
     }
     
     @Test
-    void deveRejeitarOperacaoComValorIncoerenteComPrecoEQuantidade() {
+    void deveAceitarOperacaoComValorIncoerenteComPrecoEQuantidade() {
         // Arrange
         LocalDate data = LocalDate.now();
         Quantidade quantidade = new Quantidade(BigDecimal.valueOf(100));
         Dinheiro precoUnitario = new Dinheiro(BigDecimal.valueOf(10.50));
-        Dinheiro valorOperacao = new Dinheiro(BigDecimal.valueOf(2000.00)); // Valor incorreto
+        Dinheiro valorOperacao = new Dinheiro(BigDecimal.valueOf(2000.00)); // Valor incorreto (mas aceito)
         UsuarioId usuarioId = new UsuarioId(1L);
         
-        // Act & Assert
-        OperacaoInvalidaException exception = assertThrows(OperacaoInvalidaException.class, () -> {
-            new Operacao(
-                null, "Compra", data, "Compra à vista", "PETR4", "XP Investimentos",
-                quantidade, precoUnitario, valorOperacao, false, false, null, false, usuarioId
-            );
-        });
+        // Act - Agora deve aceitar valores incoerentes pois as empresas arredondam
+        Operacao operacao = new Operacao(
+            null, "Compra", data, "Compra à vista", "PETR4", "XP Investimentos",
+            quantidade, precoUnitario, valorOperacao, false, false, null, false, usuarioId
+        );
         
-        assertTrue(exception.getMessage().contains("Valor da operação"));
-        assertTrue(exception.getMessage().contains("não confere com preço × quantidade"));
-    }
+        // Assert - Verifica que a operação foi criada e tem diferença entre valores
+        assertNotNull(operacao);
+        assertEquals(valorOperacao.getValue(), operacao.getValorOperacao().getValue());
+        assertEquals(new BigDecimal("1050.00"), operacao.getValorCalculado().getValue());
+        assertTrue(operacao.temDiferencaValor());
+        assertEquals(new BigDecimal("950.00"), operacao.getDiferencaValor());
+     }
     
     @Test
-    void deveAceitarOperacaoComValorDentroTolerancia() {
+    void deveCalcularValorCorretoAutomaticamente() {
         // Arrange
         LocalDate data = LocalDate.now();
         Quantidade quantidade = new Quantidade(BigDecimal.valueOf(100));
         Dinheiro precoUnitario = new Dinheiro(BigDecimal.valueOf(10.50));
-        Dinheiro valorOperacao = new Dinheiro(BigDecimal.valueOf(1050.01)); // Diferença de 1 centavo
+        Dinheiro valorOperacao = new Dinheiro(BigDecimal.valueOf(1050.05)); // Valor da B3
         UsuarioId usuarioId = new UsuarioId(1L);
         
-        // Act & Assert - Não deve lançar exceção
-        assertDoesNotThrow(() -> {
-            new Operacao(
-                null, "Compra", data, "Compra à vista", "PETR4", "XP Investimentos",
-                quantidade, precoUnitario, valorOperacao, false, false, null, false, usuarioId
-            );
-        });
+        // Act
+        Operacao operacao = new Operacao(
+            null, "Compra", data, "Compra à vista", "PETR4", "XP Investimentos",
+            quantidade, precoUnitario, valorOperacao, false, false, null, false, usuarioId
+        );
+        
+        // Assert - Verifica que ambos os valores estão corretos
+        assertNotNull(operacao);
+        assertEquals(valorOperacao.getValue(), operacao.getValorOperacao().getValue()); // Valor original da B3
+        assertEquals(new BigDecimal("1050.00"), operacao.getValorCalculado().getValue()); // Valor calculado
+        assertTrue(operacao.temDiferencaValor()); // Há diferença de 5 centavos
+        assertEquals(new BigDecimal("0.05"), operacao.getDiferencaValor());
     }
 }

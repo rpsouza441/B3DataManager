@@ -1,6 +1,10 @@
 package br.dev.rodrigopinheiro.B3DataManager.infrastructure.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -9,6 +13,9 @@ import java.util.Objects;
  * Entidade JPA que representa uma operação na camada de infraestrutura.
  * Espelho da entidade de domínio para persistência.
  */
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "operacao")
 public class OperacaoJpaEntity {
@@ -41,6 +48,9 @@ public class OperacaoJpaEntity {
     @Column(name = "valor_operacao", nullable = false)
     private BigDecimal valorOperacao;
     
+    @Column(name = "valor_calculado", precision = 15, scale = 2)
+    private BigDecimal valorCalculado;
+    
     @Column(name = "duplicado", nullable = false)
     private Boolean duplicado = false;
     
@@ -56,8 +66,6 @@ public class OperacaoJpaEntity {
     @Column(name = "usuario_id", nullable = false)
     private Long usuarioId;
     
-    // Construtores
-    public OperacaoJpaEntity() {}
     
     public OperacaoJpaEntity(String entradaSaida, LocalDate data, String movimentacao,
                             String produto, String instituicao, double quantidade,
@@ -79,118 +87,6 @@ public class OperacaoJpaEntity {
         this.usuarioId = usuarioId;
     }
     
-    // Getters e Setters
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public String getEntradaSaida() {
-        return entradaSaida;
-    }
-    
-    public void setEntradaSaida(String entradaSaida) {
-        this.entradaSaida = entradaSaida;
-    }
-    
-    public LocalDate getData() {
-        return data;
-    }
-    
-    public void setData(LocalDate data) {
-        this.data = data;
-    }
-    
-    public String getMovimentacao() {
-        return movimentacao;
-    }
-    
-    public void setMovimentacao(String movimentacao) {
-        this.movimentacao = movimentacao;
-    }
-    
-    public String getProduto() {
-        return produto;
-    }
-    
-    public void setProduto(String produto) {
-        this.produto = produto;
-    }
-    
-    public String getInstituicao() {
-        return instituicao;
-    }
-    
-    public void setInstituicao(String instituicao) {
-        this.instituicao = instituicao;
-    }
-    
-    public double getQuantidade() {
-        return quantidade;
-    }
-    
-    public void setQuantidade(double quantidade) {
-        this.quantidade = quantidade;
-    }
-    
-    public BigDecimal getPrecoUnitario() {
-        return precoUnitario;
-    }
-    
-    public void setPrecoUnitario(BigDecimal precoUnitario) {
-        this.precoUnitario = precoUnitario;
-    }
-    
-    public BigDecimal getValorOperacao() {
-        return valorOperacao;
-    }
-    
-    public void setValorOperacao(BigDecimal valorOperacao) {
-        this.valorOperacao = valorOperacao;
-    }
-    
-    public Boolean getDuplicado() {
-        return duplicado;
-    }
-    
-    public void setDuplicado(Boolean duplicado) {
-        this.duplicado = duplicado;
-    }
-    
-    public Boolean getDimensionado() {
-        return dimensionado;
-    }
-    
-    public void setDimensionado(Boolean dimensionado) {
-        this.dimensionado = dimensionado;
-    }
-    
-    public Long getIdOriginal() {
-        return idOriginal;
-    }
-    
-    public void setIdOriginal(Long idOriginal) {
-        this.idOriginal = idOriginal;
-    }
-    
-    public Boolean getDeletado() {
-        return deletado;
-    }
-    
-    public void setDeletado(Boolean deletado) {
-        this.deletado = deletado;
-    }
-    
-    public Long getUsuarioId() {
-        return usuarioId;
-    }
-    
-    public void setUsuarioId(Long usuarioId) {
-        this.usuarioId = usuarioId;
-    }
     
     @Override
     public boolean equals(Object o) {

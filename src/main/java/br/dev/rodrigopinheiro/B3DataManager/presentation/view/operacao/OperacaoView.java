@@ -1,12 +1,16 @@
 package br.dev.rodrigopinheiro.B3DataManager.presentation.view.operacao;
 
+import br.dev.rodrigopinheiro.B3DataManager.application.command.operacao.CountOperacoesCommand;
+import br.dev.rodrigopinheiro.B3DataManager.application.command.operacao.ListOperacoesCommand;
+import br.dev.rodrigopinheiro.B3DataManager.application.result.operacao.ListOperacoesResult;
+import br.dev.rodrigopinheiro.B3DataManager.application.security.SecurityService;
 import br.dev.rodrigopinheiro.B3DataManager.application.service.ErrorService;
-import br.dev.rodrigopinheiro.B3DataManager.application.service.OperacaoService;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Operacao;
+import br.dev.rodrigopinheiro.B3DataManager.application.usecase.operacao.CountOperacoesUseCase;
+import br.dev.rodrigopinheiro.B3DataManager.application.usecase.operacao.ListOperacoesUseCase;
+
+import br.dev.rodrigopinheiro.B3DataManager.presentation.dto.OperacaoDTO;
 import br.dev.rodrigopinheiro.B3DataManager.presentation.view.components.PaginationHelper;
 import br.dev.rodrigopinheiro.B3DataManager.presentation.view.components.ToastNotification;
-import br.dev.rodrigopinheiro.B3DataManager.presentation.view.factory.FilterFactory;
-import br.dev.rodrigopinheiro.B3DataManager.presentation.view.factory.MessageUtils;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -16,6 +20,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -24,12 +29,9 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 @Route("operacoes")
 @Menu(order = 4, icon = LineAwesomeIconUrl.BUSINESS_TIME_SOLID, title = "Operacoes")
@@ -37,11 +39,10 @@ import java.util.ResourceBundle;
 @Slf4j
 public class OperacaoView extends Div implements HasDynamicTitle, HasUrlParameter<Long> {
 
-    private final OperacaoService operacaoService;
+    private final ListOperacoesUseCase listOperacoesUseCase;
+    private final CountOperacoesUseCase countOperacoesUseCase;
     private final ErrorService errorService;
-    private final Grid<Operacao> grid = new Grid<>(Operacao.class, false);
-    private final MessageUtils messageUtils;
-    private final FilterFactory filterFactory;
+    private final Grid<OperacaoDTO> grid = new Grid<>(OperacaoDTO.class, false);
 
     private final ComboBox<String> entradaSaidaFilter;
     private final DatePicker startDateFilter;
@@ -58,27 +59,23 @@ public class OperacaoView extends Div implements HasDynamicTitle, HasUrlParamete
     private Div pageIndicator;
     private Div filters;
     private String title = "";
-    private final ResourceBundle messages;
-    private Locale currentLocale;
 
-    public OperacaoView(OperacaoService operacaoService, ErrorService errorService) {
-        this.operacaoService = operacaoService;
+    public OperacaoView(ListOperacoesUseCase listOperacoesUseCase, 
+                       CountOperacoesUseCase countOperacoesUseCase,
+                       ErrorService errorService) {
+        this.listOperacoesUseCase = listOperacoesUseCase;
+        this.countOperacoesUseCase = countOperacoesUseCase;
         this.errorService = errorService;
 
-        currentLocale = getUI().map(ui -> ui.getSession().getLocale()).orElse(Locale.getDefault());
-        messages = ResourceBundle.getBundle("messages", currentLocale);
-        this.messageUtils = new MessageUtils(messages);
-        this.filterFactory = new FilterFactory(messages);
-
         // Inicialização de filtros
-        entradaSaidaFilter = filterFactory.createComboBoxFilter("operacao.grid.entradaSaida", List.of("Entrada", "Saída"));
-        startDateFilter = filterFactory.createDatePicker("operacao.grid.dateRangeStart.placeholder");
-        endDateFilter = filterFactory.createDatePicker("operacao.grid.dateRangeEnd.placeholder");
-        movimentacaoFilter = filterFactory.createTextFieldFilter("operacao.grid.movimentacao");
-        produtoFilter = filterFactory.createTextFieldFilter("operacao.grid.produto");
-        instituicaoFilter = filterFactory.createTextFieldFilter("operacao.grid.instituicao");
-        duplicadoFilter = filterFactory.createBooleanFilter("operacao.grid.duplicado");
-        dimensionadoFilter = filterFactory.createBooleanFilter("operacao.grid.dimensionado");
+        entradaSaidaFilter = createComboBoxFilter("Entrada/Saída", List.of("Entrada", "Saída"));
+        startDateFilter = createDatePicker("Data Inicial");
+        endDateFilter = createDatePicker("Data Final");
+        movimentacaoFilter = createTextFieldFilter("Movimentação");
+        produtoFilter = createTextFieldFilter("Produto");
+        instituicaoFilter = createTextFieldFilter("Instituição");
+        duplicadoFilter = createBooleanFilter("Duplicado");
+        dimensionadoFilter = createBooleanFilter("Dimensionado");
 
         setSizeFull();
         addClassName("operacao-view");
@@ -112,7 +109,7 @@ public class OperacaoView extends Div implements HasDynamicTitle, HasUrlParamete
                 LumoUtility.AlignItems.CENTER);
 
         Icon mobileIcon = new Icon("lumo", "plus");
-        Span filtersHeading = new Span(messages.getString("operacao.grid.mobileFilters"));
+        Span filtersHeading = new Span("Filtros");
         mobileFilters.add(mobileIcon, filtersHeading);
         mobileFilters.setFlexGrow(1, filtersHeading);
 
@@ -146,8 +143,11 @@ public class OperacaoView extends Div implements HasDynamicTitle, HasUrlParamete
         booleanFiltersLayout.setWidthFull();
         booleanFiltersLayout.setSpacing(true);
 
-        Button resetButton = filterFactory.createButton("operacao.grid.reset", ButtonVariant.LUMO_TERTIARY, e -> clearFilters());
-        Button searchButton = filterFactory.createButton("operacao.grid.search", ButtonVariant.LUMO_PRIMARY, e -> refreshGrid());
+        Button resetButton = new Button("Resetar", e -> clearFilters());
+        resetButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        
+        Button searchButton = new Button("Procurar", e -> refreshGrid());
+        searchButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         HorizontalLayout buttonsLayout = new HorizontalLayout(resetButton, searchButton);
         buttonsLayout.setJustifyContentMode(FlexLayout.JustifyContentMode.END);
@@ -173,11 +173,52 @@ public class OperacaoView extends Div implements HasDynamicTitle, HasUrlParamete
      * @return Um componente `Grid` configurado.
      */
     private Component createGrid() {
-        grid.addColumn(Operacao::getEntradaSaida).setHeader(messages.getString("operacao.grid.entradaSaida"));
-        grid.addColumn(Operacao::getData).setHeader(messages.getString("operacao.grid.data"));
-        grid.addColumn(Operacao::getMovimentacao).setHeader(messages.getString("operacao.grid.movimentacao"));
-        grid.addColumn(Operacao::getProduto).setHeader(messages.getString("operacao.grid.produto"));
-        grid.addColumn(Operacao::getInstituicao).setHeader(messages.getString("operacao.grid.instituicao"));
+        grid.addColumn(OperacaoDTO::entradaSaida).setHeader("Entrada/Saída");
+        grid.addColumn(OperacaoDTO::data).setHeader("Data");
+        grid.addColumn(OperacaoDTO::movimentacao).setHeader("Movimentação");
+        grid.addColumn(OperacaoDTO::produto).setHeader("Produto");
+        grid.addColumn(OperacaoDTO::instituicao).setHeader("Instituição");
+        grid.addColumn(operacao -> formatarQuantidade(operacao.quantidade())).setHeader("Quantidade");
+        grid.addColumn(operacao -> formatarPreco(operacao.precoUnitario(), operacao.quantidade())).setHeader("Preço Unitário");
+        
+        // Valor original da B3
+        var valorB3Column = grid.addColumn(operacao -> formatarValor(operacao.valorOperacao(), operacao.quantidade()))
+            .setHeader("Valor B3");
+        
+        // Valor calculado
+        var valorCalculadoColumn = grid.addColumn(operacao -> formatarValor(operacao.valorCalculado(), operacao.quantidade()))
+            .setHeader("Valor Calculado");
+        
+        // Diferença (só mostra se houver)
+        var diferencaColumn = grid.addColumn(operacao -> operacao.temDiferencaValor() ? 
+                String.format("R$ %.2f", operacao.diferencaValor()) : "")
+            .setHeader("Diferença");
+        
+        // Aplicar estilos condicionais usando renderer
+        valorB3Column.setRenderer(new ComponentRenderer<>(operacao -> {
+            var span = new Span(formatarValor(operacao.valorOperacao(), operacao.quantidade()));
+            if (operacao.temDiferencaValor()) {
+                span.addClassNames("valor-diferente");
+            }
+            return span;
+        }));
+        
+        valorCalculadoColumn.setRenderer(new ComponentRenderer<>(operacao -> {
+            var span = new Span(formatarValor(operacao.valorCalculado(), operacao.quantidade()));
+            if (operacao.temDiferencaValor()) {
+                span.addClassNames("valor-calculado");
+            }
+            return span;
+        }));
+        
+        diferencaColumn.setRenderer(new ComponentRenderer<>(operacao -> {
+            var span = new Span(operacao.temDiferencaValor() ? 
+                String.format("R$ %.2f", operacao.diferencaValor()) : "");
+            if (operacao.temDiferencaValor()) {
+                span.addClassNames("diferenca-valor");
+            }
+            return span;
+        }));
 
         refreshGrid();
         return grid;
@@ -194,28 +235,35 @@ public class OperacaoView extends Div implements HasDynamicTitle, HasUrlParamete
             pageIndicator.addClassName("page-indicator");
         }
 
-        PaginationHelper.updatePageIndicator(pageIndicator, currentPageNumber, totalAmountOfPages, messageUtils);
+        updatePageIndicator();
 
         // Botões para alternar itens por página
-        Button items25Button = filterFactory.createButton("global.paginator.25", ButtonVariant.LUMO_TERTIARY, e -> setItemsPerPage(25));
-        Button items50Button = filterFactory.createButton("global.paginator.50", ButtonVariant.LUMO_TERTIARY, e -> setItemsPerPage(50));
-        Button items100Button = filterFactory.createButton("global.paginator.100", ButtonVariant.LUMO_TERTIARY, e -> setItemsPerPage(100));
+        Button items25Button = new Button("25", e -> setItemsPerPage(25));
+        items25Button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        
+        Button items50Button = new Button("50", e -> setItemsPerPage(50));
+        items50Button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        
+        Button items100Button = new Button("100", e -> setItemsPerPage(100));
+        items100Button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
         // Botão Anterior
-        Button previousButton = filterFactory.createButton("global.previous", ButtonVariant.LUMO_TERTIARY, e -> {
+        Button previousButton = new Button("Anterior", e -> {
             if (currentPageNumber > 1) {
                 currentPageNumber--;
                 refreshGrid();
             }
         });
+        previousButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
         // Botão Próximo
-        Button nextButton = filterFactory.createButton("global.next", ButtonVariant.LUMO_TERTIARY, e -> {
+        Button nextButton = new Button("Próximo", e -> {
             if (currentPageNumber < totalAmountOfPages) {
                 currentPageNumber++;
                 refreshGrid();
             }
         });
+        nextButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
         //adiciona classe aos botoes
         nextButton.addClassName("paginator-button");
@@ -244,21 +292,14 @@ public class OperacaoView extends Div implements HasDynamicTitle, HasUrlParamete
      */
     private void refreshGrid() {
         try {
-            totalAmountOfPages = PaginationHelper.calculateTotalPages(
-                    operacaoService.countByFilters(
-                            entradaSaidaFilter.getValue(),
-                            startDateFilter.getValue(),
-                            endDateFilter.getValue(),
-                            movimentacaoFilter.getValue(),
-                            produtoFilter.getValue(),
-                            instituicaoFilter.getValue(),
-                            duplicadoFilter.getValue(),
-                            dimensionadoFilter.getValue()
-                    ),
-                    itemsPerPage
-            );
+            Long currentUserId = getCurrentUserId();
+            if (currentUserId == null) {
+                ToastNotification.showError("Usuário não autenticado. Faça login novamente.");
+                return;
+            }
 
-            List<Operacao> items = operacaoService.findWithFilters(
+            // Contagem com Use Case
+            CountOperacoesCommand countCommand = new CountOperacoesCommand(
                     entradaSaidaFilter.getValue(),
                     startDateFilter.getValue(),
                     endDateFilter.getValue(),
@@ -267,19 +308,34 @@ public class OperacaoView extends Div implements HasDynamicTitle, HasUrlParamete
                     instituicaoFilter.getValue(),
                     duplicadoFilter.getValue(),
                     dimensionadoFilter.getValue(),
-                    PageRequest.of(currentPageNumber - 1, itemsPerPage),
-                    currentLocale
-            ).getContent();
+                    currentUserId
+            );
 
-            grid.setItems(items);
+            long totalElements = countOperacoesUseCase.execute(countCommand);
+            totalAmountOfPages = PaginationHelper.calculateTotalPages(totalElements, itemsPerPage);
 
-            if (pageIndicator != null) {
-                PaginationHelper.updatePageIndicator(pageIndicator, currentPageNumber, totalAmountOfPages, messageUtils);
-            } else {
-                log.warn("pageIndicator está nulo. O indicador de página não será atualizado.");
-            }
+            // Listagem com Use Case
+            ListOperacoesCommand listCommand = new ListOperacoesCommand(
+                    entradaSaidaFilter.getValue(),
+                    startDateFilter.getValue(),
+                    endDateFilter.getValue(),
+                    movimentacaoFilter.getValue(),
+                    produtoFilter.getValue(),
+                    instituicaoFilter.getValue(),
+                    duplicadoFilter.getValue(),
+                    dimensionadoFilter.getValue(),
+                    currentPageNumber - 1,
+                    itemsPerPage,
+                    currentUserId
+            );
+
+            ListOperacoesResult result = listOperacoesUseCase.execute(listCommand);
+            grid.setItems(result.operacoes());
+
+            updatePageIndicator();
+            
         } catch (Exception e) {
-            String errorMessage = messageUtils.getString("operacao.grid.error.loading");
+            String errorMessage = "Ocorreu um erro ao carregar os dados. Tente novamente mais tarde.";
             errorService.logError(errorMessage, e);
             ToastNotification.showError(errorMessage);
         }
@@ -312,11 +368,20 @@ public class OperacaoView extends Div implements HasDynamicTitle, HasUrlParamete
     }
 
     /**
+     * Obtém o ID do usuário autenticado.
+     */
+    private Long getCurrentUserId() {
+        return SecurityService.getAuthenticatedUserId();
+    }
+
+    /**
      * Atualiza o indicador de página.
      */
     private void updatePageIndicator() {
-        pageIndicator.setText(String.format("Página %d de %d", currentPageNumber, totalAmountOfPages));
-        log.info("Indicador de página atualizado: Página {} de {}.", currentPageNumber, totalAmountOfPages);
+        if (pageIndicator != null) {
+            pageIndicator.setText(String.format("Página %d de %d", currentPageNumber, totalAmountOfPages));
+            log.info("Indicador de página atualizado: Página {} de {}.", currentPageNumber, totalAmountOfPages);
+        }
     }
 
     @Override
@@ -326,10 +391,98 @@ public class OperacaoView extends Div implements HasDynamicTitle, HasUrlParamete
 
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter Long parameter) {
-        title = messageUtils.getString("operacao.title") + " | " + messageUtils.getString("global.project.name");
+        title = "Operações | B3 Data Manager";
         if (parameter != null) {
-            title = title + parameter;
+            title = title + " - " + parameter;
         }
         log.info("Título da página configurado como: {}", title);
+    }
+
+    /**
+     * Cria um ComboBox com filtro.
+     */
+    private ComboBox<String> createComboBoxFilter(String placeholder, List<String> items) {
+        ComboBox<String> comboBox = new ComboBox<>(placeholder);
+        comboBox.setItems(items);
+        comboBox.setPlaceholder(placeholder);
+        comboBox.setClearButtonVisible(true);
+        return comboBox;
+    }
+
+    /**
+     * Cria um DatePicker.
+     */
+    private DatePicker createDatePicker(String placeholder) {
+        DatePicker datePicker = new DatePicker(placeholder);
+        datePicker.setPlaceholder(placeholder);
+        datePicker.setClearButtonVisible(true);
+        return datePicker;
+    }
+
+    /**
+     * Cria um TextField com filtro.
+     */
+    private TextField createTextFieldFilter(String placeholder) {
+        TextField textField = new TextField(placeholder);
+        textField.setPlaceholder(placeholder);
+        textField.setClearButtonVisible(true);
+        return textField;
+    }
+
+    /**
+     * Cria um ComboBox para valores Boolean.
+     */
+    private ComboBox<Boolean> createBooleanFilter(String placeholder) {
+        ComboBox<Boolean> comboBox = new ComboBox<>(placeholder);
+        comboBox.setItems(true, false);
+        comboBox.setItemLabelGenerator(item -> item ? "Sim" : "Não");
+        comboBox.setPlaceholder(placeholder);
+        comboBox.setClearButtonVisible(true);
+        return comboBox;
+    }
+    
+    /**
+     * Formata valores monetários, mostrando "-" para operações sem valor (quantidade zero).
+     */
+    private String formatarValor(java.math.BigDecimal valor, java.math.BigDecimal quantidade) {
+        // Para operações sem quantidade (direitos não exercidos, atualizações, etc.)
+        if (quantidade.compareTo(java.math.BigDecimal.ZERO) == 0) {
+            return "-";
+        }
+        
+        // Para operações com valor zero mas quantidade > 0 (operações gratuitas)
+        if (valor.compareTo(java.math.BigDecimal.ZERO) == 0) {
+            return "R$ 0,00";
+        }
+        
+        // Para operações com valor normal
+        return String.format("R$ %.2f", valor);
+    }
+    
+    /**
+     * Formata preços unitários, mostrando "-" para operações sem quantidade.
+     */
+    private String formatarPreco(java.math.BigDecimal preco, java.math.BigDecimal quantidade) {
+        // Para operações sem quantidade (direitos não exercidos, atualizações, etc.)
+        if (quantidade.compareTo(java.math.BigDecimal.ZERO) == 0) {
+            return "-";
+        }
+        
+        // Para operações com preço normal
+        return String.format("R$ %.3f", preco);
+    }
+    
+    /**
+     * Formata quantidades, evitando notação científica e mostrando zero como "0".
+     */
+    private String formatarQuantidade(java.math.BigDecimal quantidade) {
+        // Para quantidade zero, mostrar simplesmente "0"
+        if (quantidade.compareTo(java.math.BigDecimal.ZERO) == 0) {
+            return "0";
+        }
+        
+        // Para quantidades normais, usar formatação sem notação científica
+        // Remover zeros desnecessários à direita
+        return quantidade.stripTrailingZeros().toPlainString();
     }
 }

@@ -46,13 +46,13 @@ class QuantidadeTest {
     }
     
     @Test
-    void deveRejeitarQuantidadeZero() {
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            new Quantidade(BigDecimal.ZERO);
-        });
+    void deveAceitarQuantidadeZero() {
+        // Act - Agora deve aceitar zero para operações como direitos não exercidos
+        Quantidade quantidade = new Quantidade(BigDecimal.ZERO);
         
-        assertEquals("Quantidade deve ser maior que zero", exception.getMessage());
+        // Assert
+        assertNotNull(quantidade);
+        assertEquals(BigDecimal.ZERO.setScale(8), quantidade.value());
     }
     
     @Test
@@ -62,7 +62,7 @@ class QuantidadeTest {
             new Quantidade(BigDecimal.valueOf(-10));
         });
         
-        assertEquals("Quantidade deve ser maior que zero", exception.getMessage());
+        assertEquals("Quantidade não pode ser negativa", exception.getMessage());
     }
     
     @Test

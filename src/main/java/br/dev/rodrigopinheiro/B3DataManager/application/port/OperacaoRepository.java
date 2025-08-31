@@ -1,7 +1,10 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.port;
 
+import br.dev.rodrigopinheiro.B3DataManager.application.criteria.FilterCriteria;
 import br.dev.rodrigopinheiro.B3DataManager.domain.model.Operacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.UsuarioId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
@@ -45,4 +48,23 @@ public interface OperacaoRepository {
      * @return Optional contendo a operação se encontrada
      */
     Optional<Operacao> findByIdOriginalAndUsuarioId(Long idOriginal, UsuarioId usuarioId);
+    
+    /**
+     * Busca operações com filtros e ownership obrigatório.
+     * 
+     * @param criteria Critérios de filtro
+     * @param usuarioId ID do usuário (ownership)
+     * @param pageable Configuração de paginação
+     * @return Página de operações filtradas
+     */
+    Page<Operacao> findByFiltersAndUsuarioId(FilterCriteria criteria, UsuarioId usuarioId, Pageable pageable);
+    
+    /**
+     * Conta operações com filtros e ownership obrigatório.
+     * 
+     * @param criteria Critérios de filtro
+     * @param usuarioId ID do usuário (ownership)
+     * @return Quantidade de operações que atendem aos critérios
+     */
+    long countByFiltersAndUsuarioId(FilterCriteria criteria, UsuarioId usuarioId);
 }

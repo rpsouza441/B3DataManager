@@ -5,6 +5,7 @@ import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.Dinheiro;
 import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.Quantidade;
 import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.UsuarioId;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.entity.OperacaoJpaEntity;
+
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -41,6 +42,7 @@ public class OperacaoMapper {
         
         jpaEntity.setPrecoUnitario(domainOperacao.getPrecoUnitario().getValue());
         jpaEntity.setValorOperacao(domainOperacao.getValorOperacao().getValue());
+        jpaEntity.setValorCalculado(domainOperacao.getValorCalculado().getValue());
         jpaEntity.setDuplicado(domainOperacao.getDuplicado());
         jpaEntity.setDimensionado(domainOperacao.getDimensionado());
         jpaEntity.setIdOriginal(domainOperacao.getIdOriginal());
@@ -69,22 +71,22 @@ public class OperacaoMapper {
         
         Dinheiro precoUnitario = new Dinheiro(jpaEntity.getPrecoUnitario());
         Dinheiro valorOperacao = new Dinheiro(jpaEntity.getValorOperacao());
-        
-        return new Operacao(
-            jpaEntity.getId(),
-            jpaEntity.getEntradaSaida(),
-            jpaEntity.getData(),
-            jpaEntity.getMovimentacao(),
-            jpaEntity.getProduto(),
-            jpaEntity.getInstituicao(),
-            quantidade,
-            precoUnitario,
-            valorOperacao,
-            jpaEntity.getDuplicado(),
-            jpaEntity.getDimensionado(),
-            jpaEntity.getIdOriginal(),
-            jpaEntity.getDeletado(),
-            usuarioId
-        );
+         
+         return new Operacao(
+             jpaEntity.getId(),
+             jpaEntity.getEntradaSaida(),
+             jpaEntity.getData(),
+             jpaEntity.getMovimentacao(),
+             jpaEntity.getProduto(),
+             jpaEntity.getInstituicao(),
+             quantidade,
+             precoUnitario,
+             valorOperacao,
+             jpaEntity.getDuplicado(),
+             jpaEntity.getDimensionado(),
+             jpaEntity.getIdOriginal(),
+             jpaEntity.getDeletado(),
+             usuarioId
+         );
     }
 }

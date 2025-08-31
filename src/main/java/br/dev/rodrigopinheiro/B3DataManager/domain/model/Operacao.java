@@ -23,15 +23,16 @@ public class Operacao {
     private final String instituicao;
     private final Quantidade quantidade;
     private final Dinheiro precoUnitario;
-    private final Dinheiro valorOperacao;
+    private final Dinheiro valorOperacao;  // Valor original da B3
+    private final Dinheiro valorCalculado; // Valor calculado (quantidade × preço)
     private final Boolean duplicado;
     private final Boolean dimensionado;
     private final Long idOriginal;
     private final Boolean deletado;
     private final UsuarioId usuarioId;
     
-    // Tolerância para validação de valor ≈ preço * quantidade (0.01 = 1 centavo)
-    private static final BigDecimal TOLERANCIA_VALOR = new BigDecimal("0.01");
+    // Constante removida: TOLERANCIA_VALOR
+    // Não é mais necessária pois removemos a validação de coerência de valor
     
     public Operacao(Long id, String entradaSaida, LocalDate data, String movimentacao,
                    String produto, String instituicao, Quantidade quantidade,
@@ -41,8 +42,9 @@ public class Operacao {
         // Validar invariantes
         validarInvariantes(data, quantidade, precoUnitario, valorOperacao, usuarioId);
         
-        // Validar regra opcional: valor ≈ preço * quantidade
-        validarCoerenciaValor(quantidade, precoUnitario, valorOperacao);
+        // Nota: Removida validação de coerência de valor pois as empresas arredondam
+        // para baixo propositalmente. Agora temos colunas separadas para mostrar
+        // tanto o valor original da B3 quanto o valor calculado.
         
         this.id = id;
         this.entradaSaida = entradaSaida;
@@ -52,7 +54,8 @@ public class Operacao {
         this.instituicao = instituicao;
         this.quantidade = quantidade;
         this.precoUnitario = precoUnitario;
-        this.valorOperacao = valorOperacao;
+        this.valorOperacao = valorOperacao;  // Valor original da B3
+        this.valorCalculado = calcularValorCorreto(quantidade, precoUnitario); // Valor calculado
         this.duplicado = duplicado != null ? duplicado : false;
         this.dimensionado = dimensionado != null ? dimensionado : false;
         this.idOriginal = idOriginal;
@@ -84,17 +87,23 @@ public class Operacao {
         }
     }
     
-    private void validarCoerenciaValor(Quantidade quantidade, Dinheiro precoUnitario, Dinheiro valorOperacao) {
-        BigDecimal valorCalculado = quantidade.value().multiply(precoUnitario.getValue());
-        BigDecimal diferenca = valorCalculado.subtract(valorOperacao.getValue()).abs();
-        
-        if (diferenca.compareTo(TOLERANCIA_VALOR) > 0) {
-            throw new OperacaoInvalidaException(
-                String.format("Valor da operação (%.2f) não confere com preço × quantidade (%.2f). Diferença: %.2f",
-                    valorOperacao.getValue(), valorCalculado, diferenca)
-            );
+    /**
+     * Calcula o valor correto da operação (quantidade × preço unitário).
+     */
+    private Dinheiro calcularValorCorreto(Quantidade quantidade, Dinheiro precoUnitario) {
+        // Para operações sem valor (direitos, atualizações, etc.), manter zero
+        if (quantidade.value().compareTo(BigDecimal.ZERO) == 0 || 
+            precoUnitario.getValue().compareTo(BigDecimal.ZERO) == 0) {
+            return new Dinheiro(BigDecimal.ZERO);
         }
+        
+        BigDecimal valorCalculado = quantidade.value().multiply(precoUnitario.getValue());
+        return new Dinheiro(valorCalculado);
     }
+
+    // Método removido: validarCoerenciaValor
+    // Razão: As empresas arredondam valores propositalmente para baixo.
+    // Agora temos colunas separadas para mostrar valor B3 vs valor calculado.
     
     // Getters
     public Long getId() {
@@ -131,6 +140,34 @@ public class Operacao {
     
     public Dinheiro getValorOperacao() {
         return valorOperacao;
+    }
+
+    /**
+     * Retorna o valor calculado corretamente (quantidade × preço unitário).
+     * Este é o valor que deveria estar correto matematicamente.
+     */
+    public Dinheiro getValorCalculado() {
+        return valorCalculado;
+    }
+
+    /**
+     * Verifica se há diferença entre o valor da B3 e o valor calculado.
+     */
+    public boolean temDiferencaValor() {
+        if (quantidade.value().compareTo(BigDecimal.ZERO) == 0 || 
+            precoUnitario.getValue().compareTo(BigDecimal.ZERO) == 0) {
+            return false; // Operações sem valor não têm diferença
+        }
+        
+        BigDecimal diferenca = valorCalculado.getValue().subtract(valorOperacao.getValue()).abs();
+        return diferenca.compareTo(new BigDecimal("0.01")) > 0;
+    }
+
+    /**
+     * Retorna a diferença entre valor calculado e valor da B3.
+     */
+    public BigDecimal getDiferencaValor() {
+        return valorCalculado.getValue().subtract(valorOperacao.getValue()).abs();
     }
     
     public Boolean getDuplicado() {
