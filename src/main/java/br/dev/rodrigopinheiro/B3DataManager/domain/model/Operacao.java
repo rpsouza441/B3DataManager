@@ -92,10 +92,10 @@ public class Operacao {
      */
     private Dinheiro calcularValorCorreto(Quantidade quantidade, Dinheiro precoUnitario) {
         // Para operações sem valor (direitos, atualizações, etc.), manter zero
-        if (quantidade.value().compareTo(BigDecimal.ZERO) == 0 || 
-            precoUnitario.getValue().compareTo(BigDecimal.ZERO) == 0) {
-            return new Dinheiro(BigDecimal.ZERO);
-        }
+        if (quantidade.value().compareTo(BigDecimal.ZERO) == 0 ||
+             precoUnitario.getValue().compareTo(BigDecimal.ZERO) == 0) {
+             return new Dinheiro(BigDecimal.ZERO);
+         }
         
         BigDecimal valorCalculado = quantidade.value().multiply(precoUnitario.getValue());
         return new Dinheiro(valorCalculado);

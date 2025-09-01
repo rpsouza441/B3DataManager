@@ -1,8 +1,8 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.entity;
 
-
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoMovimentacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoTransacao;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -65,7 +65,7 @@ public class Transacao {
 
     @ManyToOne
     @JoinColumn(name = "operacao_id")
-    private Operacao operacao;
+    private OperacaoEntity operacao;
 
     // Associação com o Portfolio (agregado raiz financeiro)
     @ManyToOne

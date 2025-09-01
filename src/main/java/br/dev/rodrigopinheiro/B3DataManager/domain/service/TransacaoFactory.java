@@ -4,6 +4,7 @@ import br.dev.rodrigopinheiro.B3DataManager.application.service.AtivoFinanceiroS
 import br.dev.rodrigopinheiro.B3DataManager.application.service.InstituicaoService;
 import br.dev.rodrigopinheiro.B3DataManager.application.service.PortfolioService;
 import br.dev.rodrigopinheiro.B3DataManager.domain.entity.* ;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoMovimentacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoTransacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.ativo.AtivoNotFoundException;
@@ -55,7 +56,7 @@ public class TransacaoFactory {
      * @return A transação criada, com o ativo financeiro associado.
      */
     @Transactional
-    public Transacao criarTransacao(Operacao operacao) {
+    public Transacao criarTransacao(OperacaoEntity operacao) {
         log.info("Iniciando criação da transação para a operação: {}", operacao);
 
         // 3. Extração e parsing dos dados da operação

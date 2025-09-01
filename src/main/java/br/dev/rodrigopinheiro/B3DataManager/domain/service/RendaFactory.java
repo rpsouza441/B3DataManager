@@ -1,16 +1,13 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.service;
 
-import br.dev.rodrigopinheiro.B3DataManager.application.service.AtivoFinanceiroService;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.AtivoFinanceiro;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Operacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Renda;
 import br.dev.rodrigopinheiro.B3DataManager.domain.entity.RendaFixa;
 import br.dev.rodrigopinheiro.B3DataManager.domain.entity.RendaVariavel;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Transacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroFixa;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroVariavel;
 import java.math.BigDecimal;
 
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.RendaFixaRepository;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.RendaVariavelRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +39,7 @@ public class RendaFactory {
      * @param operacao       A operação importada, que contém informações do produto.
      * @return A instância de Renda (fixa ou variável) devidamente configurada.
      */
-    public Renda criarRenda(Operacao operacao) {
+    public Renda criarRenda(OperacaoEntity operacao) {
         String produto = operacao.getProduto();
 
         if (produtoParser.isRendaFixa(operacao.getProduto())) {

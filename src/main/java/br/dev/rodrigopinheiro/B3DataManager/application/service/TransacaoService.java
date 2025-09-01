@@ -7,6 +7,7 @@ import br.dev.rodrigopinheiro.B3DataManager.domain.exception.transacao.InvalidTr
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.transacao.TransacaoNotFoundException;
 import br.dev.rodrigopinheiro.B3DataManager.domain.service.AtivoFactoryImpl;
 import br.dev.rodrigopinheiro.B3DataManager.domain.service.TransacaoFactory;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.TransacaoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -122,48 +123,13 @@ public class TransacaoService {
         log.info("Transação marcada como deletada: {}", transacaoId);
     }
 
+    /**
+     * @deprecated Use CreateTransacaoUseCase para criar transações
+     */
+    @Deprecated
     @Transactional
-    public void criarTransacao(Operacao operacao) {
-
-        // Se a operação é duplicada, encerra sem processar.
-        if (operacao.getDuplicado()) {
-            return;
-        }
-
-        Usuario usuario = operacao.getUsuario();
-        if (usuario == null) {
-            throw new IllegalArgumentException("Operação sem usuário associado.");
-        }
-        // Obtém (ou cria) os agregados necessários.
-
-        Portfolio portfolio = portfolioService.obterOuCriarPortfolio(usuario.getId());
-        Instituicao instituicao = instituicaoService.buscarOuCriarInstituicao(operacao.getInstituicao());
-
-        // Cria a transação a partir da operação.
-        Transacao transacao = transacaoFactory.criarTransacao(operacao);
-        transacao.setDarf(null);
-
-        // Associa a transação aos agregados comuns.
-        portfolio.adicionarTransacao(transacao);
-        instituicao.adicionarTransacoes(transacao);
-        usuario.associarInstituicao(instituicao);
-        instituicao.associarUsuario(usuario);
-
-
-        // Verifica se a operação representa um lucro.
-        if (!isTransacaoLucro(transacao)) {
-            // Fluxo para operações não lucro: cria o ativo financeiro e realiza as associações.
-            AtivoFinanceiro ativoFinanceiro = ativoFactoryImpl.criarAtivo(operacao, portfolio);
-            ativoFinanceiro.adicionarTransacoes(transacao);
-            portfolio.adicionarAtivoFinanceiro(ativoFinanceiro);
-
-            // Persiste o agregado com o ativo financeiro.
-            aggregatePersistenceService.persistAggregate(transacao, usuario, portfolio, instituicao, ativoFinanceiro);
-        } else {
-            // Fluxo para operações de lucro: não cria nem associa o ativo financeiro.
-            aggregatePersistenceService.persistAggregate(transacao, usuario, portfolio, instituicao);
-        }
-
+    public void criarTransacao(OperacaoEntity operacao) {
+        throw new UnsupportedOperationException("Método depreciado. Use CreateTransacaoUseCase.");
     }
 
     /**

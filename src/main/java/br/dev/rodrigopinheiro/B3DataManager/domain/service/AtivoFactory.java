@@ -1,9 +1,9 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.service;
 
 import br.dev.rodrigopinheiro.B3DataManager.domain.entity.AtivoFinanceiro;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Operacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Portfolio;
 import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Transacao;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
 
 /**
  * Interface para a criação de ativos financeiros.
@@ -39,5 +39,5 @@ public interface AtivoFactory {
      * @param portfolio para a vinculacao com ativo ou a busca dele se ja existir.
      * @return Um objeto {@link AtivoFinanceiro} devidamente criado e configurado.
      */
-    AtivoFinanceiro criarAtivo(Operacao operacao, Portfolio portfolio);
+    AtivoFinanceiro criarAtivo(OperacaoEntity operacao, Portfolio portfolio);
 }

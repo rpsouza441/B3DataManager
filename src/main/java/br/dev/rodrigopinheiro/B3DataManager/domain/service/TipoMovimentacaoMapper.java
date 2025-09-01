@@ -1,6 +1,6 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.service;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Operacao;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
 
 /**
  * Interface para resolver o tipo de movimentação de uma transação com base em uma operação.
@@ -16,5 +16,5 @@ public interface TipoMovimentacaoMapper {
      * @param operacao A operação contendo os dados necessários.
      * @return Uma String representando o tipo de movimentação (conforme o enum TipoMovimentacao).
      */
-    String determinarTipoMovimentacao(Operacao operacao);
+    String determinarTipoMovimentacao(OperacaoEntity operacao);
 }

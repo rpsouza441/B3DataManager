@@ -4,6 +4,12 @@ import br.dev.rodrigopinheiro.B3DataManager.application.command.operacao.Registe
 import br.dev.rodrigopinheiro.B3DataManager.application.criteria.FilterCriteria;
 import br.dev.rodrigopinheiro.B3DataManager.application.port.OperacaoRepository;
 import br.dev.rodrigopinheiro.B3DataManager.application.usecase.operacao.RegisterOperacaoUseCase;
+import br.dev.rodrigopinheiro.B3DataManager.application.usecase.transacao.CreateTransacaoUseCase;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import static org.mockito.Mockito.*;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.operacao.OperacaoInvalidaException;
 import br.dev.rodrigopinheiro.B3DataManager.domain.model.Operacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.Dinheiro;
@@ -23,15 +29,19 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 class RegisterOperacaoUseCaseTest {
     
     private RegisterOperacaoUseCase useCase;
     private FakeOperacaoRepository fakeRepository;
     
+    @Mock
+    private CreateTransacaoUseCase createTransacaoUseCase;
+    
     @BeforeEach
     void setUp() {
         fakeRepository = new FakeOperacaoRepository();
-        useCase = new RegisterOperacaoUseCase(fakeRepository);
+        useCase = new RegisterOperacaoUseCase(fakeRepository, createTransacaoUseCase);
     }
     
     @Test

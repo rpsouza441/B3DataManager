@@ -2,6 +2,7 @@ package br.dev.rodrigopinheiro.B3DataManager.domain.service;
 
 import br.dev.rodrigopinheiro.B3DataManager.application.service.AtivoFinanceiroService;
 import br.dev.rodrigopinheiro.B3DataManager.domain.entity.*;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,7 @@ public class AtivoFactoryImpl implements AtivoFactory {
     }
 
     @Override
-    public AtivoFinanceiro criarAtivo(Operacao operacao, Portfolio portfolio) {
+    public AtivoFinanceiro criarAtivo(OperacaoEntity operacao, Portfolio portfolio) {
         String produto = operacao.getProduto();
         String ticker = produtoParser.extrairTicker(produto);
         log.info("Criando ativo para ticker: {}", ticker);

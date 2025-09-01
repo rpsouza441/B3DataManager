@@ -1,4 +1,4 @@
-package br.dev.rodrigopinheiro.B3DataManager.domain.entity;
+package br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,9 +9,11 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 /**
- * Entidade que representa uma operação consolidada.
+ * Entidade JPA que representa uma operação consolidada.
+ * 
+ * <p>Esta é a representação de infraestrutura da operação,
+ * mapeada para a tabela do banco de dados.</p>
  */
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -19,7 +21,7 @@ import java.util.Objects;
 @ToString
 @Entity
 @Table(name = "operacao")
-public class Operacao {
+public class OperacaoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,7 +66,7 @@ public class Operacao {
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
     @ToString.Exclude // Evita loops
-    private Usuario usuario;
+    private br.dev.rodrigopinheiro.B3DataManager.domain.entity.Usuario usuario;
 
     @Override
     public final boolean equals(Object o) {
@@ -73,8 +75,8 @@ public class Operacao {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Operacao operacao = (Operacao) o;
-        return getId() != null && Objects.equals(getId(), operacao.getId());
+        OperacaoEntity that = (OperacaoEntity) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
     }
 
     @Override

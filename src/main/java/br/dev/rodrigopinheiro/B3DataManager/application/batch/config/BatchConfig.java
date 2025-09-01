@@ -34,18 +34,6 @@ public class BatchConfig {
                 .build();
     }
 
-    @Bean
-    public ItemProcessor<Operacao, AtivoFinanceiro> operacaoProcessor() {
-        return operacao -> {
-            // Implementação simples: converte Operacao em AtivoFinanceiro
-            // TODO: Implementar lógica de negócio específica
-            AtivoFinanceiro ativo = new AtivoFinanceiro();
-            ativo.setNome(operacao.getProduto());
-            ativo.setDeletado(false);
-            // Adicionar outras conversões conforme necessário
-            return ativo;
-        };
-    }
     
     @Bean
     public Step processStep(

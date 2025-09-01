@@ -1,7 +1,7 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.service;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Operacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoMovimentacao;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +23,7 @@ public class TipoMovimentacaoMapperImpl implements TipoMovimentacaoMapper {
      * @param operacao A operação contendo os dados necessários.
      * @return Uma String representando o tipo de movimentação (conforme enum TipoMovimentacao).
      */
-    public String determinarTipoMovimentacao(Operacao operacao) {
+    public String determinarTipoMovimentacao(OperacaoEntity operacao) {
         log.info("Iniciando determinação do tipo de movimentação para Operação: {}", operacao);
 
         String entradaSaida = operacao.getEntradaSaida();
