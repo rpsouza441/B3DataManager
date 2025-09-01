@@ -5,6 +5,7 @@ import br.dev.rodrigopinheiro.B3DataManager.application.command.operacao.ListOpe
 import br.dev.rodrigopinheiro.B3DataManager.application.result.operacao.ListOperacoesResult;
 import br.dev.rodrigopinheiro.B3DataManager.application.security.SecurityService;
 import br.dev.rodrigopinheiro.B3DataManager.application.service.ErrorService;
+import br.dev.rodrigopinheiro.B3DataManager.application.service.formatter.OperacaoFormatterService;
 import br.dev.rodrigopinheiro.B3DataManager.application.usecase.operacao.CountOperacoesUseCase;
 import br.dev.rodrigopinheiro.B3DataManager.application.usecase.operacao.ListOperacoesUseCase;
 
@@ -42,6 +43,7 @@ public class OperacaoView extends Div implements HasDynamicTitle, HasUrlParamete
     private final ListOperacoesUseCase listOperacoesUseCase;
     private final CountOperacoesUseCase countOperacoesUseCase;
     private final ErrorService errorService;
+    private final OperacaoFormatterService formatterService;
     private final Grid<OperacaoDTO> grid = new Grid<>(OperacaoDTO.class, false);
 
     private final ComboBox<String> entradaSaidaFilter;
@@ -62,10 +64,12 @@ public class OperacaoView extends Div implements HasDynamicTitle, HasUrlParamete
 
     public OperacaoView(ListOperacoesUseCase listOperacoesUseCase, 
                        CountOperacoesUseCase countOperacoesUseCase,
-                       ErrorService errorService) {
+                       ErrorService errorService,
+                       OperacaoFormatterService formatterService) {
         this.listOperacoesUseCase = listOperacoesUseCase;
         this.countOperacoesUseCase = countOperacoesUseCase;
         this.errorService = errorService;
+        this.formatterService = formatterService;
 
         // Inicialização de filtros
         entradaSaidaFilter = createComboBoxFilter("Entrada/Saída", List.of("Entrada", "Saída"));
@@ -178,25 +182,24 @@ public class OperacaoView extends Div implements HasDynamicTitle, HasUrlParamete
         grid.addColumn(OperacaoDTO::movimentacao).setHeader("Movimentação");
         grid.addColumn(OperacaoDTO::produto).setHeader("Produto");
         grid.addColumn(OperacaoDTO::instituicao).setHeader("Instituição");
-        grid.addColumn(operacao -> formatarQuantidade(operacao.quantidade())).setHeader("Quantidade");
-        grid.addColumn(operacao -> formatarPreco(operacao.precoUnitario(), operacao.quantidade())).setHeader("Preço Unitário");
+        grid.addColumn(operacao -> formatterService.formatarQuantidade(operacao.quantidade())).setHeader("Quantidade");
+        grid.addColumn(operacao -> formatterService.formatarPreco(operacao.precoUnitario(), operacao.quantidade())).setHeader("Preço Unitário");
         
         // Valor original da B3
-        var valorB3Column = grid.addColumn(operacao -> formatarValor(operacao.valorOperacao(), operacao.quantidade()))
+        var valorB3Column = grid.addColumn(operacao -> formatterService.formatarValor(operacao.valorOperacao(), operacao.quantidade()))
             .setHeader("Valor B3");
         
         // Valor calculado
-        var valorCalculadoColumn = grid.addColumn(operacao -> formatarValor(operacao.valorCalculado(), operacao.quantidade()))
+        var valorCalculadoColumn = grid.addColumn(operacao -> formatterService.formatarValor(operacao.valorCalculado(), operacao.quantidade()))
             .setHeader("Valor Calculado");
         
         // Diferença (só mostra se houver)
-        var diferencaColumn = grid.addColumn(operacao -> operacao.temDiferencaValor() ? 
-                String.format("R$ %.2f", operacao.diferencaValor()) : "")
+        var diferencaColumn = grid.addColumn(operacao -> formatterService.formatarDiferenca(operacao.diferencaValor()))
             .setHeader("Diferença");
         
         // Aplicar estilos condicionais usando renderer
         valorB3Column.setRenderer(new ComponentRenderer<>(operacao -> {
-            var span = new Span(formatarValor(operacao.valorOperacao(), operacao.quantidade()));
+            var span = new Span(formatterService.formatarValor(operacao.valorOperacao(), operacao.quantidade()));
             if (operacao.temDiferencaValor()) {
                 span.addClassNames("valor-diferente");
             }
@@ -204,7 +207,7 @@ public class OperacaoView extends Div implements HasDynamicTitle, HasUrlParamete
         }));
         
         valorCalculadoColumn.setRenderer(new ComponentRenderer<>(operacao -> {
-            var span = new Span(formatarValor(operacao.valorCalculado(), operacao.quantidade()));
+            var span = new Span(formatterService.formatarValor(operacao.valorCalculado(), operacao.quantidade()));
             if (operacao.temDiferencaValor()) {
                 span.addClassNames("valor-calculado");
             }
@@ -212,8 +215,7 @@ public class OperacaoView extends Div implements HasDynamicTitle, HasUrlParamete
         }));
         
         diferencaColumn.setRenderer(new ComponentRenderer<>(operacao -> {
-            var span = new Span(operacao.temDiferencaValor() ? 
-                String.format("R$ %.2f", operacao.diferencaValor()) : "");
+            var span = new Span(formatterService.formatarDiferenca(operacao.diferencaValor()));
             if (operacao.temDiferencaValor()) {
                 span.addClassNames("diferenca-valor");
             }
@@ -441,48 +443,5 @@ public class OperacaoView extends Div implements HasDynamicTitle, HasUrlParamete
         return comboBox;
     }
     
-    /**
-     * Formata valores monetários, mostrando "-" para operações sem valor (quantidade zero).
-     */
-    private String formatarValor(java.math.BigDecimal valor, java.math.BigDecimal quantidade) {
-        // Para operações sem quantidade (direitos não exercidos, atualizações, etc.)
-        if (quantidade.compareTo(java.math.BigDecimal.ZERO) == 0) {
-            return "-";
-        }
-        
-        // Para operações com valor zero mas quantidade > 0 (operações gratuitas)
-        if (valor.compareTo(java.math.BigDecimal.ZERO) == 0) {
-            return "R$ 0,00";
-        }
-        
-        // Para operações com valor normal
-        return String.format("R$ %.2f", valor);
-    }
-    
-    /**
-     * Formata preços unitários, mostrando "-" para operações sem quantidade.
-     */
-    private String formatarPreco(java.math.BigDecimal preco, java.math.BigDecimal quantidade) {
-        // Para operações sem quantidade (direitos não exercidos, atualizações, etc.)
-        if (quantidade.compareTo(java.math.BigDecimal.ZERO) == 0) {
-            return "-";
-        }
-        
-        // Para operações com preço normal
-        return String.format("R$ %.3f", preco);
-    }
-    
-    /**
-     * Formata quantidades, evitando notação científica e mostrando zero como "0".
-     */
-    private String formatarQuantidade(java.math.BigDecimal quantidade) {
-        // Para quantidade zero, mostrar simplesmente "0"
-        if (quantidade.compareTo(java.math.BigDecimal.ZERO) == 0) {
-            return "0";
-        }
-        
-        // Para quantidades normais, usar formatação sem notação científica
-        // Remover zeros desnecessários à direita
-        return quantidade.stripTrailingZeros().toPlainString();
-    }
+
 }

@@ -1,8 +1,11 @@
 package br.dev.rodrigopinheiro.B3DataManager.presentation.view.importXlsxView;
 
+import br.dev.rodrigopinheiro.B3DataManager.application.command.upload.ProcessUploadCommand;
+import br.dev.rodrigopinheiro.B3DataManager.application.result.upload.UploadProcessingResult;
 import br.dev.rodrigopinheiro.B3DataManager.application.security.SecurityService;
 import br.dev.rodrigopinheiro.B3DataManager.application.service.ErrorService;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.excel.ExcelFileImporter;
+import br.dev.rodrigopinheiro.B3DataManager.application.usecase.upload.ProcessUploadUseCase;
+import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.UsuarioId;
 import br.dev.rodrigopinheiro.B3DataManager.presentation.view.components.ToastNotification;
 import br.dev.rodrigopinheiro.B3DataManager.presentation.view.factory.MessageUtils;
 import com.vaadin.flow.component.Text;
@@ -24,8 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -35,14 +36,15 @@ import java.util.ResourceBundle;
 @Slf4j
 public class ImportXlsxView extends VerticalLayout implements HasDynamicTitle, HasUrlParameter<Long> {
 
-    private final ExcelFileImporter excelFileImporter;
+    private final ProcessUploadUseCase processUploadUseCase;
     private final ErrorService errorService;
     private final MessageUtils messageUtils;
     private String title = "";
     Locale currentLocale;
 
-    public ImportXlsxView(ExcelFileImporter excelFileImporter, ErrorService errorService) {
-        this.excelFileImporter = excelFileImporter;
+    public ImportXlsxView(ProcessUploadUseCase processUploadUseCase,
+                         ErrorService errorService) {
+        this.processUploadUseCase = processUploadUseCase;
         this.errorService = errorService;
         currentLocale = getUI().map(ui -> ui.getSession().getLocale()).orElse(Locale.getDefault());
         ResourceBundle messages = ResourceBundle.getBundle("messages", currentLocale);
@@ -86,25 +88,24 @@ public class ImportXlsxView extends VerticalLayout implements HasDynamicTitle, H
                     return;
                 }
                 
-                // Processar arquivo Excel diretamente dos bytes
-                try (InputStream inputStream = new java.io.ByteArrayInputStream(bytes)) {
-                    List<String> errors = excelFileImporter.processFile(inputStream, userId, currentLocale);
+                // Processar upload usando Use Case dedicado
+                ProcessUploadCommand command = new ProcessUploadCommand(bytes, meta.fileName(), new UsuarioId(userId));
+                UploadProcessingResult result = processUploadUseCase.execute(command);
+                
+                if (result.hasErrors()) {
+                    log.warn("Erros encontrados durante o processamento: {}", result.getErrorRows());
                     
-                    if (!errors.isEmpty()) {
-                        log.warn("Erros encontrados durante o processamento: {}", errors.size());
-                        
-                        // Criar link de download com DownloadHandler
-                        DownloadHandler downloadHandler = createErrorFileDownloadHandler(errors);
-                        Anchor downloadLink = new Anchor(downloadHandler, messageUtils.getString("importar.download.error"));
-                        downloadLink.addClassName("download-error-link");
-                        downloadLink.getElement().setAttribute("router-ignore", "true");
-                        
-                        formContainer.replace(downloadErrorFileButton, downloadLink);
-                        ToastNotification.showWarning(messageUtils.getFormattedString("importar.process.errors", errors.size()));
-                    } else {
-                        log.info("Processamento concluído sem erros.");
-                        ToastNotification.showInfo(messageUtils.getString("importar.success"));
-                    }
+                    // Criar link de download com DownloadHandler usando relatório gerado
+                    DownloadHandler downloadHandler = createErrorFileDownloadHandler(result.errorReportStream());
+                    Anchor downloadLink = new Anchor(downloadHandler, messageUtils.getString("importar.download.error"));
+                    downloadLink.addClassName("download-error-link");
+                    downloadLink.getElement().setAttribute("router-ignore", "true");
+                    
+                    formContainer.replace(downloadErrorFileButton, downloadLink);
+                    ToastNotification.showWarning(messageUtils.getFormattedString("importar.process.errors", result.getErrorRows()));
+                } else {
+                    log.info("Processamento concluído sem erros.");
+                    ToastNotification.showInfo(messageUtils.getString("importar.success"));
                 }
             } catch (Exception e) {
                 log.error("Erro ao processar o arquivo: {}", e.getMessage(), e);
@@ -149,15 +150,14 @@ public class ImportXlsxView extends VerticalLayout implements HasDynamicTitle, H
         add(formContainer);
     }
 
-    private DownloadHandler createErrorFileDownloadHandler(List<String> errors) {
-        log.info("Criando DownloadHandler para arquivo de erros com {} entradas.", errors.size());
+    private DownloadHandler createErrorFileDownloadHandler(ByteArrayInputStream errorReportStream) {
+        log.info("Criando DownloadHandler para arquivo de erros.");
         
         return DownloadHandler.fromInputStream(event -> {
-            ByteArrayInputStream stream = excelFileImporter.generateErrorFile(errors, currentLocale);
-            log.info("Arquivo de erros gerado com sucesso.");
+            log.info("Fornecendo arquivo de erros para download.");
             
             return new DownloadResponse(
-                stream,
+                errorReportStream,
                 "relatorio_erros.xlsx",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 -1 // Tamanho desconhecido

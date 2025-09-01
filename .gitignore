@@ -5,6 +5,8 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 *xlsx
+*.log
+*.csv
 
 ### STS ###
 .apt_generated
