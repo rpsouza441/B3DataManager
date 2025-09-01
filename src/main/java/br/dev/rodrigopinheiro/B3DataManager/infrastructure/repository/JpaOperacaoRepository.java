@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -87,5 +88,49 @@ public interface JpaOperacaoRepository extends JpaRepository<OperacaoJpaEntity, 
         @Param("duplicado") Boolean duplicado,
         @Param("dimensionado") Boolean dimensionado,
         @Param("usuarioId") Long usuarioId
+    );
+    
+    /**
+     * Busca a primeira operação que corresponde exatamente aos parâmetros fornecidos.
+     * Usado para verificação de duplicidade durante importação.
+     * 
+     * @param data Data da operação
+     * @param movimentacao Tipo de movimentação
+     * @param produto Produto da operação
+     * @param instituicao Instituição da operação
+     * @param quantidade Quantidade da operação
+     * @param precoUnitario Preço unitário da operação
+     * @param valorOperacao Valor total da operação
+     * @param duplicado Flag indicando se deve buscar apenas operações não duplicadas
+     * @param usuarioId ID do usuário proprietário
+     * @return Optional contendo a primeira operação encontrada
+     */
+    Optional<OperacaoJpaEntity> findFirstByDataAndMovimentacaoAndProdutoAndInstituicaoAndQuantidadeAndPrecoUnitarioAndValorOperacaoAndDuplicadoAndUsuarioId(
+        LocalDate data,
+        String movimentacao,
+        String produto,
+        String instituicao,
+        BigDecimal quantidade,
+        BigDecimal precoUnitario,
+        BigDecimal valorOperacao,
+        boolean duplicado,
+        Long usuarioId
+    );
+    
+    /**
+     * Busca operações por critérios de dimensionado e duplicado com paginação.
+     */
+    Page<OperacaoJpaEntity> findByDimensionadoAndDuplicado(
+        boolean dimensionado,
+        boolean duplicado,
+        Pageable pageable
+    );
+    
+    /**
+     * Conta operações por critérios de dimensionado e duplicado.
+     */
+    long countByDimensionadoAndDuplicado(
+        boolean dimensionado,
+        boolean duplicado
     );
 }

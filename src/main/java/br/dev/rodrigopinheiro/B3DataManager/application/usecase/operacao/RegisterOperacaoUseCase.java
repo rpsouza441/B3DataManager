@@ -35,32 +35,25 @@ public class RegisterOperacaoUseCase {
     @Transactional
     public Operacao execute(RegisterOperacaoCommand command) {
         
-        // Validar se o usuário foi fornecido
+        // Validar se o usuário foi fornecido (já é Value Object)
         if (command.usuarioId() == null) {
             throw new UsuarioNaoAutorizadoException("UsuarioId é obrigatório para registrar uma operação");
         }
         
-        // Criar UsuarioId
-        UsuarioId usuarioId = new UsuarioId(command.usuarioId());
-        
         // Verificar duplicidade se idOriginal foi fornecido
         if (command.idOriginal() != null) {
             boolean existe = operacaoRepository.existsByIdOriginalAndUsuarioId(
-                command.idOriginal(), usuarioId);
+                command.idOriginal(), command.usuarioId());
             
             if (existe) {
                 throw new OperacaoInvalidaException(
                     "Já existe uma operação com idOriginal " + command.idOriginal() + 
-                    " para o usuário " + usuarioId.value());
+                    " para o usuário " + command.usuarioId().value());
             }
         }
         
-        // Criar Value Objects
-        Quantidade quantidade = new Quantidade(command.quantidade());
-        Dinheiro precoUnitario = new Dinheiro(command.precoUnitario());
-        Dinheiro valorOperacao = new Dinheiro(command.valorOperacao());
-        
         // Criar entidade de domínio (validações são executadas no construtor)
+        // Value Objects já vêm validados do comando
         Operacao operacao = new Operacao(
             null, // ID será gerado pela infraestrutura
             command.entradaSaida(),
@@ -68,14 +61,14 @@ public class RegisterOperacaoUseCase {
             command.movimentacao(),
             command.produto(),
             command.instituicao(),
-            quantidade,
-            precoUnitario,
-            valorOperacao,
+            command.quantidade(),
+            command.precoUnitario(),
+            command.valorOperacao(),
             command.duplicado(),
             command.dimensionado(),
             command.idOriginal(),
             command.deletado(),
-            usuarioId
+            command.usuarioId()
         );
         
         // Persistir a operação

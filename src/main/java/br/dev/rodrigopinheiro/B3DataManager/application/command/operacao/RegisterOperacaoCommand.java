@@ -1,12 +1,18 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.command.operacao;
 
-import java.math.BigDecimal;
+import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.Dinheiro;
+import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.Quantidade;
+import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.UsuarioId;
+
 import java.time.LocalDate;
 import java.util.Objects;
 
 /**
  * Command imutável que representa os dados necessários para registrar uma operação.
  * Usado como entrada para o RegisterOperacaoUseCase.
+ * 
+ * <p>Atualizado para usar Value Objects ao invés de tipos primitivos,
+ * garantindo maior segurança de tipos e validações automáticas.</p>
  */
 public record RegisterOperacaoCommand(
     String entradaSaida,
@@ -14,14 +20,14 @@ public record RegisterOperacaoCommand(
     String movimentacao,
     String produto,
     String instituicao,
-    BigDecimal quantidade,
-    BigDecimal precoUnitario,
-    BigDecimal valorOperacao,
+    Quantidade quantidade,
+    Dinheiro precoUnitario,
+    Dinheiro valorOperacao,
     Boolean duplicado,
     Boolean dimensionado,
     Long idOriginal,
     Boolean deletado,
-    Long usuarioId
+    UsuarioId usuarioId
 ) {
     
     public RegisterOperacaoCommand {

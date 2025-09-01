@@ -5,8 +5,9 @@ import br.dev.rodrigopinheiro.B3DataManager.application.criteria.FilterCriteria;
 import br.dev.rodrigopinheiro.B3DataManager.application.port.OperacaoRepository;
 import br.dev.rodrigopinheiro.B3DataManager.application.usecase.operacao.RegisterOperacaoUseCase;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.operacao.OperacaoInvalidaException;
-import br.dev.rodrigopinheiro.B3DataManager.domain.exception.usuario.UsuarioNaoAutorizadoException;
 import br.dev.rodrigopinheiro.B3DataManager.domain.model.Operacao;
+import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.Dinheiro;
+import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.Quantidade;
 import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.UsuarioId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,8 +39,10 @@ class RegisterOperacaoUseCaseTest {
         // Arrange
         RegisterOperacaoCommand command = new RegisterOperacaoCommand(
             "Compra", LocalDate.now(), "Compra à vista", "PETR4", "XP Investimentos",
-            BigDecimal.valueOf(100), BigDecimal.valueOf(10.50), BigDecimal.valueOf(1050.00),
-            false, false, null, false, 1L
+            new Quantidade(BigDecimal.valueOf(100)), 
+            new Dinheiro(BigDecimal.valueOf(10.50)), 
+            new Dinheiro(BigDecimal.valueOf(1050.00)),
+            false, false, null, false, new UsuarioId(1L)
         );
         
         // Act
@@ -59,7 +62,9 @@ class RegisterOperacaoUseCaseTest {
         assertThrows(NullPointerException.class, () -> {
             new RegisterOperacaoCommand(
                 "Compra", LocalDate.now(), "Compra à vista", "PETR4", "XP Investimentos",
-                BigDecimal.valueOf(100), BigDecimal.valueOf(10.50), BigDecimal.valueOf(1050.00),
+                new Quantidade(BigDecimal.valueOf(100)), 
+                new Dinheiro(BigDecimal.valueOf(10.50)), 
+                new Dinheiro(BigDecimal.valueOf(1050.00)),
                 false, false, null, false, null // usuarioId null
             );
         });
@@ -70,8 +75,10 @@ class RegisterOperacaoUseCaseTest {
         // Arrange
         RegisterOperacaoCommand command = new RegisterOperacaoCommand(
             "Compra", LocalDate.now(), "Compra à vista", "PETR4", "XP Investimentos",
-            BigDecimal.valueOf(-100), BigDecimal.valueOf(10.50), BigDecimal.valueOf(1050.00),
-            false, false, null, false, 1L
+            new Quantidade(BigDecimal.valueOf(-100)), 
+            new Dinheiro(BigDecimal.valueOf(10.50)), 
+            new Dinheiro(BigDecimal.valueOf(1050.00)),
+            false, false, null, false, new UsuarioId(1L)
         );
         
         // Act & Assert
@@ -87,8 +94,10 @@ class RegisterOperacaoUseCaseTest {
         // Arrange
         RegisterOperacaoCommand command = new RegisterOperacaoCommand(
             "Compra", LocalDate.now(), "Compra à vista", "PETR4", "XP Investimentos",
-            BigDecimal.valueOf(100), BigDecimal.valueOf(10.50), BigDecimal.valueOf(-1050.00),
-            false, false, null, false, 1L
+            new Quantidade(BigDecimal.valueOf(100)), 
+            new Dinheiro(BigDecimal.valueOf(10.50)), 
+            new Dinheiro(BigDecimal.valueOf(-1050.00)),
+            false, false, null, false, new UsuarioId(1L)
         );
         
         // Act & Assert
@@ -110,8 +119,10 @@ class RegisterOperacaoUseCaseTest {
         
         RegisterOperacaoCommand command = new RegisterOperacaoCommand(
             "Compra", LocalDate.now(), "Compra à vista", "PETR4", "XP Investimentos",
-            BigDecimal.valueOf(100), BigDecimal.valueOf(10.50), BigDecimal.valueOf(1050.00),
-            false, false, idOriginal, false, 1L
+            new Quantidade(BigDecimal.valueOf(100)), 
+            new Dinheiro(BigDecimal.valueOf(10.50)), 
+            new Dinheiro(BigDecimal.valueOf(1050.00)),
+            false, false, idOriginal, false, new UsuarioId(1L)
         );
         
         // Act & Assert
@@ -174,6 +185,28 @@ class RegisterOperacaoUseCaseTest {
         
         @Override
         public long countByFiltersAndUsuarioId(FilterCriteria criteria, UsuarioId usuarioId) {
+            // Implementação simples para testes - retorna 0
+            return 0;
+        }
+        
+        @Override
+        public Optional<Operacao> findFirstByDataAndMovimentacaoAndProdutoAndInstituicaoAndQuantidadeAndPrecoUnitarioAndValorOperacaoAndDuplicadoAndUsuarioId(
+                java.time.LocalDate data, String movimentacao, String produto, String instituicao,
+                java.math.BigDecimal quantidade, java.math.BigDecimal precoUnitario, java.math.BigDecimal valorOperacao,
+                boolean duplicado, UsuarioId usuarioId) {
+            // Implementação simples para testes - retorna vazio
+            return Optional.empty();
+        }
+        
+        @Override
+        public java.util.List<Operacao> findByDimensionadoAndDuplicadoWithPagination(
+                boolean dimensionado, boolean duplicado, int pageSize, int offset) {
+            // Implementação simples para testes - retorna lista vazia
+            return java.util.List.of();
+        }
+        
+        @Override
+        public long countByDimensionadoAndDuplicado(boolean dimensionado, boolean duplicado) {
             // Implementação simples para testes - retorna 0
             return 0;
         }

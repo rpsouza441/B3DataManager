@@ -84,4 +84,38 @@ public class OperacaoRepositoryAdapter implements OperacaoRepository {
             usuarioId.value()
         );
     }
+    
+    @Override
+    public Optional<Operacao> findFirstByDataAndMovimentacaoAndProdutoAndInstituicaoAndQuantidadeAndPrecoUnitarioAndValorOperacaoAndDuplicadoAndUsuarioId(
+            java.time.LocalDate data,
+            String movimentacao,
+            String produto,
+            String instituicao,
+            java.math.BigDecimal quantidade,
+            java.math.BigDecimal precoUnitario,
+            java.math.BigDecimal valorOperacao,
+            boolean duplicado,
+            UsuarioId usuarioId) {
+        
+        return jpaRepository.findFirstByDataAndMovimentacaoAndProdutoAndInstituicaoAndQuantidadeAndPrecoUnitarioAndValorOperacaoAndDuplicadoAndUsuarioId(
+                data, movimentacao, produto, instituicao, quantidade, precoUnitario, valorOperacao, duplicado, usuarioId.value()
+        ).map(mapper::toDomainEntity);
+    }
+    
+    @Override
+    public java.util.List<Operacao> findByDimensionadoAndDuplicadoWithPagination(
+            boolean dimensionado, boolean duplicado, int pageSize, int offset) {
+        
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(offset / pageSize, pageSize, org.springframework.data.domain.Sort.by("id").ascending());
+        Page<OperacaoJpaEntity> page = jpaRepository.findByDimensionadoAndDuplicado(dimensionado, duplicado, pageable);
+        
+        return page.getContent().stream()
+                .map(mapper::toDomainEntity)
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
+    @Override
+    public long countByDimensionadoAndDuplicado(boolean dimensionado, boolean duplicado) {
+        return jpaRepository.countByDimensionadoAndDuplicado(dimensionado, duplicado);
+    }
 }

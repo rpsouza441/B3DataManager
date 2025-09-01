@@ -1,7 +1,7 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.batch.config;
 
 import br.dev.rodrigopinheiro.B3DataManager.domain.entity.AtivoFinanceiro;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Operacao;
+import br.dev.rodrigopinheiro.B3DataManager.domain.model.Operacao;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -35,16 +35,29 @@ public class BatchConfig {
     }
 
     @Bean
+    public ItemProcessor<Operacao, AtivoFinanceiro> operacaoProcessor() {
+        return operacao -> {
+            // Implementação simples: converte Operacao em AtivoFinanceiro
+            // TODO: Implementar lógica de negócio específica
+            AtivoFinanceiro ativo = new AtivoFinanceiro();
+            ativo.setNome(operacao.getProduto());
+            ativo.setDeletado(false);
+            // Adicionar outras conversões conforme necessário
+            return ativo;
+        };
+    }
+    
+    @Bean
     public Step processStep(
             ItemReader<Operacao> reader,
             ItemProcessor<Operacao, AtivoFinanceiro> processor,
-            ItemWriter<AtivoFinanceiro> writer
+            ItemWriter<AtivoFinanceiro> ativoItemWriter
     ) {
         return new StepBuilder("processStep", jobRepository)
                 .<Operacao, AtivoFinanceiro>chunk(10, transactionManager) // Processa 10 itens por vez
                 .reader(reader)
                 .processor(processor)
-                .writer(writer)
+                .writer(ativoItemWriter)
                 .build();
     }
 }

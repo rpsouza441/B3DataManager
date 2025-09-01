@@ -1,6 +1,8 @@
 package br.dev.rodrigopinheiro.B3DataManager.presentation.exception;
 
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.ServiceException;
+import br.dev.rodrigopinheiro.B3DataManager.domain.exception.excel.ExcelProcessingException;
+import br.dev.rodrigopinheiro.B3DataManager.domain.exception.excel.InvalidDataException;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.operacao.OperacaoInvalidaException;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.usuario.UsuarioNaoAutorizadoException;
 import org.springframework.http.HttpStatus;
@@ -41,6 +43,28 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
                 "Erro de Serviço",
+                ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(ExcelProcessingException.class)
+    public ResponseEntity<ApiError> handleExcelProcessingException(ExcelProcessingException ex) {
+        ApiError error = new ApiError(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Erro no Processamento do Excel",
+                ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(InvalidDataException.class)
+    public ResponseEntity<ApiError> handleInvalidDataException(InvalidDataException ex) {
+        ApiError error = new ApiError(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Dados Inválidos",
                 ex.getMessage()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);

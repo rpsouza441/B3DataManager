@@ -7,14 +7,18 @@ import br.dev.rodrigopinheiro.B3DataManager.presentation.view.components.ToastNo
 import br.dev.rodrigopinheiro.B3DataManager.presentation.view.factory.MessageUtils;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.Anchor;
+
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
+import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.upload.UploadI18N;
 import com.vaadin.flow.router.*;
-import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.streams.DownloadHandler;
+import com.vaadin.flow.server.streams.DownloadResponse;
+import com.vaadin.flow.server.streams.UploadHandler;
+
 import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
@@ -29,7 +33,7 @@ import java.util.ResourceBundle;
 @Menu(order = 4, icon = LineAwesomeIconUrl.FILE_EXCEL_SOLID, title = "Importar")
 @PermitAll
 @Slf4j
-public class ImportXlsxView extends VerticalLayout implements HasDynamicTitle {
+public class ImportXlsxView extends VerticalLayout implements HasDynamicTitle, HasUrlParameter<Long> {
 
     private final ExcelFileImporter excelFileImporter;
     private final ErrorService errorService;
@@ -58,18 +62,7 @@ public class ImportXlsxView extends VerticalLayout implements HasDynamicTitle {
         Div formContainer = new Div();
         formContainer.addClassName("form-container");
 
-        // Buffer de memória para o upload
-        MemoryBuffer buffer = new MemoryBuffer();
-        Upload upload = new Upload(buffer);
-        upload.setDropLabel(new Div(new Text(messageUtils.getString("importar.upload.dropLabel"))));
-        upload.setAcceptedFileTypes(".xlsx");
-        upload.setMaxFiles(1);
-
-        // Configura estilo do label no botão de upload
-        upload.getElement().executeJs(
-                "this.shadowRoot.querySelector('vaadin-button').setAttribute('part', 'label')"
-        );
-
+        // Declarar componentes no escopo correto
         ProgressBar progressBar = new ProgressBar();
         progressBar.setVisible(false);
         progressBar.setIndeterminate(true);
@@ -78,12 +71,13 @@ public class ImportXlsxView extends VerticalLayout implements HasDynamicTitle {
         Button downloadErrorFileButton = new Button(messageUtils.getString("importar.download.error"));
         downloadErrorFileButton.addClassName("download-error-button");
         downloadErrorFileButton.setEnabled(false);
-
-        upload.addSucceededListener(event -> {
-            log.info("Arquivo carregado com sucesso: {}", event.getFileName());
+        
+        // Configuração do upload com UploadHandler.inMemory (API Vaadin 24.8+)
+        UploadHandler uploadHandler = UploadHandler.inMemory((meta, bytes) -> {
+            log.info("Processando arquivo: {} ({} bytes)", meta.fileName(), bytes.length);
             progressBar.setVisible(true);
-
-            try (InputStream inputStream = buffer.getInputStream()) {
+            
+            try {
                 Long userId = SecurityService.getAuthenticatedUserId();
                 if (userId == null) {
                     log.error("ID do usuário autenticado é nulo.");
@@ -91,23 +85,26 @@ public class ImportXlsxView extends VerticalLayout implements HasDynamicTitle {
                     progressBar.setVisible(false);
                     return;
                 }
-
-                List<String> errors = excelFileImporter.processFile(inputStream, userId, currentLocale);
-
-                if (!errors.isEmpty()) {
-                    log.warn("Erros encontrados durante o processamento: {}", errors.size());
-                    StreamResource resource = createErrorFile(errors);
-
-                    // Usa um componente Anchor para gerenciar o download
-                    Anchor downloadLink = new Anchor(resource, messageUtils.getString("importar.download.error"));
-                    downloadLink.getElement().setAttribute("download", "relatorio_erros.xlsx");
-                    downloadLink.addClassName("download-error-link");
-
-                    formContainer.replace(downloadErrorFileButton, downloadLink); // Substitui o botão pelo link
-                    ToastNotification.showWarning(messageUtils.getFormattedString("importar.process.errors", errors.size()));
-                } else {
-                    log.info("Processamento concluído sem erros.");
-                    ToastNotification.showInfo(messageUtils.getString("importar.success"));
+                
+                // Processar arquivo Excel diretamente dos bytes
+                try (InputStream inputStream = new java.io.ByteArrayInputStream(bytes)) {
+                    List<String> errors = excelFileImporter.processFile(inputStream, userId, currentLocale);
+                    
+                    if (!errors.isEmpty()) {
+                        log.warn("Erros encontrados durante o processamento: {}", errors.size());
+                        
+                        // Criar link de download com DownloadHandler
+                        DownloadHandler downloadHandler = createErrorFileDownloadHandler(errors);
+                        Anchor downloadLink = new Anchor(downloadHandler, messageUtils.getString("importar.download.error"));
+                        downloadLink.addClassName("download-error-link");
+                        downloadLink.getElement().setAttribute("router-ignore", "true");
+                        
+                        formContainer.replace(downloadErrorFileButton, downloadLink);
+                        ToastNotification.showWarning(messageUtils.getFormattedString("importar.process.errors", errors.size()));
+                    } else {
+                        log.info("Processamento concluído sem erros.");
+                        ToastNotification.showInfo(messageUtils.getString("importar.success"));
+                    }
                 }
             } catch (Exception e) {
                 log.error("Erro ao processar o arquivo: {}", e.getMessage(), e);
@@ -117,24 +114,68 @@ public class ImportXlsxView extends VerticalLayout implements HasDynamicTitle {
                 log.info("Processo de upload finalizado.");
             }
         });
+        
+        Upload upload = new Upload(uploadHandler);
+        upload.setDropLabel(new Div(new Text(messageUtils.getString("importar.upload.dropLabel"))));
+        upload.setAcceptedFileTypes(".xlsx");
+        upload.setMaxFiles(1);
+        
+        // Configuração de internacionalização do upload (Vaadin 24.8+)
+        UploadI18N i18n = new UploadI18N();
+        
+        // Inicializar objetos internos antes de usar
+        UploadI18N.AddFiles addFiles = new UploadI18N.AddFiles();
+        addFiles.setOne("Selecionar arquivo...");
+        i18n.setAddFiles(addFiles);
+        
+        UploadI18N.DropFiles dropFiles = new UploadI18N.DropFiles();
+        dropFiles.setOne("Arraste o arquivo Excel aqui");
+        i18n.setDropFiles(dropFiles);
+        
+        UploadI18N.Error error = new UploadI18N.Error();
+        error.setFileIsTooBig("Arquivo muito grande");
+        error.setIncorrectFileType("Tipo de arquivo incorreto. Use apenas .xlsx");
+        i18n.setError(error);
+        
+        upload.setI18n(i18n);
 
+        // Configura estilo do label no botão de upload
+        upload.getElement().executeJs(
+                "this.shadowRoot.querySelector('vaadin-button').setAttribute('part', 'label')"
+        );
 
 
         formContainer.add(upload, progressBar, downloadErrorFileButton);
         add(formContainer);
     }
 
-    private StreamResource createErrorFile(List<String> errors) {
-        log.info("Gerando arquivo de erros com {} entradas.", errors.size());
-        return new StreamResource("relatorio_erros.xlsx", () -> {
+    private DownloadHandler createErrorFileDownloadHandler(List<String> errors) {
+        log.info("Criando DownloadHandler para arquivo de erros com {} entradas.", errors.size());
+        
+        return DownloadHandler.fromInputStream(event -> {
             ByteArrayInputStream stream = excelFileImporter.generateErrorFile(errors, currentLocale);
             log.info("Arquivo de erros gerado com sucesso.");
-            return stream;
+            
+            return new DownloadResponse(
+                stream,
+                "relatorio_erros.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                -1 // Tamanho desconhecido
+            );
         });
     }
 
     @Override
     public String getPageTitle() {
         return title;
+    }
+
+    @Override
+    public void setParameter(BeforeEvent event, @OptionalParameter Long parameter) {
+        title = "Importar Excel | B3 Data Manager";
+        if (parameter != null) {
+            title = title + " - " + parameter;
+        }
+        log.info("Título da página configurado como: {}", title);
     }
 }

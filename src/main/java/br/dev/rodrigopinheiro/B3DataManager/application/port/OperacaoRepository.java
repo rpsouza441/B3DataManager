@@ -60,11 +60,66 @@ public interface OperacaoRepository {
     Page<Operacao> findByFiltersAndUsuarioId(FilterCriteria criteria, UsuarioId usuarioId, Pageable pageable);
     
     /**
-     * Conta operações com filtros e ownership obrigatório.
+     * Conta operações por filtros e usuário.
      * 
      * @param criteria Critérios de filtro
-     * @param usuarioId ID do usuário (ownership)
-     * @return Quantidade de operações que atendem aos critérios
+     * @param usuarioId ID do usuário
+     * @return Número de operações que atendem aos critérios
      */
     long countByFiltersAndUsuarioId(FilterCriteria criteria, UsuarioId usuarioId);
+    
+    /**
+     * Busca a primeira operação que corresponde exatamente aos parâmetros fornecidos.
+     * Usado para verificação de duplicidade durante importação.
+     * 
+     * @param data Data da operação
+     * @param movimentacao Tipo de movimentação
+     * @param produto Produto da operação
+     * @param instituicao Instituição da operação
+     * @param quantidade Quantidade da operação
+     * @param precoUnitario Preço unitário da operação
+     * @param valorOperacao Valor total da operação
+     * @param duplicado Flag indicando se deve buscar apenas operações não duplicadas
+     * @param usuarioId ID do usuário proprietário
+     * @return Optional contendo a primeira operação encontrada
+     */
+    Optional<Operacao> findFirstByDataAndMovimentacaoAndProdutoAndInstituicaoAndQuantidadeAndPrecoUnitarioAndValorOperacaoAndDuplicadoAndUsuarioId(
+        java.time.LocalDate data,
+        String movimentacao,
+        String produto,
+        String instituicao,
+        java.math.BigDecimal quantidade,
+        java.math.BigDecimal precoUnitario,
+        java.math.BigDecimal valorOperacao,
+        boolean duplicado,
+        UsuarioId usuarioId
+    );
+    
+    /**
+     * Busca operações por critérios de dimensionado e duplicado com paginação.
+     * 
+     * @param dimensionado Indica se a operação foi dimensionada
+     * @param duplicado Indica se a operação é duplicada
+     * @param pageSize Tamanho da página
+     * @param offset Offset para paginação
+     * @return Lista de operações encontradas
+     */
+    java.util.List<Operacao> findByDimensionadoAndDuplicadoWithPagination(
+        boolean dimensionado,
+        boolean duplicado,
+        int pageSize,
+        int offset
+    );
+    
+    /**
+     * Conta operações por critérios de dimensionado e duplicado.
+     * 
+     * @param dimensionado Indica se a operação foi dimensionada
+     * @param duplicado Indica se a operação é duplicada
+     * @return Número total de operações
+     */
+    long countByDimensionadoAndDuplicado(
+        boolean dimensionado,
+        boolean duplicado
+    );
 }

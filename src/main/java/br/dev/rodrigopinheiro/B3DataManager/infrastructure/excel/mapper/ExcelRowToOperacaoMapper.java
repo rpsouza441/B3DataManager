@@ -4,29 +4,64 @@ import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Operacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.excel.InvalidDataException;
 import br.dev.rodrigopinheiro.B3DataManager.domain.util.DateFormatter;
 import org.apache.poi.ss.usermodel.*;
-import org.springframework.context.MessageSource;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Locale;
 
+/**
+ * Mapper responsável por converter linhas do Excel em entidades Operacao.
+ * 
+ * <p>Atualizado para não depender de MessageSource, seguindo princípios
+ * da arquitetura hexagonal e simplificando o tratamento de exceções.</p>
+ * 
+ * @deprecated Esta classe será removida quando a migração para ImportExcelUseCase for completa
+ */
+@Deprecated
 public class ExcelRowToOperacaoMapper {
 
-    private final MessageSource messageSource;
     private final DataFormatter dataFormatter;
 
-    public ExcelRowToOperacaoMapper(MessageSource messageSource) {
-        this.messageSource = messageSource;
+    public ExcelRowToOperacaoMapper() {
         this.dataFormatter = new DataFormatter();
     }
+    
+    /**
+     * Construtor mantido para compatibilidade (ignora MessageSource).
+     * 
+     * @param messageSource Ignorado - mantido apenas para compatibilidade
+     * @deprecated Use o construtor sem parâmetros
+     */
+    @Deprecated
+    public ExcelRowToOperacaoMapper(Object messageSource) {
+        this();
+    }
 
-    public Operacao map(Row row, Locale locale) {
+    /**
+     * Converte uma linha do Excel em entidade Operacao.
+     * 
+     * @param row Linha do Excel
+     * @param locale Locale (mantido para compatibilidade, mas não usado)
+     * @return Entidade Operacao mapeada
+     * @deprecated Use ImportExcelUseCase para processamento completo
+     */
+    @Deprecated
+    public Operacao map(Row row, java.util.Locale locale) {
+        return map(row);
+    }
+    
+    /**
+     * Converte uma linha do Excel em entidade Operacao.
+     * 
+     * @param row Linha do Excel
+     * @return Entidade Operacao mapeada
+     */
+    public Operacao map(Row row) {
         // Valida os campos obrigatórios
-        validarCampoObrigatorio(row.getCell(0), "entrada_saida", row.getRowNum(), locale);
-        validarCampoObrigatorio(row.getCell(1), "data", row.getRowNum(), locale);
-        validarCampoObrigatorio(row.getCell(2), "movimentacao", row.getRowNum(), locale);
-        validarCampoObrigatorio(row.getCell(3), "produto", row.getRowNum(), locale);
-        validarCampoObrigatorio(row.getCell(4), "instituicao", row.getRowNum(), locale);
+        validarCampoObrigatorio(row.getCell(0), "Entrada/Saída", row.getRowNum());
+        validarCampoObrigatorio(row.getCell(1), "Data", row.getRowNum());
+        validarCampoObrigatorio(row.getCell(2), "Movimentação", row.getRowNum());
+        validarCampoObrigatorio(row.getCell(3), "Produto", row.getRowNum());
+        validarCampoObrigatorio(row.getCell(4), "Instituição", row.getRowNum());
 
         Operacao operacao = new Operacao();
 
@@ -52,9 +87,18 @@ public class ExcelRowToOperacaoMapper {
         return operacao;
     }
 
-    private void validarCampoObrigatorio(Cell cell, String campo, int linha, Locale locale) {
+    /**
+     * Valida se um campo obrigatório está preenchido.
+     * 
+     * @param cell Célula do Excel
+     * @param campo Nome do campo para mensagem de erro
+     * @param linha Número da linha para mensagem de erro
+     */
+    private void validarCampoObrigatorio(Cell cell, String campo, int linha) {
         if (cell == null || dataFormatter.formatCellValue(cell).trim().isEmpty()) {
-            throw new InvalidDataException("excel.field.required", messageSource, new Object[]{campo, linha});
+            throw new InvalidDataException(
+                String.format("Campo '%s' é obrigatório na linha %d", campo, linha + 1)
+            );
         }
     }
 
@@ -102,17 +146,34 @@ public class ExcelRowToOperacaoMapper {
         }
     }
 
+    /**
+     * Extrai valor de data de uma célula do Excel.
+     * 
+     * @param cell Célula contendo a data
+     * @return LocalDate extraído da célula
+     */
     private LocalDate getLocalDateValue(Cell cell) {
         if (cell == null) {
-            throw new InvalidDataException("Data é obrigatória", messageSource, new Object[]{"data", cell.getRowIndex()});
+            throw new InvalidDataException(
+                String.format("Data é obrigatória na linha %d", cell != null ? cell.getRowIndex() + 1 : 0)
+            );
         }
-        if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
-            // Se a célula é numérica e formatada como data
-            return cell.getLocalDateTimeCellValue().toLocalDate();
-        } else {
-            // Converte a String utilizando o DateFormatter
-            String dataStr = dataFormatter.formatCellValue(cell).trim();
-            return DateFormatter.parse(dataStr);
+        
+        try {
+            if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
+                // Se a célula é numérica e formatada como data
+                return cell.getLocalDateTimeCellValue().toLocalDate();
+            } else {
+                // Converte a String utilizando o DateFormatter
+                String dataStr = dataFormatter.formatCellValue(cell).trim();
+                return DateFormatter.parse(dataStr);
+            }
+        } catch (Exception e) {
+            throw new InvalidDataException(
+                String.format("Data inválida na linha %d: %s", 
+                    cell.getRowIndex() + 1, 
+                    dataFormatter.formatCellValue(cell))
+            );
         }
     }
 

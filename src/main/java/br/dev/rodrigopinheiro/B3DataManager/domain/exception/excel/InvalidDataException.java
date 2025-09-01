@@ -1,54 +1,28 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.exception.excel;
 
-import org.springframework.context.MessageSource;
-
+/**
+ * Exceção lançada quando dados inválidos são encontrados durante processamento de Excel.
+ * 
+ * <p>Simplificada para não depender de MessageSource, seguindo princípios da arquitetura hexagonal.</p>
+ */
 public class InvalidDataException extends RuntimeException {
 
-    private final String messageKey;
-
     /**
-     * Construtor que utiliza o MessageSource para localizar a mensagem.
+     * Construtor com mensagem de erro.
      *
-     * @param messageKey    A chave da mensagem no arquivo de mensagens.
-     * @param messageSource O MessageSource para localizar mensagens.
-     * @param messageArgs   Argumentos opcionais para formatação da mensagem.
+     * @param message Mensagem descritiva do erro
      */
-    public InvalidDataException(String messageKey, MessageSource messageSource, Object... messageArgs) {
-        super(getLocalizedMessage(messageKey, messageSource, messageArgs));
-        this.messageKey = messageKey;
+    public InvalidDataException(String message) {
+        super(message);
     }
 
     /**
-     * Construtor para casos com mensagens personalizadas e causas.
+     * Construtor com mensagem de erro e causa.
      *
-     * @param messageKey    A chave da mensagem no arquivo de mensagens.
-     * @param messageSource O MessageSource para localizar mensagens.
-     * @param cause         Exceção original que causou o erro.
-     * @param messageArgs   Argumentos opcionais para formatação da mensagem.
+     * @param message Mensagem descritiva do erro
+     * @param cause Exceção original que causou o erro
      */
-    public InvalidDataException(String messageKey, MessageSource messageSource, Throwable cause, Object... messageArgs) {
-        super(getLocalizedMessage(messageKey, messageSource, messageArgs), cause);
-        this.messageKey = messageKey;
-    }
-
-    /**
-     * Obtém a mensagem localizada com base no MessageSource.
-     *
-     * @param messageKey    A chave da mensagem no arquivo de mensagens.
-     * @param messageSource O MessageSource para localizar mensagens.
-     * @param messageArgs   Argumentos opcionais para formatação da mensagem.
-     * @return Mensagem localizada e formatada.
-     */
-    private static String getLocalizedMessage(String messageKey, MessageSource messageSource, Object... messageArgs) {
-        return messageSource.getMessage(messageKey, messageArgs, null); // Locale será gerenciado pelo Spring
-    }
-
-    /**
-     * Obtém a chave da mensagem associada a esta exceção.
-     *
-     * @return A chave da mensagem.
-     */
-    public String getMessageKey() {
-        return messageKey;
+    public InvalidDataException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
