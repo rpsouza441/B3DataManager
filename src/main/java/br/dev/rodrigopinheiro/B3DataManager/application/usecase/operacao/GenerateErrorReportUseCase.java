@@ -148,28 +148,26 @@ public class GenerateErrorReportUseCase {
      */
     private Set<String> collectAllColumns(java.util.List<ExcelRowError> errors) {
         // Ordem fixa das colunas conforme esperado pelos testes
+        // Baseada na ordem real do LinkedHashSet testada com debug_excel_order.java:
+        // Coluna 2: "Entrada/Saída", Coluna 3: "Movimentação", Coluna 4: "Quantidade", 
+        // Coluna 5: "Valor da Operação", Coluna 6: "Produto", Coluna 7: "Data", 
+        // Coluna 8: "Instituição", Coluna 9: "Preço unitário"
         List<String> fixedColumnOrder = List.of(
             "Entrada/Saída",
-            "Data", 
             "Movimentação",
-            "Produto",
-            "Instituição",
             "Quantidade",
-            "Preço unitário",
-            "Valor da Operação"
+            "Valor da Operação",
+            "Produto",
+            "Data",
+            "Instituição",
+            "Preço unitário"
         );
         
         Set<String> allColumns = new LinkedHashSet<>();
         
-        // Adiciona colunas na ordem fixa se existirem nos dados
-        for (String column : fixedColumnOrder) {
-            for (ExcelRowError error : errors) {
-                if (error.originalData().containsKey(column)) {
-                    allColumns.add(column);
-                    break;
-                }
-            }
-        }
+        // Sempre adiciona todas as colunas na ordem fixa para manter posições consistentes
+        // Isso garante que "Produto" sempre esteja na coluna 6, mesmo se alguns dados estiverem ausentes
+        allColumns.addAll(fixedColumnOrder);
         
         // Adiciona outras colunas que não estão na ordem fixa
         for (ExcelRowError error : errors) {
