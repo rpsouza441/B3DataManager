@@ -1,19 +1,20 @@
 package br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository;
 
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.AtivoFinanceiro;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Portfolio;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.PortfolioEntity;
+
 import java.util.List;
 import java.util.Optional;
 
-public interface AtivoFinanceiroRepository extends JpaRepository<AtivoFinanceiro, Long>, JpaSpecificationExecutor<AtivoFinanceiro> {
+public interface AtivoFinanceiroRepository extends JpaRepository<AtivoFinanceiroEntity, Long>, JpaSpecificationExecutor<AtivoFinanceiroEntity> {
 
-    Optional<AtivoFinanceiro> findByNomeAndPortfolio(String nomeAtivo, Portfolio portfolio);
+    Optional<AtivoFinanceiroEntity> findByNomeAndPortfolio(String nomeAtivo, PortfolioEntity portfolio);
 
 
     /**
@@ -21,7 +22,7 @@ public interface AtivoFinanceiroRepository extends JpaRepository<AtivoFinanceiro
      *
      * @return Lista de AtivoFinanceiros não deletados.
      */
-    List<AtivoFinanceiro> findByDeletadoFalse();
+    List<AtivoFinanceiroEntity> findByDeletadoFalse();
 
     /**
      * Busca um ativo financeiro pelo ID, verificando se não está deletado.
@@ -29,7 +30,7 @@ public interface AtivoFinanceiroRepository extends JpaRepository<AtivoFinanceiro
      * @param id ID do ativo financeiro.
      * @return O ativo financeiro encontrado.
      */
-    Optional<AtivoFinanceiro> findByIdAndDeletadoFalse(Long id);
+    Optional<AtivoFinanceiroEntity> findByIdAndDeletadoFalse(Long id);
 
     /**
      * Busca um ativo financeiro pelo nome.
@@ -37,15 +38,15 @@ public interface AtivoFinanceiroRepository extends JpaRepository<AtivoFinanceiro
      * @param nome Nome do ativo financeiro.
      * @return Um Optional contendo o ativo financeiro, se encontrado.
      */
-    Optional<AtivoFinanceiro> findByNome(String nome);
+    Optional<AtivoFinanceiroEntity> findByNome(String nome);
 
     //TODO Testar
-    @Query("SELECT af FROM AtivoFinanceiro af " +
+    @Query("SELECT af FROM AtivoFinanceiroEntity af " +
             "JOIN af.portfolio p " +
             "JOIN p.usuario u " +
             "JOIN u.instituicoes i " +
             "WHERE u.id = :userId AND i.id = :instituicaoId")
-    List<AtivoFinanceiro> findAtivosByUsuarioAndInstituicao(@Param("userId") Long userId,
+    List<AtivoFinanceiroEntity> findAtivosByUsuarioAndInstituicao(@Param("userId") Long userId,
                                                             @Param("instituicaoId") Long instituicaoId);
 
 }

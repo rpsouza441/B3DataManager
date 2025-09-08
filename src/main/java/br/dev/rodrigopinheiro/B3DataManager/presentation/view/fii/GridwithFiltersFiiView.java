@@ -3,10 +3,10 @@ package br.dev.rodrigopinheiro.B3DataManager.presentation.view.fii;
 import br.dev.rodrigopinheiro.B3DataManager.application.security.SecurityService;
 import br.dev.rodrigopinheiro.B3DataManager.application.service.ErrorService;
 import br.dev.rodrigopinheiro.B3DataManager.application.service.RendaVariavelService;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.AtivoFinanceiro;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.RendaVariavel;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroVariavel;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.ServiceException;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
 import br.dev.rodrigopinheiro.B3DataManager.presentation.dto.AtivoFiiDTO;
 import br.dev.rodrigopinheiro.B3DataManager.presentation.view.components.PaginationHelper;
 import br.dev.rodrigopinheiro.B3DataManager.presentation.view.components.ToastNotification;
@@ -49,7 +49,7 @@ import java.util.ResourceBundle;
 @Menu(order = 1, icon = LineAwesomeIconUrl.WAREHOUSE_SOLID, title = "FII")
 @PermitAll
 @Uses(Icon.class)
-public class GridwithFiltersFiiView extends Div implements HasDynamicTitle, HasUrlParameter<Long>, Specification<AtivoFinanceiro> {
+public class GridwithFiltersFiiView extends Div implements HasDynamicTitle, HasUrlParameter<Long>, Specification<AtivoFinanceiroEntity> {
 
     // Dependências de serviço e mensagens
     private final RendaVariavelService rendaVariavelService;
@@ -286,7 +286,7 @@ public class GridwithFiltersFiiView extends Div implements HasDynamicTitle, HasU
             );
 
             // 2. Busca paginada dos FIIs com os filtros (e com o tipo FII fixo)
-            List<RendaVariavel> ativos = rendaVariavelService.findWithFilters(
+            List<RendaVariavelEntity> ativos = rendaVariavelService.findWithFilters(
                     TipoAtivoFinanceiroVariavel.FII.name(),
                     filters.nome.getValue(),
                     filters.startDate.getValue(),
@@ -371,7 +371,7 @@ public class GridwithFiltersFiiView extends Div implements HasDynamicTitle, HasU
      * @return Predicate composto com os filtros aplicados
      */
     @Override
-    public Predicate toPredicate(Root<AtivoFinanceiro> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+    public Predicate toPredicate(Root<AtivoFinanceiroEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
 
         // Filtro por nome (converte para minúsculo para comparação case-insensitive)

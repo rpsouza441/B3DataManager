@@ -1,4 +1,4 @@
-package br.dev.rodrigopinheiro.B3DataManager.domain.entity;
+package br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity;
 
 
 import jakarta.persistence.*;
@@ -16,7 +16,7 @@ import java.util.Objects;
 @ToString
 @Entity
 @Table(name = "instituicao")
-public class Instituicao {
+public class InstituicaoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,23 +27,23 @@ public class Instituicao {
 
     @ManyToMany(mappedBy = "instituicoes")
     @ToString.Exclude // Evita loops
-    private List<Usuario> usuarios;
+    private List<UsuarioEntity> usuarios;
 
     @OneToMany(mappedBy = "instituicao")
     @ToString.Exclude // Evita loops
-    private List<Transacao> transacoes;
+    private List<TransacaoEntity> transacoes;
 
 
-    public void associarUsuario(Usuario usuario) {
+    public void associarUsuario(UsuarioEntity usuario) {
         // Define explicitamente o AtivoFinanceiro na renda
         if (this.usuarios == null) {
-            usuarios = new ArrayList<Usuario>();
+            usuarios = new ArrayList<UsuarioEntity>();
         }
         usuarios.add(usuario);
 
     }
 
-    public void adicionarTransacoes(Transacao transacao) {
+    public void adicionarTransacoes(TransacaoEntity transacao) {
 
         // Define explicitamente o AtivoFinanceiro na renda
         transacao.setInstituicao(this);
@@ -62,7 +62,7 @@ public class Instituicao {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Instituicao that = (Instituicao) o;
+        InstituicaoEntity that = (InstituicaoEntity) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
 

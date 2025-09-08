@@ -1,42 +1,29 @@
-package br.dev.rodrigopinheiro.B3DataManager.domain.entity;
+package br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity;
 
-
-import jakarta.persistence.*;
+import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroFixa;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Objects;
-
 
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @Entity
-@Table(name = "darf")
-public class Darf {
+@Table(name = "renda_fixa")
+public class RendaFixaEntity extends RendaEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @Column(name = "tipo_renda_fixa", nullable = false)
+    private String tipoRendaFixa;
 
-    @Column(name = "esta_pago")
-    private boolean estaPago;
-
-    @Column(name = "data_pagamento")
-    private LocalDate dataPagamento;
-
-    @Column(name = "valor", nullable = false)
-    private BigDecimal valor;
-
-    @OneToMany(mappedBy = "darf")
-    @ToString.Exclude // Evita loops
-    private List<Transacao> transacoes;
+    public void setTipoRendaFixa(TipoAtivoFinanceiroFixa tipoRendaFixa) {
+        this.tipoRendaFixa = tipoRendaFixa.name();
+    }
 
     @Override
     public final boolean equals(Object o) {
@@ -45,8 +32,8 @@ public class Darf {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Darf darf = (Darf) o;
-        return getId() != null && Objects.equals(getId(), darf.getId());
+        RendaFixaEntity rendaFixa = (RendaFixaEntity) o;
+        return getId() != null && Objects.equals(getId(), rendaFixa.getId());
     }
 
     @Override

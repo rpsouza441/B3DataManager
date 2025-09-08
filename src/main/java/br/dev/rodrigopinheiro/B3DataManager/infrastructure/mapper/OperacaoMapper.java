@@ -4,7 +4,9 @@ import br.dev.rodrigopinheiro.B3DataManager.domain.model.Operacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.Dinheiro;
 import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.Quantidade;
 import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.UsuarioId;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.entity.OperacaoJpaEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.UsuarioEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.UsuarioRepository;
 
 import org.springframework.stereotype.Component;
 
@@ -17,18 +19,24 @@ import java.math.BigDecimal;
 @Component
 public class OperacaoMapper {
     
+    private final UsuarioRepository usuarioRepository;
+    
+    public OperacaoMapper(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
+    }
+    
     /**
      * Converte uma entidade de domínio para entidade JPA.
      * 
      * @param domainOperacao Entidade de domínio
      * @return Entidade JPA
      */
-    public OperacaoJpaEntity toJpaEntity(Operacao domainOperacao) {
+    public OperacaoEntity toJpaEntity(Operacao domainOperacao) {
         if (domainOperacao == null) {
             return null;
         }
         
-        OperacaoJpaEntity jpaEntity = new OperacaoJpaEntity();
+        OperacaoEntity jpaEntity = new OperacaoEntity();
         
         jpaEntity.setId(domainOperacao.getId());
         jpaEntity.setEntradaSaida(domainOperacao.getEntradaSaida());
@@ -47,7 +55,10 @@ public class OperacaoMapper {
         jpaEntity.setDimensionado(domainOperacao.getDimensionado());
         jpaEntity.setIdOriginal(domainOperacao.getIdOriginal());
         jpaEntity.setDeletado(domainOperacao.getDeletado());
-        jpaEntity.setUsuarioId(domainOperacao.getUsuarioId().value());
+        // Buscar UsuarioEntity para relacionamento
+        UsuarioEntity usuario = usuarioRepository.findById(domainOperacao.getUsuarioId().value())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado: " + domainOperacao.getUsuarioId().value()));
+        jpaEntity.setUsuario(usuario);
         
         return jpaEntity;
     }
@@ -58,13 +69,15 @@ public class OperacaoMapper {
      * @param jpaEntity Entidade JPA
      * @return Entidade de domínio
      */
-    public Operacao toDomainEntity(OperacaoJpaEntity jpaEntity) {
+    public Operacao toDomainEntity(OperacaoEntity jpaEntity) {
         if (jpaEntity == null) {
             return null;
         }
         
-        // Criar Value Objects
-        UsuarioId usuarioId = new UsuarioId(jpaEntity.getUsuarioId());
+        // Criar Value Objects - usar relacionamento ou campo de compatibilidade
+        Long usuarioIdValue = jpaEntity.getUsuario() != null ? 
+            jpaEntity.getUsuario().getId() : jpaEntity.getUsuarioId();
+        UsuarioId usuarioId = new UsuarioId(usuarioIdValue);
         
         // Conversão double -> BigDecimal para o domínio
         Quantidade quantidade = new Quantidade(BigDecimal.valueOf(jpaEntity.getQuantidade()));

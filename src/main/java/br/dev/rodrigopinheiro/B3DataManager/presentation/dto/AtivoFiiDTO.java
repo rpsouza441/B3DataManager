@@ -1,12 +1,13 @@
 package br.dev.rodrigopinheiro.B3DataManager.presentation.dto;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.RendaVariavel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
 
 @Builder
 @Data
@@ -28,7 +29,7 @@ public class AtivoFiiDTO {
      * @param totalInvestido Total investido em FIIs no portfólio do usuário
      * @return AtivoFiiDTO correspondente
      */
-    public static AtivoFiiDTO from(RendaVariavel rv, BigDecimal totalInvestido) {
+    public static AtivoFiiDTO from(RendaVariavelEntity rv, BigDecimal totalInvestido) {
         BigDecimal totalDoAtivo = rv.getPrecoUnitario()
                 .multiply(BigDecimal.valueOf(rv.getQuantidade()))
                 .setScale(2, RoundingMode.HALF_UP);

@@ -1,18 +1,11 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.service;
 
-import br.dev.rodrigopinheiro.B3DataManager.application.service.AtivoFinanceiroService;
-import br.dev.rodrigopinheiro.B3DataManager.application.service.InstituicaoService;
-import br.dev.rodrigopinheiro.B3DataManager.application.service.PortfolioService;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.* ;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoMovimentacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoTransacao;
-import br.dev.rodrigopinheiro.B3DataManager.domain.exception.ativo.AtivoNotFoundException;
-import br.dev.rodrigopinheiro.B3DataManager.domain.exception.instituicao.InstituicaoNotFoundException;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.TransacaoEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -56,7 +49,7 @@ public class TransacaoFactory {
      * @return A transação criada, com o ativo financeiro associado.
      */
     @Transactional
-    public Transacao criarTransacao(OperacaoEntity operacao) {
+    public TransacaoEntity criarTransacao(OperacaoEntity operacao) {
         log.info("Iniciando criação da transação para a operação: {}", operacao);
 
         // 3. Extração e parsing dos dados da operação
@@ -71,7 +64,7 @@ public class TransacaoFactory {
         TipoTransacao tipoTransacao = tipoTransacaoMapper.mapear(operacao.getEntradaSaida(), operacao.getMovimentacao());
 
         // 5. Criação da transação (idealmente via construtor ou builder)
-        Transacao transacao = new Transacao();
+        TransacaoEntity transacao = new TransacaoEntity();
         transacao.setData(operacao.getData());
         transacao.setEntradaSaida(entradaSaida);
         transacao.setQuantidade(quantidade);

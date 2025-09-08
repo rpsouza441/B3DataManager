@@ -1,16 +1,16 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.service;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.AtivoFinanceiro;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Portfolio;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Transacao;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.PortfolioEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.TransacaoEntity;
 
 /**
  * Interface para a criação de ativos financeiros.
  *
  * <p>
- * Esta fábrica é responsável por orquestrar a criação de um objeto {@link AtivoFinanceiro}
- * a partir dos dados contidos em uma {@link Operacao} e na respectiva {@link Transacao}.
+ * Esta fábrica é responsável por orquestrar a criação de um objeto {@link AtivoFinanceiroEntity}
+ * a partir dos dados contidos em uma {@link Operacao} e na respectiva {@link TransacaoEntity}.
  * O processo inclui a criação e associação da renda (fixa ou variável) ao ativo,
  * utilizando internamente a {@code RendaFactory}.
  * </p>
@@ -37,7 +37,7 @@ public interface AtivoFactory {
      *
      * @param operacao  A operação que contém os dados de entrada para a criação do ativo.
      * @param portfolio para a vinculacao com ativo ou a busca dele se ja existir.
-     * @return Um objeto {@link AtivoFinanceiro} devidamente criado e configurado.
+     * @return Um objeto {@link AtivoFinanceiroEntity} devidamente criado e configurado.
      */
-    AtivoFinanceiro criarAtivo(OperacaoEntity operacao, Portfolio portfolio);
+    AtivoFinanceiroEntity criarAtivo(OperacaoEntity operacao, PortfolioEntity portfolio);
 }

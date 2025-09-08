@@ -1,7 +1,8 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.batch.config;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.AtivoFinanceiro;
 import br.dev.rodrigopinheiro.B3DataManager.domain.model.Operacao;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -38,11 +39,11 @@ public class BatchConfig {
     @Bean
     public Step processStep(
             ItemReader<Operacao> reader,
-            ItemProcessor<Operacao, AtivoFinanceiro> processor,
-            ItemWriter<AtivoFinanceiro> ativoItemWriter
+            ItemProcessor<Operacao, AtivoFinanceiroEntity> processor,
+            ItemWriter<AtivoFinanceiroEntity> ativoItemWriter
     ) {
         return new StepBuilder("processStep", jobRepository)
-                .<Operacao, AtivoFinanceiro>chunk(10, transactionManager) // Processa 10 itens por vez
+                .<Operacao, AtivoFinanceiroEntity>chunk(10, transactionManager) // Processa 10 itens por vez
                 .reader(reader)
                 .processor(processor)
                 .writer(ativoItemWriter)

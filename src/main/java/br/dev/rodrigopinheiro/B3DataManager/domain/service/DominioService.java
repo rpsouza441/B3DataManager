@@ -1,7 +1,7 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.service;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.AtivoFinanceiro;
 import br.dev.rodrigopinheiro.B3DataManager.domain.model.Operacao;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +14,8 @@ public class DominioService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public AtivoFinanceiro criarAtivo(Operacao operacao) {
-        AtivoFinanceiro ativo = new AtivoFinanceiro();
+    public AtivoFinanceiroEntity criarAtivo(Operacao operacao) {
+        AtivoFinanceiroEntity ativo = new AtivoFinanceiroEntity();
 
         //TODO Criar logica de conversão.
 //        ativo.setNome(operacao.getProduto());

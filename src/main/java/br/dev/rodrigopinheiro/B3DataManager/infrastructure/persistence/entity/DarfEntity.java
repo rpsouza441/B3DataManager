@@ -1,29 +1,42 @@
-package br.dev.rodrigopinheiro.B3DataManager.domain.entity;
+package br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroVariavel;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
+
 
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Entity
-@Table(name = "renda_variavel")
-public class RendaVariavel extends Renda {
+@Table(name = "darf")
+public class DarfEntity {
 
-    @Column(name = "tipo_renda_variavel", nullable = false)
-    private String tipoRendaVariavel;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
 
-    public void setTipoRendaVariavel(TipoAtivoFinanceiroVariavel tipoRendaVariavel) {
-        this.tipoRendaVariavel = tipoRendaVariavel.name();
-    }
+    @Column(name = "esta_pago")
+    private boolean estaPago;
+
+    @Column(name = "data_pagamento")
+    private LocalDate dataPagamento;
+
+    @Column(name = "valor", nullable = false)
+    private BigDecimal valor;
+
+    @OneToMany(mappedBy = "darf")
+    @ToString.Exclude // Evita loops
+    private List<TransacaoEntity> transacoes;
 
     @Override
     public final boolean equals(Object o) {
@@ -32,8 +45,8 @@ public class RendaVariavel extends Renda {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        RendaVariavel that = (RendaVariavel) o;
-        return getId() != null && Objects.equals(getId(), that.getId());
+        DarfEntity darf = (DarfEntity) o;
+        return getId() != null && Objects.equals(getId(), darf.getId());
     }
 
     @Override

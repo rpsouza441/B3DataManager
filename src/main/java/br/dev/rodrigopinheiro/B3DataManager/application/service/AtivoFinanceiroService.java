@@ -1,9 +1,9 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.service;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.AtivoFinanceiro;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Portfolio;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.RendaVariavel;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.ServiceException;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.PortfolioEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.AtivoFinanceiroRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -37,10 +37,10 @@ public class AtivoFinanceiroService {
      * @param nomeAtivo Nome do ativo financeiro.
      * @return O ativo financeiro existente ou criado.
      */
-    public AtivoFinanceiro verificarOuCriarAtivoFinanceiro(Long usuarioId, String nomeAtivo) {
+    public AtivoFinanceiroEntity verificarOuCriarAtivoFinanceiro(Long usuarioId, String nomeAtivo) {
         log.info("Verificando ou criando AtivoFinanceiro para usuário {} com nome '{}'", usuarioId, nomeAtivo);
         // Obtém (ou cria) o Portfolio do usuário
-        Portfolio portfolio = portfolioService.obterOuCriarPortfolio(usuarioId);
+        PortfolioEntity portfolio = portfolioService.obterOuCriarPortfolio(usuarioId);
         // Procura um ativo financeiro com o mesmo nome associado a este portfolio
         return ativoFinanceiroRepository.findByNomeAndPortfolio(nomeAtivo, portfolio)
                 .orElseGet(() -> criarAtivoFinanceiro(nomeAtivo, portfolio));
@@ -53,12 +53,12 @@ public class AtivoFinanceiroService {
      * @param portfolio Portfolio do usuário.
      * @return O ativo financeiro criado.
      */
-    private AtivoFinanceiro criarAtivoFinanceiro(String nomeAtivo, Portfolio portfolio) {
-        AtivoFinanceiro novoAtivo = new AtivoFinanceiro();
+    private AtivoFinanceiroEntity criarAtivoFinanceiro(String nomeAtivo, PortfolioEntity portfolio) {
+        AtivoFinanceiroEntity novoAtivo = new AtivoFinanceiroEntity();
         novoAtivo.setNome(nomeAtivo);
         novoAtivo.setPortfolio(portfolio);
         novoAtivo.setDeletado(false);
-        AtivoFinanceiro salvo = ativoFinanceiroRepository.save(novoAtivo);
+        AtivoFinanceiroEntity salvo = ativoFinanceiroRepository.save(novoAtivo);
         log.info("AtivoFinanceiro criado com sucesso: {}", salvo);
         return salvo;
     }
@@ -71,9 +71,9 @@ public class AtivoFinanceiroService {
      * @return O ativo financeiro associado ao usuário.
      * @throws ServiceException Se o ativo não for encontrado ou não pertencer ao usuário.
      */
-    public AtivoFinanceiro buscarAtivoPorIdEUsuario(Long ativoFinanceiroId, Long usuarioId) {
+    public AtivoFinanceiroEntity buscarAtivoPorIdEUsuario(Long ativoFinanceiroId, Long usuarioId) {
         log.info("Buscando AtivoFinanceiro com ID {} para o usuário {}", ativoFinanceiroId, usuarioId);
-        AtivoFinanceiro ativo = ativoFinanceiroRepository.findByIdAndDeletadoFalse(ativoFinanceiroId)
+        AtivoFinanceiroEntity ativo = ativoFinanceiroRepository.findByIdAndDeletadoFalse(ativoFinanceiroId)
                 .orElseThrow(() -> new ServiceException("Ativo financeiro não encontrado ou não pertence ao usuário."));
         // Verifica se o ativo pertence ao Portfolio cujo usuário é o mesmo
         if (!ativo.getPortfolio().getUsuario().getId().equals(usuarioId)) {
@@ -87,7 +87,7 @@ public class AtivoFinanceiroService {
      *
      * @return Lista de AtivoFinanceiros não deletados.
      */
-    public List<AtivoFinanceiro> findAll() {
+    public List<AtivoFinanceiroEntity> findAll() {
         log.info("Buscando todos os AtivoFinanceiros não deletados.");
         return ativoFinanceiroRepository.findByDeletadoFalse();
     }
@@ -98,7 +98,7 @@ public class AtivoFinanceiroService {
      * @param id ID do ativo financeiro.
      * @return O ativo financeiro encontrado.
      */
-    public Optional<AtivoFinanceiro> findById(Long id) {
+    public Optional<AtivoFinanceiroEntity> findById(Long id) {
         log.info("Buscando AtivoFinanceiro com ID {}", id);
         return ativoFinanceiroRepository.findByIdAndDeletadoFalse(id);
     }
@@ -109,7 +109,7 @@ public class AtivoFinanceiroService {
      * @param ativo O ativo financeiro a ser salvo ou atualizado.
      * @return O ativo salvo ou atualizado.
      */
-    public AtivoFinanceiro save(AtivoFinanceiro ativo) {
+    public AtivoFinanceiroEntity save(AtivoFinanceiroEntity ativo) {
         log.info("Salvando AtivoFinanceiro: {}", ativo);
         return ativoFinanceiroRepository.save(ativo);
     }
@@ -121,7 +121,7 @@ public class AtivoFinanceiroService {
      */
     public void deleteById(Long id) {
         log.info("Marcando AtivoFinanceiro com ID {} como deletado.", id);
-        AtivoFinanceiro ativo = ativoFinanceiroRepository.findById(id)
+        AtivoFinanceiroEntity ativo = ativoFinanceiroRepository.findById(id)
                 .orElseThrow(() -> new ServiceException("Ativo financeiro não encontrado."));
         ativo.setDeletado(true);
         ativoFinanceiroRepository.save(ativo);
@@ -134,7 +134,7 @@ public class AtivoFinanceiroService {
      * @param pageable Paginação.
      * @return Página de AtivoFinanceiros.
      */
-    public Page<AtivoFinanceiro> list(Pageable pageable) {
+    public Page<AtivoFinanceiroEntity> list(Pageable pageable) {
         log.info("Buscando lista paginada de AtivoFinanceiros.");
         return ativoFinanceiroRepository.findAll(pageable);
     }
@@ -146,7 +146,7 @@ public class AtivoFinanceiroService {
      * @param filter   Filtro para os AtivoFinanceiros.
      * @return Página de AtivoFinanceiros filtrados.
      */
-    public Page<AtivoFinanceiro> list(Pageable pageable, Specification<AtivoFinanceiro> filter) {
+    public Page<AtivoFinanceiroEntity> list(Pageable pageable, Specification<AtivoFinanceiroEntity> filter) {
         log.info("Buscando lista paginada de AtivoFinanceiros com filtro.");
         return ativoFinanceiroRepository.findAll(filter, pageable);
     }
@@ -166,16 +166,16 @@ public class AtivoFinanceiroService {
      * @param ativo O ativo financeiro cujas operações serão consideradas.
      * @return O preço médio ou BigDecimal.ZERO se não houver quantidade.
      */
-    public BigDecimal calcularPrecoMedio(AtivoFinanceiro ativo) {
+    public BigDecimal calcularPrecoMedio(AtivoFinanceiroEntity ativo) {
         // Supondo que o preço médio seja calculado a partir das entradas (renda variável)
-        List<RendaVariavel> rendas = ativo.getRendaVariaveis();
+        List<RendaVariavelEntity> rendas = ativo.getRendaVariaveis();
         if (rendas == null || rendas.isEmpty()) {
             return BigDecimal.ZERO;
         }
         BigDecimal totalInvestido = BigDecimal.ZERO;
         double quantidadeTotal = 0.0;
 
-        for (RendaVariavel renda : rendas) {
+        for (RendaVariavelEntity renda : rendas) {
             // Para cada operação, o valor investido é dado por: preço unitário * quantidade
             BigDecimal totalOperacao = renda.getPrecoUnitario()
                     .multiply(BigDecimal.valueOf(renda.getQuantidade()));
@@ -200,15 +200,15 @@ public class AtivoFinanceiroService {
      * @return O ativo financeiro encontrado ou recém-criado, devidamente associado ao portfolio.
      */
     //TODO buscar o fixa e variavel
-    public AtivoFinanceiro buscarOuCriarAtivoFinanceiro(String ticker, Portfolio portfolio) {
+    public AtivoFinanceiroEntity buscarOuCriarAtivoFinanceiro(String ticker, PortfolioEntity portfolio) {
         // Busca no repositório um ativo financeiro com base no ticker.
         log.info("Buscando ticker {}", ticker);
 
-        Optional<AtivoFinanceiro> optionalAtivo = ativoFinanceiroRepository.findByNomeAndPortfolio(ticker, portfolio);
+        Optional<AtivoFinanceiroEntity> optionalAtivo = ativoFinanceiroRepository.findByNomeAndPortfolio(ticker, portfolio);
 
         if (optionalAtivo.isPresent()) {
             // Se o ativo for encontrado, o recuperamos.
-            AtivoFinanceiro ativoExistente = optionalAtivo.get();
+            AtivoFinanceiroEntity ativoExistente = optionalAtivo.get();
 
             // Verifica se o ativo já está associado ao Portfolio esperado.
             // Se não estiver, associa-o ao portfolio informado.
@@ -218,7 +218,7 @@ public class AtivoFinanceiroService {
             return ativoExistente;
         } else {
             // Se o ativo não for encontrado, cria um novo AtivoFinanceiro com os dados mínimos.
-            AtivoFinanceiro novoAtivo = new AtivoFinanceiro();
+            AtivoFinanceiroEntity novoAtivo = new AtivoFinanceiroEntity();
             novoAtivo.setNome(ticker);
             novoAtivo.setPortfolio(portfolio);
 

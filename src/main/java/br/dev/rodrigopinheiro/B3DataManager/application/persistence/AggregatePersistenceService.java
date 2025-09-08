@@ -1,6 +1,10 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.persistence;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.*;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.InstituicaoEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.PortfolioEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.TransacaoEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.UsuarioEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,7 +49,7 @@ public class AggregatePersistenceService {
      * @param ativoFinanceiro (Opcional) O ativo financeiro relacionado, se aplicável à operação.
      */
     @Transactional
-    public void persistAggregate(Transacao transacao, Usuario usuario, Portfolio portfolio, Instituicao instituicao, AtivoFinanceiro ativoFinanceiro) {
+    public void persistAggregate(TransacaoEntity transacao, UsuarioEntity usuario, PortfolioEntity portfolio, InstituicaoEntity instituicao, AtivoFinanceiroEntity ativoFinanceiro) {
         log.info("Persistindo Portfolio com ID: {}", portfolio.getId());
 
         ativoFinanceiroRepository.save(ativoFinanceiro);
@@ -70,7 +74,7 @@ public class AggregatePersistenceService {
      * @param instituicao A instituição associada à operação.
      */
     @Transactional
-    public void persistAggregate(Transacao transacao, Usuario usuario, Portfolio portfolio, Instituicao instituicao) {
+    public void persistAggregate(TransacaoEntity transacao, UsuarioEntity usuario, PortfolioEntity portfolio, InstituicaoEntity instituicao) {
         log.info("Persistindo Portfolio com ID: {}", portfolio.getId());
 
         transacaoRepository.save(transacao);

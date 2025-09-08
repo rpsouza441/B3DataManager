@@ -6,6 +6,7 @@ target/
 !**/src/test/**/target/
 *xlsx
 *.log
+*.log.*
 *.csv
 
 ### STS ###
@@ -35,6 +36,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Trae ###
+.trae
 
 
 /target/

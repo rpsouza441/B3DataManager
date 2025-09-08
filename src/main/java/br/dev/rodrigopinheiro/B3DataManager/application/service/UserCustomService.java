@@ -1,7 +1,7 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.service;
 
 import br.dev.rodrigopinheiro.B3DataManager.application.security.CustomUserDetails;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Usuario;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.UsuarioEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.UsuarioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class UserCustomService implements UserDetailsService {
     /**
      * Retorna todos os usuários.
      */
-    public List<Usuario> findAllUsers() {
+    public List<UsuarioEntity> findAllUsers() {
         log.info("Buscando todos os usuários.");
         return userRepository.findAll();
     }
@@ -37,7 +37,7 @@ public class UserCustomService implements UserDetailsService {
     /**
      * Busca um usuário pelo ID.
      */
-    public Optional<Usuario> findUserById(Long id) {
+    public Optional<UsuarioEntity> findUserById(Long id) {
         log.info("Buscando usuário com ID: {}", id);
         return userRepository.findById(id);
     }
@@ -45,7 +45,7 @@ public class UserCustomService implements UserDetailsService {
     /**
      * Busca um usuário pelo email.
      */
-    public Optional<Usuario> findUserByEmail(String email) {
+    public Optional<UsuarioEntity> findUserByEmail(String email) {
         log.info("Buscando usuário com email: {}", email);
         return userRepository.findByEmail(email.toLowerCase());
     }
@@ -66,7 +66,7 @@ public class UserCustomService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Usuario user = userRepository.findByUsername(username.toLowerCase())
+        UsuarioEntity user = userRepository.findByUsername(username.toLowerCase())
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado com username: " + username));
 
         return new CustomUserDetails(user);

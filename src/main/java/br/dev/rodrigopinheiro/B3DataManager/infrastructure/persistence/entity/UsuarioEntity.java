@@ -1,4 +1,4 @@
-package br.dev.rodrigopinheiro.B3DataManager.domain.entity;
+package br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity;
 
 
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.Roles;
@@ -18,7 +18,7 @@ import java.util.*;
 @ToString
 @Entity
 @Table(name = "usuario")
-public class Usuario {
+public class UsuarioEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,18 +52,18 @@ public class Usuario {
             uniqueConstraints = @UniqueConstraint(columnNames = {"usuario_id", "instituicao_id"})
 
     )
-    private Set<Instituicao> instituicoes;
+    private Set<InstituicaoEntity> instituicoes;
 
 
     // O Portfolio é o agregado que reúne ativos e transações
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, optional = true)
     @ToString.Exclude
-    private Portfolio portfolio;
+    private PortfolioEntity portfolio;
 
     @Column(name = "deletado", nullable = false)
     private Boolean deletado = false;
 
-    public void associarInstituicao(Instituicao instituicao) {
+    public void associarInstituicao(InstituicaoEntity instituicao) {
 
             // Define explicitamente o AtivoFinanceiro na renda
             if (this.instituicoes == null) {
@@ -80,7 +80,7 @@ public class Usuario {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Usuario usuario = (Usuario) o;
+        UsuarioEntity usuario = (UsuarioEntity) o;
         return getId() != null && Objects.equals(getId(), usuario.getId());
     }
 

@@ -1,6 +1,6 @@
 package br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository;
 
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.entity.OperacaoJpaEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,7 +17,7 @@ import java.util.Optional;
  * Interface Spring Data JPA para operações de persistência.
  */
 @Repository
-public interface JpaOperacaoRepository extends JpaRepository<OperacaoJpaEntity, Long> {
+public interface JpaOperacaoRepository extends JpaRepository<OperacaoEntity, Long> {
     
     /**
      * Verifica se existe uma operação com o ID original e usuário especificados.
@@ -26,7 +26,7 @@ public interface JpaOperacaoRepository extends JpaRepository<OperacaoJpaEntity, 
      * @param usuarioId O ID do usuário
      * @return true se existe uma operação com esses parâmetros
      */
-    boolean existsByIdOriginalAndUsuarioId(Long idOriginal, Long usuarioId);
+    boolean existsByIdOriginalAndUsuario_Id(Long idOriginal, Long usuarioId);
     
     /**
      * Busca uma operação por ID original e usuário.
@@ -35,13 +35,13 @@ public interface JpaOperacaoRepository extends JpaRepository<OperacaoJpaEntity, 
      * @param usuarioId O ID do usuário
      * @return Optional contendo a operação se encontrada
      */
-    Optional<OperacaoJpaEntity> findByIdOriginalAndUsuarioId(Long idOriginal, Long usuarioId);
+    Optional<OperacaoEntity> findByIdOriginalAndUsuario_Id(Long idOriginal, Long usuarioId);
     
     /**
      * Busca operações com filtros e ownership obrigatório.
      * Query otimizada sem conversões desnecessárias de data.
      */
-    @Query("SELECT o FROM OperacaoJpaEntity o WHERE " +
+    @Query("SELECT o FROM OperacaoEntity o WHERE " +
            "(:entradaSaida IS NULL OR o.entradaSaida = :entradaSaida) AND " +
            "(:startDate IS NULL OR o.data >= :startDate) AND " +
            "(:endDate IS NULL OR o.data <= :endDate) AND " +
@@ -50,8 +50,8 @@ public interface JpaOperacaoRepository extends JpaRepository<OperacaoJpaEntity, 
            "(:instituicao IS NULL OR LOWER(o.instituicao) LIKE LOWER(CONCAT('%', :instituicao, '%'))) AND " +
            "(:duplicado IS NULL OR o.duplicado = :duplicado) AND " +
            "(:dimensionado IS NULL OR o.dimensionado = :dimensionado) AND " +
-           "o.usuarioId = :usuarioId")
-    Page<OperacaoJpaEntity> findByFiltersAndUsuarioId(
+           "o.usuario.id = :usuarioId")
+    Page<OperacaoEntity> findByFiltersAndUsuarioId(
         @Param("entradaSaida") String entradaSaida,
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate,
@@ -68,7 +68,7 @@ public interface JpaOperacaoRepository extends JpaRepository<OperacaoJpaEntity, 
      * Conta operações com filtros e ownership obrigatório.
      * Query otimizada para contagem.
      */
-    @Query("SELECT COUNT(o) FROM OperacaoJpaEntity o WHERE " +
+    @Query("SELECT COUNT(o) FROM OperacaoEntity o WHERE " +
            "(:entradaSaida IS NULL OR o.entradaSaida = :entradaSaida) AND " +
            "(:startDate IS NULL OR o.data >= :startDate) AND " +
            "(:endDate IS NULL OR o.data <= :endDate) AND " +
@@ -77,7 +77,7 @@ public interface JpaOperacaoRepository extends JpaRepository<OperacaoJpaEntity, 
            "(:instituicao IS NULL OR LOWER(o.instituicao) LIKE LOWER(CONCAT('%', :instituicao, '%'))) AND " +
            "(:duplicado IS NULL OR o.duplicado = :duplicado) AND " +
            "(:dimensionado IS NULL OR o.dimensionado = :dimensionado) AND " +
-           "o.usuarioId = :usuarioId")
+           "o.usuario.id = :usuarioId")
     long countByFiltersAndUsuarioId(
         @Param("entradaSaida") String entradaSaida,
         @Param("startDate") LocalDate startDate,
@@ -105,7 +105,7 @@ public interface JpaOperacaoRepository extends JpaRepository<OperacaoJpaEntity, 
      * @param usuarioId ID do usuário proprietário
      * @return Optional contendo a primeira operação encontrada
      */
-    Optional<OperacaoJpaEntity> findFirstByDataAndMovimentacaoAndProdutoAndInstituicaoAndQuantidadeAndPrecoUnitarioAndValorOperacaoAndDuplicadoAndUsuarioId(
+    Optional<OperacaoEntity> findFirstByDataAndMovimentacaoAndProdutoAndInstituicaoAndQuantidadeAndPrecoUnitarioAndValorOperacaoAndDuplicadoAndUsuario_Id(
         LocalDate data,
         String movimentacao,
         String produto,
@@ -120,7 +120,7 @@ public interface JpaOperacaoRepository extends JpaRepository<OperacaoJpaEntity, 
     /**
      * Busca operações por critérios de dimensionado e duplicado com paginação.
      */
-    Page<OperacaoJpaEntity> findByDimensionadoAndDuplicado(
+    Page<OperacaoEntity> findByDimensionadoAndDuplicado(
         boolean dimensionado,
         boolean duplicado,
         Pageable pageable

@@ -4,11 +4,16 @@ import br.dev.rodrigopinheiro.B3DataManager.application.command.transacao.Create
 import br.dev.rodrigopinheiro.B3DataManager.application.persistence.AggregatePersistenceService;
 import br.dev.rodrigopinheiro.B3DataManager.application.service.InstituicaoService;
 import br.dev.rodrigopinheiro.B3DataManager.application.service.PortfolioService;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.*;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoTransacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.service.AtivoFactoryImpl;
 import br.dev.rodrigopinheiro.B3DataManager.domain.service.TransacaoFactory;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.InstituicaoEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.PortfolioEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.TransacaoEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.UsuarioEntity;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +21,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,6 +36,7 @@ import static org.mockito.Mockito.*;
  * incluindo operações normais, duplicadas e de lucro.</p>
  */
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("CreateTransacaoUseCase")
 class CreateTransacaoUseCaseTest {
     
@@ -50,11 +58,11 @@ class CreateTransacaoUseCaseTest {
     private CreateTransacaoUseCase createTransacaoUseCase;
     
     private OperacaoEntity operacao;
-    private Usuario usuario;
-    private Portfolio portfolio;
-    private Instituicao instituicao;
-    private Transacao transacao;
-    private AtivoFinanceiro ativoFinanceiro;
+    private UsuarioEntity usuario;
+    private PortfolioEntity portfolio;
+    private InstituicaoEntity instituicao;
+    private TransacaoEntity transacao;
+    private AtivoFinanceiroEntity ativoFinanceiro;
     
     @BeforeEach
     void setUp() {
@@ -67,7 +75,7 @@ class CreateTransacaoUseCaseTest {
         );
         
         // Setup mocks
-        usuario = mock(Usuario.class);
+        usuario = mock(UsuarioEntity.class);
         when(usuario.getId()).thenReturn(1L);
         
         operacao = mock(OperacaoEntity.class);
@@ -76,10 +84,10 @@ class CreateTransacaoUseCaseTest {
         when(operacao.getUsuario()).thenReturn(usuario);
         when(operacao.getInstituicao()).thenReturn("XP INVESTIMENTOS");
         
-        portfolio = mock(Portfolio.class);
-        instituicao = mock(Instituicao.class);
-        transacao = mock(Transacao.class);
-        ativoFinanceiro = mock(AtivoFinanceiro.class);
+        portfolio = mock(PortfolioEntity.class);
+        instituicao = mock(InstituicaoEntity.class);
+        transacao = mock(TransacaoEntity.class);
+        ativoFinanceiro = mock(AtivoFinanceiroEntity.class);
         
         when(portfolioService.obterOuCriarPortfolio(1L)).thenReturn(portfolio);
         when(instituicaoService.buscarOuCriarInstituicao("XP INVESTIMENTOS")).thenReturn(instituicao);

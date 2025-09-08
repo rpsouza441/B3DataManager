@@ -1,7 +1,7 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.service;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Portfolio;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Usuario;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.PortfolioEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.UsuarioEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.PortfolioRepository;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.UsuarioRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +32,8 @@ public class PortfolioService {
      * @return Portfolio associado ao usuário.
      */
     @Transactional
-    public Portfolio obterOuCriarPortfolio(Long usuarioId) {
-        Optional<Portfolio> optionalPortfolio = portfolioRepository.findByUsuarioId(usuarioId);
+    public PortfolioEntity obterOuCriarPortfolio(Long usuarioId) {
+        Optional<PortfolioEntity> optionalPortfolio = portfolioRepository.findByUsuarioId(usuarioId);
         if (optionalPortfolio.isPresent()) {
             log.info("Portfolio encontrado para o usuário {}: {}", usuarioId, optionalPortfolio.get());
 
@@ -42,10 +42,10 @@ public class PortfolioService {
         log.info("Portfolio não encontrado para o usuário {}. Criando novo portfolio.", usuarioId);
 
         // Recupera o usuário; se não existir, lança uma exceção
-        Usuario usuario = usuarioRepository.findById(usuarioId)
+        UsuarioEntity usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com ID: " + usuarioId));
         // Cria um novo Portfolio e associa ao usuário
-        Portfolio portfolio = new Portfolio();
+        PortfolioEntity portfolio = new PortfolioEntity();
         portfolio.setUsuario(usuario);
         // Inicializa os saldos com valores padrão (zero)
         portfolio.setSaldoTotal(BigDecimal.ZERO);
@@ -53,7 +53,7 @@ public class PortfolioService {
         portfolio.setLucroVenda(BigDecimal.ZERO);
         portfolio.setLucroRendimento(BigDecimal.ZERO);
         // Salva e retorna o novo Portfolio
-        Portfolio novoPortfolio = portfolioRepository.save(portfolio);
+        PortfolioEntity novoPortfolio = portfolioRepository.save(portfolio);
         log.info("Novo portfolio criado para o usuário {}: {}", usuarioId, novoPortfolio);
         return novoPortfolio;
     }

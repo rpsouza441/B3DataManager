@@ -1,15 +1,15 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.service;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.AtivoFinanceiro;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Renda;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.RendaFixa;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.RendaVariavel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaFixaEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -31,19 +31,19 @@ public class CalculoPrecoMedioService {
      * @param quantidadeVenda A quantidade vendida.
      * @return O custo médio calculado como BigDecimal.
      */
-    public BigDecimal calcularPrecoMedioVendaFifoRendaVariavel(AtivoFinanceiro ativo, double quantidadeVenda) {
-        List<RendaVariavel> rendas = new ArrayList<>(ativo.getRendaVariaveis());
+    public BigDecimal calcularPrecoMedioVendaFifoRendaVariavel(AtivoFinanceiroEntity ativo, double quantidadeVenda) {
+        List<RendaVariavelEntity> rendas = new ArrayList<>(ativo.getRendaVariaveis());
         if (rendas.isEmpty()) {
             log.warn("Nenhuma operação de renda variável encontrada para o ativo: {}", ativo.getNome());
             return BigDecimal.ZERO;
         }
         // Ordena as rendas pela data de compra, do mais antigo para o mais recente
-        rendas.sort(Comparator.comparing(Renda::getDataCompra));
+        rendas.sort(Comparator.comparing(RendaEntity::getDataCompra));
 
         BigDecimal totalCusto = BigDecimal.ZERO;
         double quantidadeRestante = quantidadeVenda;
 
-        for (RendaVariavel renda : rendas) {
+        for (RendaVariavelEntity renda : rendas) {
             double disponivel = renda.getQuantidade();
             if (quantidadeRestante <= disponivel) {
                 totalCusto = totalCusto.add(renda.getPrecoUnitario().multiply(BigDecimal.valueOf(quantidadeRestante)));
@@ -79,19 +79,19 @@ public class CalculoPrecoMedioService {
      * @param valorVenda      O valor total da venda.
      * @return O lucro obtido na venda, calculado com base no custo médio FIFO.
      */
-    public BigDecimal calcularLucroVendaFifoRendaFixa(AtivoFinanceiro ativo, double quantidadeVenda, BigDecimal valorVenda) {
-        List<RendaFixa> rendas = new ArrayList<>(ativo.getRendaFixas());
+    public BigDecimal calcularLucroVendaFifoRendaFixa(AtivoFinanceiroEntity ativo, double quantidadeVenda, BigDecimal valorVenda) {
+        List<RendaFixaEntity> rendas = new ArrayList<>(ativo.getRendaFixas());
         if (rendas.isEmpty()) {
             log.warn("Nenhuma operação de renda fixa encontrada para o ativo: {}", ativo.getNome());
             return BigDecimal.ZERO;
         }
         // Ordena as rendas fixas pela data de compra, do mais antigo para o mais recente
-        rendas.sort(Comparator.comparing(Renda::getDataCompra));
+        rendas.sort(Comparator.comparing(RendaEntity::getDataCompra));
 
         BigDecimal totalCusto = BigDecimal.ZERO;
         double quantidadeRestante = quantidadeVenda;
 
-        for (RendaFixa renda : rendas) {
+        for (RendaFixaEntity renda : rendas) {
             double disponivel = renda.getQuantidade();
             if (quantidadeRestante <= disponivel) {
                 totalCusto = totalCusto.add(renda.getPrecoUnitario().multiply(BigDecimal.valueOf(quantidadeRestante)));

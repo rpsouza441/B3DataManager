@@ -1,13 +1,16 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.service;
 
 import br.dev.rodrigopinheiro.B3DataManager.application.persistence.AggregatePersistenceService;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.*;
+import br.dev.rodrigopinheiro.B3DataManager.domain.model.*;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoTransacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.transacao.InvalidTransacaoException;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.transacao.TransacaoNotFoundException;
 import br.dev.rodrigopinheiro.B3DataManager.domain.service.AtivoFactoryImpl;
 import br.dev.rodrigopinheiro.B3DataManager.domain.service.TransacaoFactory;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.InstituicaoEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.TransacaoEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.TransacaoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -54,19 +57,19 @@ public class TransacaoService {
      * @return Transacao salva.
      */
     @Transactional
-    public Transacao salvarTransacao(Long usuarioId, Transacao transacao, Locale locale) {
+    public TransacaoEntity salvarTransacao(Long usuarioId, TransacaoEntity transacao, Locale locale) {
         if (transacao == null) {
             throw new InvalidTransacaoException(messageSource);
         }
 
         // Verificar ou criar AtivoFinanceiro associado ao usuário
-        AtivoFinanceiro ativoFinanceiro = ativoFinanceiroService.verificarOuCriarAtivoFinanceiro(
+        AtivoFinanceiroEntity ativoFinanceiro = ativoFinanceiroService.verificarOuCriarAtivoFinanceiro(
                 usuarioId,
                 transacao.getAtivoFinanceiro().getNome()
         );
 
         // Verificar ou criar Instituicao associada à transação
-        Instituicao instituicao = instituicaoService.verificarOuCriarInstituicao(
+        InstituicaoEntity instituicao = instituicaoService.verificarOuCriarInstituicao(
                 transacao.getInstituicao().getNome(),
                 usuarioId,
                 locale
@@ -80,7 +83,7 @@ public class TransacaoService {
         transacao.setDeletado(false);
 
         // Salvar transação
-        Transacao transacaoSalva = transacaoRepository.save(transacao);
+        TransacaoEntity transacaoSalva = transacaoRepository.save(transacao);
         log.info("Transação salva com sucesso: {}", transacaoSalva);
         return transacaoSalva;
     }
@@ -92,12 +95,12 @@ public class TransacaoService {
      * @param ativoFinanceiroId ID do ativo financeiro.
      * @return Lista de transações associadas ao ativo financeiro.
      */
-    public List<Transacao> listarTransacoesPorAtivo(Long usuarioId, Long ativoFinanceiroId) {
+    public List<TransacaoEntity> listarTransacoesPorAtivo(Long usuarioId, Long ativoFinanceiroId) {
         // Verificar se o ativo financeiro pertence ao usuário
-        AtivoFinanceiro ativoFinanceiro = ativoFinanceiroService.buscarAtivoPorIdEUsuario(ativoFinanceiroId, usuarioId);
+        AtivoFinanceiroEntity ativoFinanceiro = ativoFinanceiroService.buscarAtivoPorIdEUsuario(ativoFinanceiroId, usuarioId);
 
         // Buscar transações não deletadas associadas ao ativo financeiro
-        List<Transacao> transacoes = transacaoRepository.findByAtivoFinanceiroIdAndDeletadoFalse(ativoFinanceiro.getId());
+        List<TransacaoEntity> transacoes = transacaoRepository.findByAtivoFinanceiroIdAndDeletadoFalse(ativoFinanceiro.getId());
         log.info("Transações encontradas para o ativo financeiro {}: {}", ativoFinanceiro.getNome(), transacoes);
         return transacoes;
     }
@@ -111,7 +114,7 @@ public class TransacaoService {
     @Transactional
     public void deletarTransacao(Long transacaoId, Locale locale) {
         // Buscar a transação pelo ID
-        Transacao transacao = transacaoRepository.findById(transacaoId)
+        TransacaoEntity transacao = transacaoRepository.findById(transacaoId)
                 .orElseThrow(() -> {
                     log.warn("Tentativa de excluir uma transação não encontrada com ID: {}", transacaoId);
                     throw new TransacaoNotFoundException(transacaoId, messageSource);
@@ -138,7 +141,7 @@ public class TransacaoService {
      * @param transacao A operação a ser verificada.
      * @return true se o produto da operação for um dos tipos de lucro; false caso contrário.
      */
-    private boolean isTransacaoLucro(Transacao transacao) {
+    private boolean isTransacaoLucro(TransacaoEntity transacao) {
         return transacao.getTipoTransacao() != null &&
                 (transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_RENDIMENTO.name())
                         || transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_DIVIDENDO.name())

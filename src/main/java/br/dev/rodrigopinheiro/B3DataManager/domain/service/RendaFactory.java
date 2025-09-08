@@ -1,13 +1,13 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.service;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Renda;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.RendaFixa;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.RendaVariavel;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroFixa;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroVariavel;
 import java.math.BigDecimal;
 
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaFixaEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.RendaFixaRepository;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.RendaVariavelRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -39,12 +39,12 @@ public class RendaFactory {
      * @param operacao       A operação importada, que contém informações do produto.
      * @return A instância de Renda (fixa ou variável) devidamente configurada.
      */
-    public Renda criarRenda(OperacaoEntity operacao) {
+    public RendaEntity criarRenda(OperacaoEntity operacao) {
         String produto = operacao.getProduto();
 
         if (produtoParser.isRendaFixa(operacao.getProduto())) {
             // Criação e configuração da RendaFixa
-            RendaFixa rendaFixa = new RendaFixa();
+            RendaFixaEntity rendaFixa = new RendaFixaEntity();
             // Mapeia o tipo de ativo fixo a partir do produto
             TipoAtivoFinanceiroFixa tipoFixa = tipoAtivoFixaMapper.mapear(produto);
             log.debug("Tipo de renda fixa: {}", tipoFixa);
@@ -59,7 +59,7 @@ public class RendaFactory {
             return rendaFixaRepository.save(rendaFixa);
         } else {
             // Criação e configuração da RendaVariavel
-            RendaVariavel rendaVariavel = new RendaVariavel();
+            RendaVariavelEntity rendaVariavel = new RendaVariavelEntity();
             // Para renda variável, o ticker deve ser extraído corretamente
             String ticker = produtoParser.extrairTicker(produto);
             log.debug("Ticker extraido: {}", ticker);

@@ -1,4 +1,4 @@
-package br.dev.rodrigopinheiro.B3DataManager.domain.entity;
+package br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 @Entity
 @Table(name = "portifolio")
-public class Portfolio {
+public class PortfolioEntity {
 
 
     @Id
@@ -28,17 +28,17 @@ public class Portfolio {
     // Associação direta com o usuário
     @OneToOne
     @JoinColumn(name = "usuario_id", nullable = false)
-    private Usuario usuario;
+    private UsuarioEntity usuario;
 
     // Agrega os ativos financeiros do usuário
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-    private Set<AtivoFinanceiro> ativosFinanceiro = new HashSet<>();
+    private Set<AtivoFinanceiroEntity> ativosFinanceiro = new HashSet<>();
 
     // Agrega as transações realizadas no portfolio
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-    private List<Transacao> transacoes = new ArrayList<>();
+    private List<TransacaoEntity> transacoes = new ArrayList<>();
 
     @Column(name = "saldo_total")
     private BigDecimal saldoTotal;
@@ -58,7 +58,7 @@ public class Portfolio {
      *
      * @param ativo O ativo financeiro a ser adicionado.
      */
-    public void adicionarAtivoFinanceiro(AtivoFinanceiro ativo) {
+    public void adicionarAtivoFinanceiro(AtivoFinanceiroEntity ativo) {
         if (ativo == null) {
             throw new IllegalArgumentException("Ativo financeiro não pode ser nulo.");
         }
@@ -76,7 +76,7 @@ public class Portfolio {
      *
      * @param ativo O ativo financeiro a ser removido.
      */
-    public void removerAtivoFinanceiro(AtivoFinanceiro ativo) {
+    public void removerAtivoFinanceiro(AtivoFinanceiroEntity ativo) {
         if (ativo == null) {
             throw new IllegalArgumentException("Ativo financeiro não pode ser nulo.");
         }
@@ -90,7 +90,7 @@ public class Portfolio {
      *
      * @param transacao A transação a ser adicionada.
      */
-    public void adicionarTransacao(Transacao transacao) {
+    public void adicionarTransacao(TransacaoEntity transacao) {
         if (transacao == null) {
             throw new IllegalArgumentException("Transação não pode ser nula.");
         }
@@ -104,7 +104,7 @@ public class Portfolio {
      *
      * @param transacao A transação a ser removida.
      */
-    public void removerTransacao(Transacao transacao) {
+    public void removerTransacao(TransacaoEntity transacao) {
         if (transacao == null) {
             throw new IllegalArgumentException("Transação não pode ser nula.");
         }
@@ -133,7 +133,7 @@ public class Portfolio {
      * @param transacao a transação utilizada para atualizar os saldos do portfolio.
      * @throws IllegalArgumentException se o valor total da transação for nulo.
      */
-    public void atualizarSaldos(Transacao transacao) {
+    public void atualizarSaldos(TransacaoEntity transacao) {
         Map<String, BigDecimal> impacto = calcularImpactoTransacao(transacao);
         this.saldoTotal = this.saldoTotal.add(impacto.get("saldoTotal"));
         this.saldoAplicado = this.saldoAplicado.add(impacto.get("saldoAplicado"));
@@ -165,7 +165,7 @@ public class Portfolio {
         BigDecimal novoLucroVenda = BigDecimal.ZERO;
         BigDecimal novoLucroRendimento = BigDecimal.ZERO;
 
-        for (Transacao transacao : transacoes) {
+        for (TransacaoEntity transacao : transacoes) {
             Map<String, BigDecimal> impacto = calcularImpactoTransacao(transacao);
             novoSaldoTotal = novoSaldoTotal.add(impacto.get("saldoTotal"));
             novoSaldoAplicado = novoSaldoAplicado.add(impacto.get("saldoAplicado"));
@@ -187,7 +187,7 @@ public class Portfolio {
      *
      * Se a transação for do tipo "TRANSFERENCIA" ou tiver valor nulo, retorna um Map com zeros.
      */
-    private Map<String, BigDecimal> calcularImpactoTransacao(Transacao transacao) {
+    private Map<String, BigDecimal> calcularImpactoTransacao(TransacaoEntity transacao) {
         // Cria e inicializa o Map com valores zerados.
         Map<String, BigDecimal> impacto = new HashMap<>();
         impacto.put("saldoTotal", BigDecimal.ZERO);
@@ -235,7 +235,7 @@ public class Portfolio {
      * @param ativo O ativo financeiro a ser verificado.
      * @return true se o ativo estiver presente; false caso contrário.
      */
-    public boolean possuiAtivo(AtivoFinanceiro ativo) {
+    public boolean possuiAtivo(AtivoFinanceiroEntity ativo) {
         return ativo != null && this.ativosFinanceiro.contains(ativo);
     }
 
@@ -245,12 +245,12 @@ public class Portfolio {
      *
      * @return Lista de registros de Renda Fixa.
      */
-    public List<RendaFixa> buscarRendaFixa() {
+    public List<RendaFixaEntity> buscarRendaFixa() {
         return ativosFinanceiro.stream()
                 .filter(Objects::nonNull)
                 .flatMap(ativo -> {
-                    List<RendaFixa> fixas = ativo.getRendaFixas();
-                    return fixas != null ? fixas.stream() : Stream.<RendaFixa>empty();
+                    List<RendaFixaEntity> fixas = ativo.getRendaFixas();
+                    return fixas != null ? fixas.stream() : Stream.<RendaFixaEntity>empty();
                 })
                 .collect(Collectors.toList());
     }
@@ -261,12 +261,12 @@ public class Portfolio {
      *
      * @return Lista de registros de Renda Variável.
      */
-    public List<RendaVariavel> buscarRendaVariavel() {
+    public List<RendaVariavelEntity> buscarRendaVariavel() {
         return ativosFinanceiro.stream()
                 .filter(Objects::nonNull)
                 .flatMap(ativo -> {
-                    List<RendaVariavel> variaveis = ativo.getRendaVariaveis();
-                    return variaveis != null ? variaveis.stream() : Stream.<RendaVariavel>empty();
+                    List<RendaVariavelEntity> variaveis = ativo.getRendaVariaveis();
+                    return variaveis != null ? variaveis.stream() : Stream.<RendaVariavelEntity>empty();
                 })
                 .collect(Collectors.toList());
     }
@@ -279,7 +279,7 @@ public class Portfolio {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Portfolio portfolio = (Portfolio) o;
+        PortfolioEntity portfolio = (PortfolioEntity) o;
         return getId() != null && Objects.equals(getId(), portfolio.getId());
     }
 

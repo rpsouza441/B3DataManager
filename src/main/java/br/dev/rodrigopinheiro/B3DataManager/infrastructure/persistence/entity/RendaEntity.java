@@ -1,4 +1,4 @@
-package br.dev.rodrigopinheiro.B3DataManager.domain.entity;
+package br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @DiscriminatorColumn(name = "tipo_renda", discriminatorType = DiscriminatorType.STRING)
-public abstract class Renda {
+public abstract class RendaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
@@ -34,6 +34,6 @@ public abstract class Renda {
 
     @ManyToOne
     @JoinColumn(name = "ativo_financeiro_id")
-    private AtivoFinanceiro ativoFinanceiro;
+    private AtivoFinanceiroEntity ativoFinanceiro;
 
 }

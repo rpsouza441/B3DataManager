@@ -4,7 +4,7 @@ import br.dev.rodrigopinheiro.B3DataManager.application.criteria.FilterCriteria;
 import br.dev.rodrigopinheiro.B3DataManager.application.port.OperacaoRepository;
 import br.dev.rodrigopinheiro.B3DataManager.domain.model.Operacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.UsuarioId;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.entity.OperacaoJpaEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.mapper.OperacaoMapper;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.JpaOperacaoRepository;
 import org.springframework.data.domain.Page;
@@ -30,8 +30,8 @@ public class OperacaoRepositoryAdapter implements OperacaoRepository {
     
     @Override
     public Operacao save(Operacao operacao) {
-        OperacaoJpaEntity jpaEntity = mapper.toJpaEntity(operacao);
-        OperacaoJpaEntity savedEntity = jpaRepository.save(jpaEntity);
+        OperacaoEntity jpaEntity = mapper.toJpaEntity(operacao);
+        OperacaoEntity savedEntity = jpaRepository.save(jpaEntity);
         return mapper.toDomainEntity(savedEntity);
     }
     
@@ -43,18 +43,18 @@ public class OperacaoRepositoryAdapter implements OperacaoRepository {
     
     @Override
     public boolean existsByIdOriginalAndUsuarioId(Long idOriginal, UsuarioId usuarioId) {
-        return jpaRepository.existsByIdOriginalAndUsuarioId(idOriginal, usuarioId.value());
+        return jpaRepository.existsByIdOriginalAndUsuario_Id(idOriginal, usuarioId.value());
     }
     
     @Override
     public Optional<Operacao> findByIdOriginalAndUsuarioId(Long idOriginal, UsuarioId usuarioId) {
-        return jpaRepository.findByIdOriginalAndUsuarioId(idOriginal, usuarioId.value())
+        return jpaRepository.findByIdOriginalAndUsuario_Id(idOriginal, usuarioId.value())
                 .map(mapper::toDomainEntity);
     }
     
     @Override
     public Page<Operacao> findByFiltersAndUsuarioId(FilterCriteria criteria, UsuarioId usuarioId, Pageable pageable) {
-        Page<OperacaoJpaEntity> jpaPage = jpaRepository.findByFiltersAndUsuarioId(
+        Page<OperacaoEntity> jpaPage = jpaRepository.findByFiltersAndUsuarioId(
             criteria.entradaSaida(),
             criteria.startDate(),
             criteria.endDate(),
@@ -97,7 +97,7 @@ public class OperacaoRepositoryAdapter implements OperacaoRepository {
             boolean duplicado,
             UsuarioId usuarioId) {
         
-        return jpaRepository.findFirstByDataAndMovimentacaoAndProdutoAndInstituicaoAndQuantidadeAndPrecoUnitarioAndValorOperacaoAndDuplicadoAndUsuarioId(
+        return jpaRepository.findFirstByDataAndMovimentacaoAndProdutoAndInstituicaoAndQuantidadeAndPrecoUnitarioAndValorOperacaoAndDuplicadoAndUsuario_Id(
                 data, movimentacao, produto, instituicao, quantidade, precoUnitario, valorOperacao, duplicado, usuarioId.value()
         ).map(mapper::toDomainEntity);
     }
@@ -107,7 +107,7 @@ public class OperacaoRepositoryAdapter implements OperacaoRepository {
             boolean dimensionado, boolean duplicado, int pageSize, int offset) {
         
         org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(offset / pageSize, pageSize, org.springframework.data.domain.Sort.by("id").ascending());
-        Page<OperacaoJpaEntity> page = jpaRepository.findByDimensionadoAndDuplicado(dimensionado, duplicado, pageable);
+        Page<OperacaoEntity> page = jpaRepository.findByDimensionadoAndDuplicado(dimensionado, duplicado, pageable);
         
         return page.getContent().stream()
                 .map(mapper::toDomainEntity)

@@ -1,8 +1,7 @@
-package br.dev.rodrigopinheiro.B3DataManager.domain.entity;
+package br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity;
 
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoMovimentacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoTransacao;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -18,7 +17,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @Entity
 @Table(name = "transacao")
-public class Transacao {
+public class TransacaoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,15 +52,15 @@ public class Transacao {
 
     @ManyToOne
     @JoinColumn(name = "ativo_financeiro_id")
-    private AtivoFinanceiro ativoFinanceiro;
+    private AtivoFinanceiroEntity ativoFinanceiro;
 
     @ManyToOne
     @JoinColumn(name = "instituicao_id")
-    private Instituicao instituicao;
+    private InstituicaoEntity instituicao;
 
     @ManyToOne
     @JoinColumn(name = "darf_id")
-    private Darf darf;
+    private DarfEntity darf;
 
     @ManyToOne
     @JoinColumn(name = "operacao_id")
@@ -70,7 +69,7 @@ public class Transacao {
     // Associação com o Portfolio (agregado raiz financeiro)
     @ManyToOne
     @JoinColumn(name = "portfolio_id")
-    private Portfolio portfolio;
+    private PortfolioEntity portfolio;
 
     public void setTipoMovimentacao(TipoMovimentacao tipoMovimentacao) {
         this.tipoMovimentacao = tipoMovimentacao.name();
@@ -93,7 +92,7 @@ public class Transacao {
      * @throws IllegalArgumentException se o ativo financeiro for nulo
      * @throws IllegalStateException se já houver um ativo financeiro associado (opcional)
      */
-    public void associarAtivoFinanceiro(AtivoFinanceiro ativoFinanceiro) {
+    public void associarAtivoFinanceiro(AtivoFinanceiroEntity ativoFinanceiro) {
         if (ativoFinanceiro == null) {
             throw new IllegalArgumentException("Ativo financeiro não pode ser nulo.");
         }
@@ -117,7 +116,7 @@ public class Transacao {
      * @param instituicao a instituição a ser associada à transação
      * @throws IllegalArgumentException se a instituição for nula
      */
-    public void associarInstituicao(Instituicao instituicao) {
+    public void associarInstituicao(InstituicaoEntity instituicao) {
         if (instituicao == null) {
             throw new IllegalArgumentException("Ativo financeiro não pode ser nulo.");
         }
@@ -137,7 +136,7 @@ public class Transacao {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Transacao transacao = (Transacao) o;
+        TransacaoEntity transacao = (TransacaoEntity) o;
         return getId() != null && Objects.equals(getId(), transacao.getId());
     }
 

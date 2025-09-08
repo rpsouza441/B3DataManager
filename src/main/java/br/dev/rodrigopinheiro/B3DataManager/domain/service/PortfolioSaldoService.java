@@ -1,10 +1,11 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.service;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.AtivoFinanceiro;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Portfolio;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Transacao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.PortfolioEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.TransacaoEntity;
 
 import java.math.BigDecimal;
 
@@ -28,7 +29,7 @@ public class PortfolioSaldoService {
      * @param portfolio  O Portfolio a ser atualizado.
      * @param transacao  A Transação que impacta os saldos.
      */
-    public void atualizarSaldos(Portfolio portfolio, Transacao transacao) {
+    public void atualizarSaldos(PortfolioEntity portfolio, TransacaoEntity transacao) {
         // Atualiza o saldo total do portfolio
         portfolio.setSaldoTotal(portfolio.getSaldoTotal().add(transacao.getValorTotal()));
 
@@ -37,7 +38,7 @@ public class PortfolioSaldoService {
             portfolio.setSaldoAplicado(portfolio.getSaldoAplicado().add(transacao.getValorTotal()));
         } else {
             // Para saída, calcula o lucro com base no custo médio (FIFO)
-            AtivoFinanceiro ativo = transacao.getAtivoFinanceiro();
+            AtivoFinanceiroEntity ativo = transacao.getAtivoFinanceiro();
             BigDecimal lucro = BigDecimal.ZERO;
             // Verifica se o ativo possui operações de renda variável
             if (ativo.getRendaVariaveis() != null && !ativo.getRendaVariaveis().isEmpty()) {

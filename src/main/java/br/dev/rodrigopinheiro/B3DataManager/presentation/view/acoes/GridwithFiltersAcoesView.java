@@ -3,10 +3,10 @@ package br.dev.rodrigopinheiro.B3DataManager.presentation.view.acoes;
 import br.dev.rodrigopinheiro.B3DataManager.application.security.SecurityService;
 import br.dev.rodrigopinheiro.B3DataManager.application.service.ErrorService;
 import br.dev.rodrigopinheiro.B3DataManager.application.service.RendaVariavelService;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.AtivoFinanceiro;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.RendaVariavel;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroVariavel;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.ServiceException;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
 import br.dev.rodrigopinheiro.B3DataManager.presentation.dto.AtivoAcaoDTO;
 import br.dev.rodrigopinheiro.B3DataManager.presentation.view.components.PaginationHelper;
 import br.dev.rodrigopinheiro.B3DataManager.presentation.view.components.ToastNotification;
@@ -49,7 +49,7 @@ import java.util.ResourceBundle;
 @PermitAll
 @Uses(Icon.class)
 public class GridwithFiltersAcoesView extends Div
-        implements HasDynamicTitle, HasUrlParameter<Long>, Specification<AtivoFinanceiro> {
+        implements HasDynamicTitle, HasUrlParameter<Long>, Specification<AtivoFinanceiroEntity> {
 
     private final RendaVariavelService rendaVariavelService;
     private final ErrorService errorService;
@@ -233,7 +233,7 @@ public class GridwithFiltersAcoesView extends Div
             totalAmountOfPages = PaginationHelper.calculateTotalPages(totalRegistros, itemsPerPage);
 
             // 3) Busca página de RendaVariavel já com filtros aplicados
-            List<RendaVariavel> rendasPaginadas = rendaVariavelService.findWithFiltersIn(
+            List<RendaVariavelEntity> rendasPaginadas = rendaVariavelService.findWithFiltersIn(
                     tiposAcoes,
                     filters.nome.getValue(),
                     filters.startDate.getValue(),
@@ -304,7 +304,7 @@ public class GridwithFiltersAcoesView extends Div
      * @return Predicate composto com os filtros aplicados
      */
     @Override
-    public Predicate toPredicate(Root<AtivoFinanceiro> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+    public Predicate toPredicate(Root<AtivoFinanceiroEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();
 
         // Filtro por nome (converte para minúsculo para comparação case-insensitive)

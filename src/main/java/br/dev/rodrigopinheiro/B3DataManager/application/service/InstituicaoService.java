@@ -1,10 +1,10 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.service;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Instituicao;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Usuario;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.instituicao.InstituicaoAlreadyExistsException;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.instituicao.InstituicaoNotFoundException;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.instituicao.InvalidInstituicaoNameException;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.InstituicaoEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.UsuarioEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.InstituicaoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -38,7 +38,7 @@ public class InstituicaoService {
      * @return Instituição criada.
      */
     @Transactional
-    public Instituicao criarInstituicao(String nome, Long usuarioId, Locale locale) {
+    public InstituicaoEntity criarInstituicao(String nome, Long usuarioId, Locale locale) {
         log.info("Iniciando criação de instituição com nome: {} e usuário ID: {}", nome, usuarioId);
         checkIfNullOrEmpty(nome, locale);
 
@@ -48,15 +48,15 @@ public class InstituicaoService {
             throw new InstituicaoAlreadyExistsException(nome, messageSource);
         }
 
-        Usuario usuario = usuarioService.buscarUsuarioPorId(usuarioId);
+        UsuarioEntity usuario = usuarioService.buscarUsuarioPorId(usuarioId);
 
         // Criar a instituição e associá-la ao usuário
-        Instituicao novaInstituicao = new Instituicao();
+        InstituicaoEntity novaInstituicao = new InstituicaoEntity();
         novaInstituicao.setNome(nome);
         novaInstituicao.setUsuarios(List.of(usuario)); // Associa ao usuário
 
 
-        Instituicao instituicaoCriada = instituicaoRepository.save(novaInstituicao);
+        InstituicaoEntity instituicaoCriada = instituicaoRepository.save(novaInstituicao);
         log.info("Instituição criada com sucesso: {}", instituicaoCriada);
         return instituicaoCriada;    }
 
@@ -71,10 +71,10 @@ public class InstituicaoService {
      * @return Instituição atualizada.
      */
     @Transactional
-    public Instituicao atualizarInstituicao(Long id, String nome, Long usuarioId, Locale locale) {
+    public InstituicaoEntity atualizarInstituicao(Long id, String nome, Long usuarioId, Locale locale) {
         log.info("Atualizando instituição com ID: {}", id);
 
-        Instituicao instituicao = getInstituicaoById(id, locale);
+        InstituicaoEntity instituicao = getInstituicaoById(id, locale);
 
         if (nome != null && !nome.isEmpty()) {
             log.debug("Atualizando nome da instituição para: {}", nome);
@@ -82,14 +82,14 @@ public class InstituicaoService {
         }
 
         if (usuarioId != null) {
-            Usuario usuario = usuarioService.buscarUsuarioPorId(usuarioId);
+            UsuarioEntity usuario = usuarioService.buscarUsuarioPorId(usuarioId);
             if (!instituicao.getUsuarios().contains(usuario)) {
                 log.debug("Adicionando usuário ID: {} à instituição ID: {}", usuarioId, id);
                 instituicao.getUsuarios().add(usuario);
             }
         }
 
-        Instituicao instituicaoAtualizada = instituicaoRepository.save(instituicao);
+        InstituicaoEntity instituicaoAtualizada = instituicaoRepository.save(instituicao);
         log.info("Instituição atualizada com sucesso: {}", instituicaoAtualizada);
         return instituicaoAtualizada;
     }
@@ -100,7 +100,7 @@ public class InstituicaoService {
      * @param id ID da instituição.
      * @return Instituição encontrada.
      */
-    public Instituicao buscarPorId(Long id, Locale locale) {
+    public InstituicaoEntity buscarPorId(Long id, Locale locale) {
         log.info("Buscando instituição com ID: {}", id);
 
         return getInstituicaoById(id, locale);
@@ -111,7 +111,7 @@ public class InstituicaoService {
      *
      * @return Lista de instituições.
      */
-    public List<Instituicao> listarTodas() {
+    public List<InstituicaoEntity> listarTodas() {
         log.info("Listando todas as instituições cadastradas.");
         return instituicaoRepository.findAll();
     }
@@ -125,7 +125,7 @@ public class InstituicaoService {
     public void excluirInstituicao(Long id, Locale locale) {
         log.info("Excluindo instituição com ID: {}", id);
 
-        Instituicao instituicao = instituicaoRepository.findById(id)
+        InstituicaoEntity instituicao = instituicaoRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Tentativa de excluir instituição não encontrada com ID: {}", id);
                     return new InstituicaoNotFoundException(id, messageSource);
@@ -143,7 +143,7 @@ public class InstituicaoService {
      * @return Instituição existente ou criada.
      */
     @Transactional
-    public Instituicao verificarOuCriarInstituicao(String nome, Long usuarioId, Locale locale) {
+    public InstituicaoEntity verificarOuCriarInstituicao(String nome, Long usuarioId, Locale locale) {
         log.info("Verificando ou criando instituição com nome: {} e usuário ID: {}", nome, usuarioId);
 
         checkIfNullOrEmpty(nome, locale);
@@ -155,10 +155,10 @@ public class InstituicaoService {
                 });
     }
 
-    public Instituicao buscarOuCriarInstituicao(String nome) {
-        Optional<Instituicao> optionalInstituicao = instituicaoRepository.findByNome(nome);
+    public InstituicaoEntity buscarOuCriarInstituicao(String nome) {
+        Optional<InstituicaoEntity> optionalInstituicao = instituicaoRepository.findByNome(nome);
         return optionalInstituicao.orElseGet(() -> {
-            Instituicao novaInstituicao = new Instituicao();
+            InstituicaoEntity novaInstituicao = new InstituicaoEntity();
             novaInstituicao.setNome(nome);
             // Defina outros atributos mínimos se necessário.
             return instituicaoRepository.save(novaInstituicao);
@@ -172,7 +172,7 @@ public class InstituicaoService {
         }
     }
 
-    private Instituicao getInstituicaoById(Long id, Locale locale) {
+    private InstituicaoEntity getInstituicaoById(Long id, Locale locale) {
         return instituicaoRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Instituição não encontrada com ID: {}", id);

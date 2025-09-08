@@ -82,37 +82,31 @@ class RegisterOperacaoUseCaseTest {
     
     @Test
     void deveRejeitarOperacaoComQuantidadeInvalida() {
-        // Arrange
-        RegisterOperacaoCommand command = new RegisterOperacaoCommand(
-            "Compra", LocalDate.now(), "Compra à vista", "PETR4", "XP Investimentos",
-            new Quantidade(BigDecimal.valueOf(-100)), 
-            new Dinheiro(BigDecimal.valueOf(10.50)), 
-            new Dinheiro(BigDecimal.valueOf(1050.00)),
-            false, false, null, false, new UsuarioId(1L)
-        );
-        
-        // Act & Assert
+        // Act & Assert - A exceção deve ser lançada na criação do Value Object
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            useCase.execute(command);
+            new RegisterOperacaoCommand(
+                "Compra", LocalDate.now(), "Compra à vista", "PETR4", "XP Investimentos",
+                new Quantidade(BigDecimal.valueOf(-100)), 
+                new Dinheiro(BigDecimal.valueOf(10.50)), 
+                new Dinheiro(BigDecimal.valueOf(1050.00)),
+                false, false, null, false, new UsuarioId(1L)
+            );
         });
         
-        assertEquals("Quantidade deve ser maior que zero", exception.getMessage());
+        assertEquals("Quantidade não pode ser negativa", exception.getMessage());
     }
     
     @Test
     void deveRejeitarOperacaoComValorNegativo() {
-        // Arrange
-        RegisterOperacaoCommand command = new RegisterOperacaoCommand(
-            "Compra", LocalDate.now(), "Compra à vista", "PETR4", "XP Investimentos",
-            new Quantidade(BigDecimal.valueOf(100)), 
-            new Dinheiro(BigDecimal.valueOf(10.50)), 
-            new Dinheiro(BigDecimal.valueOf(-1050.00)),
-            false, false, null, false, new UsuarioId(1L)
-        );
-        
-        // Act & Assert
+        // Act & Assert - A exceção deve ser lançada na criação do Value Object
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            useCase.execute(command);
+            new RegisterOperacaoCommand(
+                "Compra", LocalDate.now(), "Compra à vista", "PETR4", "XP Investimentos",
+                new Quantidade(BigDecimal.valueOf(100)), 
+                new Dinheiro(BigDecimal.valueOf(10.50)), 
+                new Dinheiro(BigDecimal.valueOf(-1050.00)),
+                false, false, null, false, new UsuarioId(1L)
+            );
         });
         
         assertEquals("Valor monetário não pode ser negativo", exception.getMessage());

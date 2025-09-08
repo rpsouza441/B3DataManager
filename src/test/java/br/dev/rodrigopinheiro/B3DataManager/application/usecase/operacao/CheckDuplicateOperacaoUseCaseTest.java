@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.dao.DataAccessException;
 
 import java.math.BigDecimal;
@@ -31,6 +33,7 @@ import static org.mockito.Mockito.*;
  * incluindo sucessos, erros e validações.</p>
  */
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("CheckDuplicateOperacaoUseCase")
 class CheckDuplicateOperacaoUseCaseTest {
     

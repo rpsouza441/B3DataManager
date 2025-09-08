@@ -1,8 +1,8 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.service;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Usuario;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.Roles;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.usuario.*;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.UsuarioEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.UsuarioRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
@@ -32,7 +32,7 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Page<Usuario> list(Pageable pageable, Specification<Usuario> filter) {
+    public Page<UsuarioEntity> list(Pageable pageable, Specification<UsuarioEntity> filter) {
         return usuarioRepository.findAll(filter, pageable);
     }
 
@@ -43,7 +43,7 @@ public class UsuarioService {
 
     private void criarUsuarioPadrao(String username, String senha, String email, Set<Roles> roles) {
         if (usuarioRepository.findByUsername(username).isEmpty()) {
-            Usuario usuario = new Usuario();
+            UsuarioEntity usuario = new UsuarioEntity();
             usuario.setUsername(username);
             usuario.setPassword(passwordEncoder.encode(senha));
             usuario.setEmail(email);
@@ -75,7 +75,7 @@ public class UsuarioService {
         }
 
         // Criar o novo usuário
-        Usuario usuario = new Usuario();
+        UsuarioEntity usuario = new UsuarioEntity();
         usuario.setUsername(username);
         usuario.setEmail(email);
         usuario.setPassword(passwordEncoder.encode(password));
@@ -85,7 +85,7 @@ public class UsuarioService {
         roles.add(Roles.USER);
         usuario.setRoles(roles);
 
-        Usuario savedUser = usuarioRepository.save(usuario);
+        UsuarioEntity savedUser = usuarioRepository.save(usuario);
         log.info("Usuário '{}' registrado com sucesso. ID: {}", username, savedUser.getId());
     }
 
@@ -93,8 +93,8 @@ public class UsuarioService {
      * Busca um usuário pelo ID.
      */
     @Transactional(readOnly = true)
-    public Usuario buscarUsuarioPorId(Long id) {
-        Usuario usuario = usuarioRepository.findById(id)
+    public UsuarioEntity buscarUsuarioPorId(Long id) {
+        UsuarioEntity usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNotFoundException( id, messageSource));
         Hibernate.initialize(usuario.getInstituicoes());
         return usuario;
@@ -111,7 +111,7 @@ public class UsuarioService {
     public void deleteById(Long id, Locale locale) {
         log.info("Marcando o usuário como deletado com ID: {}", id);
 
-        Usuario usuario = usuarioRepository.findById(id)
+        UsuarioEntity usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Tentativa de excluir um usuário não encontrado com ID: {}", id);
                     throw new UsuarioNotFoundException(id, messageSource);

@@ -1,4 +1,4 @@
-package br.dev.rodrigopinheiro.B3DataManager.domain.entity;
+package br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,7 +15,7 @@ import java.util.Objects;
 @ToString
 @Entity
 @Table(name = "ativo_financeiro")
-public class AtivoFinanceiro {
+public class AtivoFinanceiroEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,19 +28,19 @@ public class AtivoFinanceiro {
     // Agora, o ativo pertence ao Portfolio
     @ManyToOne
     @JoinColumn(name = "portfolio_id")
-    private Portfolio portfolio;
+    private PortfolioEntity portfolio;
 
     @OneToMany(mappedBy = "ativoFinanceiro")
     @ToString.Exclude // Evita loops
-    private List<Transacao> transacoes;
+    private List<TransacaoEntity> transacoes;
 
     @OneToMany(mappedBy = "ativoFinanceiro")
     @ToString.Exclude // Evita loops
-    private List<RendaVariavel> rendaVariaveis = new ArrayList<>();
+    private List<RendaVariavelEntity> rendaVariaveis = new ArrayList<>();
 
     @OneToMany(mappedBy = "ativoFinanceiro")
     @ToString.Exclude // Evita loops
-    private List<RendaFixa> rendaFixas;
+    private List<RendaFixaEntity> rendaFixas;
 
     @Column(name = "deletado", nullable = false)
     private Boolean deletado = false;
@@ -52,22 +52,22 @@ public class AtivoFinanceiro {
      *
      * @param renda A renda a ser adicionada.
      */
-    public void adicionarRenda(Renda renda) {
+    public void adicionarRenda(RendaEntity renda) {
         if (renda == null) {
             throw new IllegalArgumentException("Renda não pode ser nula.");
         }
         // Define explicitamente o AtivoFinanceiro na renda
         renda.setAtivoFinanceiro(this);
-        if (renda instanceof RendaFixa) {
+        if (renda instanceof RendaFixaEntity) {
             if (rendaFixas == null) {
                 rendaFixas = new ArrayList<>();
             }
-            rendaFixas.add((RendaFixa) renda);
-        } else if (renda instanceof RendaVariavel) {
+            rendaFixas.add((RendaFixaEntity) renda);
+        } else if (renda instanceof RendaVariavelEntity) {
             if (rendaVariaveis == null) {
                 rendaVariaveis = new ArrayList<>();
             }
-            rendaVariaveis.add((RendaVariavel) renda);
+            rendaVariaveis.add((RendaVariavelEntity) renda);
         }
     }
 
@@ -77,7 +77,7 @@ public class AtivoFinanceiro {
      *
      * @param transacao A renda a ser adicionada.
      */
-    public void adicionarTransacoes(Transacao transacao) {
+    public void adicionarTransacoes(TransacaoEntity transacao) {
         if (transacao == null) {
             throw new IllegalArgumentException("Transacao não pode ser nula.");
         }
@@ -98,7 +98,7 @@ public class AtivoFinanceiro {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        AtivoFinanceiro that = (AtivoFinanceiro) o;
+        AtivoFinanceiroEntity that = (AtivoFinanceiroEntity) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
 

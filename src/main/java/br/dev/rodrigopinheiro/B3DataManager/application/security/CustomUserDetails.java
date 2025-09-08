@@ -1,17 +1,18 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.security;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Usuario;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.UsuarioEntity;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class CustomUserDetails implements UserDetails {
 
-    private final Usuario usuario;
+    private final UsuarioEntity usuario;
 
-    public CustomUserDetails(Usuario usuario) {
+    public CustomUserDetails(UsuarioEntity usuario) {
         this.usuario = usuario;
     }
 
@@ -19,7 +20,7 @@ public class CustomUserDetails implements UserDetails {
         return usuario.getId();
     }
 
-    public Usuario getUsuario() {
+    public UsuarioEntity getUsuario() {
         return usuario;
     }
 

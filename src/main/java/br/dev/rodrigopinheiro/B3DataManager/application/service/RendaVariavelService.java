@@ -1,12 +1,12 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.service;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.AtivoFinanceiro;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Portfolio;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.RendaVariavel;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroVariavel;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.rendavariavel.InvalidRendaVariavelException;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.api.ApiMarketPriceClient;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.api.model.MarketPrice;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.PortfolioEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.RendaVariavelRepository;
 import br.dev.rodrigopinheiro.B3DataManager.presentation.dto.AtivoAcaoDTO;
 import br.dev.rodrigopinheiro.B3DataManager.presentation.dto.AtivoFiiDTO;
@@ -55,16 +55,16 @@ public class RendaVariavelService {
     }
 
 
-    public RendaVariavel save(RendaVariavel rendaVariavel) {
+    public RendaVariavelEntity save(RendaVariavelEntity rendaVariavel) {
         // Inserir validações e regras de negócio específicas para renda variável
         return rendaVariavelRepository.save(rendaVariavel);
     }
 
-    public Optional<RendaVariavel> findById(Long id) {
+    public Optional<RendaVariavelEntity> findById(Long id) {
         return rendaVariavelRepository.findById(id);
     }
 
-    public List<RendaVariavel> findAll() {
+    public List<RendaVariavelEntity> findAll() {
         return rendaVariavelRepository.findAll();
     }
 
@@ -117,10 +117,10 @@ public class RendaVariavelService {
      * @return Entidade de renda variável salva.
      */
     @Transactional
-    public RendaVariavel salvarAcao(Long usuarioId, RendaVariavel rendaVariavel, Locale locale) {
+    public RendaVariavelEntity salvarAcao(Long usuarioId, RendaVariavelEntity rendaVariavel, Locale locale) {
         log.info("Salvando ação para o usuário com ID {}: {}", usuarioId, rendaVariavel);
 
-        RendaVariavel salvo = salvarRendaVariavel(usuarioId, rendaVariavel, locale);
+        RendaVariavelEntity salvo = salvarRendaVariavel(usuarioId, rendaVariavel, locale);
 
         log.info("Ação salva com sucesso: {}", salvo);
         return salvo;
@@ -159,7 +159,7 @@ public class RendaVariavelService {
         );
     }
 
-    public Page<RendaVariavel> findWithFilters(String tipo, String nome, LocalDate startDate, LocalDate endDate,
+    public Page<RendaVariavelEntity> findWithFilters(String tipo, String nome, LocalDate startDate, LocalDate endDate,
                                                BigDecimal precoMedioMin, BigDecimal precoMedioMax,
                                                Pageable pageable, Long usuarioId, Locale locale) {
         log.info("Aplicando filtros para FIIs: tipo={}, nome={}, startDate={}, endDate={}, precoMedioMin={}, precoMedioMax={}, usuarioId={}",
@@ -179,7 +179,7 @@ public class RendaVariavelService {
     /**
      * NOVO: busca filtrando por uma lista de tipos (p.ex. todas as categorias de ação).
      */
-    public Page<RendaVariavel> findWithFiltersIn(List<String> tipos,
+    public Page<RendaVariavelEntity> findWithFiltersIn(List<String> tipos,
                                                  String nome,
                                                  LocalDate startDate,
                                                  LocalDate endDate,
@@ -223,34 +223,34 @@ public class RendaVariavelService {
         // 1) PASSO 1: Carrega TODAS as RendaVariavel FII (sem paginação)
         //    para descobrir quanto dinheiro há investido em cada ativo.
         // --------------------------------------------------------------------
-        List<RendaVariavel> todasRendasFii = rendaVariavelRepository
+        List<RendaVariavelEntity> todasRendasFii = rendaVariavelRepository
                 .findByTipoRendaVariavelInAndAtivoFinanceiroUsuarioId(
                         List.of(TipoAtivoFinanceiroVariavel.FII.name()),
                         usuarioId
                 );
 
         // Agrupa por AtivoFinanceiro
-        Map<AtivoFinanceiro, List<RendaVariavel>> rendasPorAtivo = todasRendasFii.stream()
-                .collect(Collectors.groupingBy(RendaVariavel::getAtivoFinanceiro));
+        Map<AtivoFinanceiroEntity, List<RendaVariavelEntity>> rendasPorAtivo = todasRendasFii.stream()
+                .collect(Collectors.groupingBy(RendaVariavelEntity::getAtivoFinanceiro));
 
         // Armazena aqui o resultado para cada ativo: precoMedio(2 dec), total(2 dec), etc.
-        Map<AtivoFinanceiro, DadosRendaVariavelCalculados> dadosCalculadosMap = new HashMap<>();
+        Map<AtivoFinanceiroEntity, DadosRendaVariavelCalculados> dadosCalculadosMap = new HashMap<>();
 
         // Precisamos também do precoAtual, então colete tickers
         List<String> tickersTodos = rendasPorAtivo.keySet().stream()
-                .map(AtivoFinanceiro::getNome)
+                .map(AtivoFinanceiroEntity::getNome)
                 .distinct()
                 .collect(Collectors.toList());
         // Buscar preços de mercado
         // Map<String, BigDecimal> precoPorTicker = carregarPrecoMercado(tickersTodos);
 
         // 1.1) Calcula precoMedio(2 decimais) e total(2 decimais) para cada ativo
-        for (Map.Entry<AtivoFinanceiro, List<RendaVariavel>> entry : rendasPorAtivo.entrySet()) {
-            AtivoFinanceiro ativo = entry.getKey();
-            List<RendaVariavel> rendas = entry.getValue();
+        for (Map.Entry<AtivoFinanceiroEntity, List<RendaVariavelEntity>> entry : rendasPorAtivo.entrySet()) {
+            AtivoFinanceiroEntity ativo = entry.getKey();
+            List<RendaVariavelEntity> rendas = entry.getValue();
 
             double somaQuantidade = rendas.stream()
-                    .mapToDouble(RendaVariavel::getQuantidade)
+                    .mapToDouble(RendaVariavelEntity::getQuantidade)
                     .sum();
 
             if (somaQuantidade <= 0) {
@@ -308,23 +308,23 @@ public class RendaVariavelService {
         // 2) PASSO 2: Carrega apenas a página (fiisPage)
         //    e para cada ativo da página, pega do Map o que já calculamos
         // --------------------------------------------------------------------
-        Page<RendaVariavel> fiisPage = rendaVariavelRepository
+        Page<RendaVariavelEntity> fiisPage = rendaVariavelRepository
                 .findByTipoRendaVariavelAndAtivoFinanceiroUsuarioId(
                         TipoAtivoFinanceiroVariavel.FII.name(),
                         usuarioId,
                         pageable
                 );
 
-        Map<AtivoFinanceiro, List<RendaVariavel>> fiisPaginadasPorAtivo = fiisPage.getContent().stream()
-                .collect(Collectors.groupingBy(RendaVariavel::getAtivoFinanceiro));
+        Map<AtivoFinanceiroEntity, List<RendaVariavelEntity>> fiisPaginadasPorAtivo = fiisPage.getContent().stream()
+                .collect(Collectors.groupingBy(RendaVariavelEntity::getAtivoFinanceiro));
 
         // --------------------------------------------------------------------
         // 3) PASSO 3: Monta o DTO apenas para os ativos dessa página
         // --------------------------------------------------------------------
         List<AtivoFiiDTO> ativosDTO = new ArrayList<>();
 
-        for (Map.Entry<AtivoFinanceiro, List<RendaVariavel>> entry : fiisPaginadasPorAtivo.entrySet()) {
-            AtivoFinanceiro ativo = entry.getKey();
+        for (Map.Entry<AtivoFinanceiroEntity, List<RendaVariavelEntity>> entry : fiisPaginadasPorAtivo.entrySet()) {
+            AtivoFinanceiroEntity ativo = entry.getKey();
 
             // Pega o que já calculamos no passo 1
             DadosRendaVariavelCalculados dados = dadosCalculadosMap.get(ativo);
@@ -360,7 +360,7 @@ public class RendaVariavelService {
     }
 
     public BigDecimal calcularTotalInvestidoEmFiis(Long usuarioId) {
-        List<RendaVariavel> todasRendasFii = rendaVariavelRepository.findByTipoRendaVariavelInAndAtivoFinanceiroUsuarioId(
+        List<RendaVariavelEntity> todasRendasFii = rendaVariavelRepository.findByTipoRendaVariavelInAndAtivoFinanceiroUsuarioId(
                 List.of(TipoAtivoFinanceiroVariavel.FII.name()),
                 usuarioId
         );
@@ -386,7 +386,7 @@ public class RendaVariavelService {
         );
 
         // Traga todas as transações de compra/venda para esses tipos
-        List<RendaVariavel> todasAcoes = rendaVariavelRepository
+        List<RendaVariavelEntity> todasAcoes = rendaVariavelRepository
                 .findByTipoRendaVariavelInAndAtivoFinanceiroUsuarioId(tiposAcoes, usuarioId);
 
         // Agora faça a soma do (preçoUnitario * quantidade)
@@ -512,13 +512,13 @@ public class RendaVariavelService {
 
 
     @NotNull
-    private RendaVariavel salvarRendaVariavel(Long usuarioId, RendaVariavel rendaVariavel, Locale locale) {
+    private RendaVariavelEntity salvarRendaVariavel(Long usuarioId, RendaVariavelEntity rendaVariavel, Locale locale) {
         // 1. Recupera (ou cria) o Portfolio do usuário
-        Portfolio portfolio = portfolioService.obterOuCriarPortfolio(usuarioId);
+        PortfolioEntity portfolio = portfolioService.obterOuCriarPortfolio(usuarioId);
 
         // 2. Verifica ou cria o AtivoFinanceiro associado ao Portfolio
         // Aqui, o métod interno do service de AtivoFinanceiro já obtém o Portfolio a partir do usuarioId.
-        AtivoFinanceiro ativoFinanceiro = ativoFinanceiroService.verificarOuCriarAtivoFinanceiro(
+        AtivoFinanceiroEntity ativoFinanceiro = ativoFinanceiroService.verificarOuCriarAtivoFinanceiro(
                 usuarioId,
                 rendaVariavel.getAtivoFinanceiro().getNome()
         );
@@ -535,13 +535,13 @@ public class RendaVariavelService {
         validarRendaVariavel(rendaVariavel, locale);
 
         // 5. Salvar a entidade RendaVariavel
-        RendaVariavel salva = rendaVariavelRepository.save(rendaVariavel);
+        RendaVariavelEntity salva = rendaVariavelRepository.save(rendaVariavel);
         log.info("RendaVariavel salva com sucesso: {}", salva);
         return salva;
     }
 
 
-    private void validarRendaVariavel(RendaVariavel rendaVariavel, Locale locale) {
+    private void validarRendaVariavel(RendaVariavelEntity rendaVariavel, Locale locale) {
         if (rendaVariavel.getAtivoFinanceiro() == null || rendaVariavel.getAtivoFinanceiro().getId() == null) {
             throw new InvalidRendaVariavelException("ativo_financeiro.null", messageSource);
         }

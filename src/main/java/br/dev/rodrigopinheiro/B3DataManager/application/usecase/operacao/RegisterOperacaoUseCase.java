@@ -4,11 +4,11 @@ import br.dev.rodrigopinheiro.B3DataManager.application.command.operacao.Registe
 import br.dev.rodrigopinheiro.B3DataManager.application.command.transacao.CreateTransacaoCommand;
 import br.dev.rodrigopinheiro.B3DataManager.application.port.OperacaoRepository;
 import br.dev.rodrigopinheiro.B3DataManager.application.usecase.transacao.CreateTransacaoUseCase;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.Usuario;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.operacao.OperacaoInvalidaException;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.usuario.UsuarioNaoAutorizadoException;
 import br.dev.rodrigopinheiro.B3DataManager.domain.model.Operacao;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.UsuarioEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,7 +91,7 @@ public class RegisterOperacaoUseCase {
         // Criar transação correspondente
         try {
             // Converter domain.model.Operacao para infrastructure.persistence.entity.OperacaoEntity
-            br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity operacaoEntity = convertToEntity(operacaoSalva);
+            OperacaoEntity operacaoEntity = convertToEntity(operacaoSalva);
             CreateTransacaoCommand createTransacaoCommand = new CreateTransacaoCommand(operacaoEntity);
             createTransacaoUseCase.execute(createTransacaoCommand);
             log.debug("Transação criada para operação: {}", operacaoSalva.getId());
@@ -132,9 +132,9 @@ public class RegisterOperacaoUseCase {
         
         // Usar referência proxy do usuário para evitar validação de campos obrigatórios
         if (operacao.getUsuarioId() != null) {
-            Usuario usuarioRef = 
+            UsuarioEntity usuarioRef = 
                 entityManager.getReference(
-                    Usuario.class, 
+                    UsuarioEntity.class, 
                     operacao.getUsuarioId().value()
                 );
             entity.setUsuario(usuarioRef);

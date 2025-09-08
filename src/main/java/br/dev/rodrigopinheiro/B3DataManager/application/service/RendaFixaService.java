@@ -1,6 +1,6 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.service;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.RendaFixa;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaFixaEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.RendaFixaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,16 +18,16 @@ public class RendaFixaService {
         this.rendaFixaRepository = rendaFixaRepository;
     }
 
-    public RendaFixa save(RendaFixa rendaFixa) {
+    public RendaFixaEntity save(RendaFixaEntity rendaFixa) {
         // Aqui você pode incluir regras de negócio ou validações específicas
         return rendaFixaRepository.save(rendaFixa);
     }
 
-    public Optional<RendaFixa> findById(Long id) {
+    public Optional<RendaFixaEntity> findById(Long id) {
         return rendaFixaRepository.findById(id);
     }
 
-    public List<RendaFixa> findAll() {
+    public List<RendaFixaEntity> findAll() {
         return rendaFixaRepository.findAll();
     }
 

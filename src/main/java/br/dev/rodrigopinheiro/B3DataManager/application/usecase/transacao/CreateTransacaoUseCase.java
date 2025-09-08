@@ -4,10 +4,15 @@ import br.dev.rodrigopinheiro.B3DataManager.application.command.transacao.Create
 import br.dev.rodrigopinheiro.B3DataManager.application.persistence.AggregatePersistenceService;
 import br.dev.rodrigopinheiro.B3DataManager.application.service.InstituicaoService;
 import br.dev.rodrigopinheiro.B3DataManager.application.service.PortfolioService;
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.*;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoTransacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.service.AtivoFactoryImpl;
 import br.dev.rodrigopinheiro.B3DataManager.domain.service.TransacaoFactory;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.InstituicaoEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.PortfolioEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.TransacaoEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.UsuarioEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,7 +91,7 @@ public class CreateTransacaoUseCase {
     public void execute(CreateTransacaoCommand command) {
         log.debug("Iniciando criação de transação para operação: {}", command.operacao().getId());
         
-        br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity operacao = command.operacao();
+       OperacaoEntity operacao = command.operacao();
         
         // Se a operação é duplicada, encerra sem processar
         if (operacao.getDuplicado()) {
@@ -94,7 +99,7 @@ public class CreateTransacaoUseCase {
             return;
         }
         
-        Usuario usuario = operacao.getUsuario();
+        UsuarioEntity usuario = operacao.getUsuario();
         if (usuario == null) {
             throw new IllegalArgumentException("Operação sem usuário associado.");
         }
@@ -102,11 +107,11 @@ public class CreateTransacaoUseCase {
         log.debug("Processando operação para usuário: {}", usuario.getId());
         
         // Obtém (ou cria) os agregados necessários
-        Portfolio portfolio = portfolioService.obterOuCriarPortfolio(usuario.getId());
-        Instituicao instituicao = instituicaoService.buscarOuCriarInstituicao(operacao.getInstituicao());
+        PortfolioEntity portfolio = portfolioService.obterOuCriarPortfolio(usuario.getId());
+        InstituicaoEntity instituicao = instituicaoService.buscarOuCriarInstituicao(operacao.getInstituicao());
         
         // Cria a transação a partir da operação
-        Transacao transacao = transacaoFactory.criarTransacao(operacao);
+        TransacaoEntity transacao = transacaoFactory.criarTransacao(operacao);
         transacao.setDarf(null);
         
         log.debug("Transação criada: tipo={}, valor={}", 
@@ -123,7 +128,7 @@ public class CreateTransacaoUseCase {
             log.debug("Transação não é lucro, criando ativo financeiro");
             
             // Fluxo para operações não lucro: cria o ativo financeiro e realiza as associações
-            AtivoFinanceiro ativoFinanceiro = ativoFactoryImpl.criarAtivo(operacao, portfolio);
+            AtivoFinanceiroEntity ativoFinanceiro = ativoFactoryImpl.criarAtivo(operacao, portfolio);
             ativoFinanceiro.adicionarTransacoes(transacao);
             portfolio.adicionarAtivoFinanceiro(ativoFinanceiro);
             
@@ -147,7 +152,7 @@ public class CreateTransacaoUseCase {
      * @param transacao A transação a ser verificada
      * @return true se a transação for de lucro; false caso contrário
      */
-    private boolean isTransacaoLucro(Transacao transacao) {
+    private boolean isTransacaoLucro(TransacaoEntity transacao) {
         return transacao.getTipoTransacao() != null &&
                 (transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_RENDIMENTO.name())
                         || transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_DIVIDENDO.name())

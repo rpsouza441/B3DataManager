@@ -1,6 +1,5 @@
 package br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.entity.RendaVariavel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,21 +7,23 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 @Repository
-public interface RendaVariavelRepository extends JpaRepository<RendaVariavel, Long> {
+public interface RendaVariavelRepository extends JpaRepository<RendaVariavelEntity, Long> {
 
     /**
      * Busca uma renda variável de um tipo específico associada a um usuário.
      */
-    @Query("SELECT rv FROM RendaVariavel rv " +
+    @Query("SELECT rv FROM RendaVariavelEntity rv " +
             "WHERE rv.tipoRendaVariavel = :tipoRendaVariavel " +
             "AND rv.ativoFinanceiro.portfolio.usuario.id = :usuarioId " +
             "AND rv.ativoFinanceiro.deletado = false")
-    List<RendaVariavel> findByTipoRendaVariavelAndAtivoFinanceiroUsuarioId(String tipoRendaVariavel, Long usuarioId);
+    List<RendaVariavelEntity> findByTipoRendaVariavelAndAtivoFinanceiroUsuarioId(String tipoRendaVariavel, Long usuarioId);
 
 
     /**
@@ -33,13 +34,13 @@ public interface RendaVariavelRepository extends JpaRepository<RendaVariavel, Lo
      * @param pageable          Objeto de paginação.
      * @return Página de entidades de Renda Variável.
      */
-    @Query("SELECT rv FROM RendaVariavel rv " +
+    @Query("SELECT rv FROM RendaVariavelEntity rv " +
             "JOIN FETCH rv.ativoFinanceiro af " +
             "LEFT JOIN FETCH af.rendaVariaveis " +
             "WHERE rv.tipoRendaVariavel = :tipoRendaVariavel " +
             "AND af.portfolio.usuario.id = :usuarioId " +
             "AND af.deletado = false")
-    Page<RendaVariavel> findByTipoRendaVariavelAndAtivoFinanceiroUsuarioId(
+    Page<RendaVariavelEntity> findByTipoRendaVariavelAndAtivoFinanceiroUsuarioId(
             String tipoRendaVariavel,
             Long usuarioId,
             Pageable pageable
@@ -54,11 +55,11 @@ public interface RendaVariavelRepository extends JpaRepository<RendaVariavel, Lo
      * @param pageable  Objeto de paginação.
      * @return Página de entidades de Renda Variável.
      */
-    @Query("SELECT rv FROM RendaVariavel rv " +
+    @Query("SELECT rv FROM RendaVariavelEntity rv " +
             "WHERE rv.tipoRendaVariavel IN :tipos " +
             "AND rv.ativoFinanceiro.portfolio.usuario.id = :usuarioId " +
             "AND rv.ativoFinanceiro.deletado = false")
-    Page<RendaVariavel> findByTipoRendaVariavelInAndAtivoFinanceiroUsuarioId(
+    Page<RendaVariavelEntity> findByTipoRendaVariavelInAndAtivoFinanceiroUsuarioId(
             List<String> tipos,
             Long usuarioId,
             Pageable pageable
@@ -67,17 +68,17 @@ public interface RendaVariavelRepository extends JpaRepository<RendaVariavel, Lo
     /**
      * Busca todas as rendas variáveis de múltiplos tipos associadas a um usuário.
      */
-    @Query("SELECT rv FROM RendaVariavel rv " +
+    @Query("SELECT rv FROM RendaVariavelEntity rv " +
             "WHERE rv.tipoRendaVariavel IN :tipos " +
             "AND rv.ativoFinanceiro.portfolio.usuario.id = :usuarioId " +
             "AND rv.ativoFinanceiro.deletado = false")
-    List<RendaVariavel> findByTipoRendaVariavelInAndAtivoFinanceiroUsuarioId(
+    List<RendaVariavelEntity> findByTipoRendaVariavelInAndAtivoFinanceiroUsuarioId(
             List<String> tipos,
             Long usuarioId
     );
 
 
-    @Query("SELECT rv FROM RendaVariavel rv " +
+    @Query("SELECT rv FROM RendaVariavelEntity rv " +
             "WHERE rv.tipoRendaVariavel = :tipo " +
             "AND (:nome IS NULL OR LOWER(rv.ativoFinanceiro.nome) LIKE LOWER(CONCAT('%', :nome, '%'))) " +
             "AND (:startDate IS NULL OR rv.dataCompra >= :startDate) " +
@@ -85,7 +86,7 @@ public interface RendaVariavelRepository extends JpaRepository<RendaVariavel, Lo
             "AND (:precoMedioMin IS NULL OR rv.precoUnitario >= :precoMedioMin) " +
             "AND (:precoMedioMax IS NULL OR rv.precoUnitario <= :precoMedioMax) " +
             "AND rv.ativoFinanceiro.portfolio.usuario.id = :usuarioId")
-    Page<RendaVariavel> findByFilters(
+    Page<RendaVariavelEntity> findByFilters(
             @Param("tipo") String tipo,
             @Param("nome") String nome,
             @Param("startDate") LocalDate startDate,
@@ -97,7 +98,7 @@ public interface RendaVariavelRepository extends JpaRepository<RendaVariavel, Lo
     );
 
     // **NOVO**: versão que aceita vários tipos de renda variável
-    @Query("SELECT rv FROM RendaVariavel rv " +
+    @Query("SELECT rv FROM RendaVariavelEntity rv " +
             " WHERE rv.tipoRendaVariavel IN :tipos " +
             "   AND (:nome IS NULL OR LOWER(rv.ativoFinanceiro.nome) LIKE LOWER(CONCAT('%', :nome, '%'))) " +
             "   AND (:startDate IS NULL OR rv.dataCompra >= :startDate) " +
@@ -105,7 +106,7 @@ public interface RendaVariavelRepository extends JpaRepository<RendaVariavel, Lo
             "   AND (:precoMedioMin IS NULL OR rv.precoUnitario >= :precoMedioMin) " +
             "   AND (:precoMedioMax IS NULL OR rv.precoUnitario <= :precoMedioMax) " +
             "   AND rv.ativoFinanceiro.portfolio.usuario.id = :usuarioId")
-    Page<RendaVariavel> findByFiltersIn(
+    Page<RendaVariavelEntity> findByFiltersIn(
             @Param("tipos") List<String> tipos,
             @Param("nome") String nome,
             @Param("startDate") LocalDate startDate,
@@ -117,7 +118,7 @@ public interface RendaVariavelRepository extends JpaRepository<RendaVariavel, Lo
     );
 
 
-    @Query("SELECT COUNT(rv) FROM RendaVariavel rv " +
+    @Query("SELECT COUNT(rv) FROM RendaVariavelEntity rv " +
             "WHERE rv.tipoRendaVariavel = :tipo " +
             "AND (:nome IS NULL OR LOWER(rv.ativoFinanceiro.nome) LIKE LOWER(CONCAT('%', :nome, '%'))) " +
             "AND (:startDate IS NULL OR rv.dataCompra >= :startDate) " +
@@ -136,7 +137,7 @@ public interface RendaVariavelRepository extends JpaRepository<RendaVariavel, Lo
     );
 
     // NOVO: suporta vários tipos
-    @Query("SELECT COUNT(rv) FROM RendaVariavel rv " +
+    @Query("SELECT COUNT(rv) FROM RendaVariavelEntity rv " +
             " WHERE rv.tipoRendaVariavel IN :tipos " +
             "   AND (:nome IS NULL OR LOWER(rv.ativoFinanceiro.nome) LIKE LOWER(CONCAT('%', :nome, '%'))) " +
             "   AND (:startDate IS NULL OR rv.dataCompra >= :startDate) " +
@@ -162,7 +163,7 @@ public interface RendaVariavelRepository extends JpaRepository<RendaVariavel, Lo
      * @param usuarioId         ID do usuário.
      * @return Número total de registros.
      */
-    @Query("SELECT COUNT(rv) FROM RendaVariavel rv WHERE rv.tipoRendaVariavel = :tipoRendaVariavel AND rv.ativoFinanceiro.portfolio.usuario.id = :usuarioId")
+    @Query("SELECT COUNT(rv) FROM RendaVariavelEntity rv WHERE rv.tipoRendaVariavel = :tipoRendaVariavel AND rv.ativoFinanceiro.portfolio.usuario.id = :usuarioId")
     Long countByTipoRendaVariavelAndAtivoFinanceiroUsuarioId(@Param("tipoRendaVariavel") String tipoRendaVariavel,
                                                              @Param("usuarioId") Long usuarioId);
 
@@ -176,7 +177,7 @@ public interface RendaVariavelRepository extends JpaRepository<RendaVariavel, Lo
      * @return Número total de registros.
      */
     @Query("SELECT COUNT(rv) " +
-            "FROM RendaVariavel rv " +
+            "FROM RendaVariavelEntity rv " +
             "WHERE rv.tipoRendaVariavel IN :tipos " +
             "  AND rv.ativoFinanceiro.portfolio.usuario.id = :usuarioId")
     Long countByTipoRendaVariavelInAndAtivoFinanceiroUsuarioId(
