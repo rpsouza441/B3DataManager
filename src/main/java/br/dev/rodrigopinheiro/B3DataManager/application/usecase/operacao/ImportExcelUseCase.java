@@ -8,7 +8,7 @@ import br.dev.rodrigopinheiro.B3DataManager.application.result.operacao.ImportEx
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.excel.ExcelProcessingException;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.excel.InvalidDataException;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.operacao.OperacaoInvalidaException;
-import br.dev.rodrigopinheiro.B3DataManager.domain.model.ExcelRowError;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.adapter.inbound.excel.ExcelRowError;
 import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.Dinheiro;
 import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.Quantidade;
 import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.UsuarioId;
@@ -175,10 +175,10 @@ public class ImportExcelUseCase {
             
         } catch (IOException e) {
             log.error("Erro ao processar arquivo Excel: {}", e.getMessage(), e);
-            throw new ExcelProcessingException("Arquivo Excel corrompido ou inválido: " + e.getMessage(), e);
+            throw new ExcelProcessingException("Erro ao processar arquivo Excel: " + e.getMessage(), e);
         } catch (Exception e) {
             log.error("Erro inesperado durante importação: {}", e.getMessage(), e);
-            throw new RuntimeException("Erro inesperado durante importação Excel", e);
+            throw new ExcelProcessingException("Erro inesperado durante importação Excel", e);
         }
         
         log.info("Importação concluída. Processadas: {}, Sucessos: {}, Erros: {}", 
@@ -217,7 +217,14 @@ public class ImportExcelUseCase {
         
         CheckDuplicateResult duplicateResult = checkDuplicateUseCase.execute(duplicateCommand);
         
-        // Registra operação
+        // Se for duplicata, lança exceção em vez de registrar
+        if (duplicateResult.isDuplicate()) {
+            throw new OperacaoInvalidaException(
+                "Operação duplicada detectada. ID da operação original: " + duplicateResult.originalId()
+            );
+        }
+        
+        // Registra operação apenas se não for duplicata
         RegisterOperacaoCommand registerCommand = new RegisterOperacaoCommand(
             entradaSaida,
             data,
@@ -227,9 +234,9 @@ public class ImportExcelUseCase {
             new Quantidade(quantidade),
             new Dinheiro(precoUnitario),
             new Dinheiro(valorOperacao),
-            duplicateResult.isDuplicate(),
+            false, // não é duplicata (já verificado acima)
             false, // dimensionado
-            duplicateResult.originalId(),
+            null, // originalId não aplicável para não-duplicatas
             false, // deletado
             usuarioId
         );
@@ -245,13 +252,18 @@ public class ImportExcelUseCase {
             return "";
         }
         
-        return switch (row.getCell(columnIndex).getCellType()) {
-            case STRING -> row.getCell(columnIndex).getStringCellValue().trim();
-            case NUMERIC -> String.valueOf(row.getCell(columnIndex).getNumericCellValue());
-            case BOOLEAN -> String.valueOf(row.getCell(columnIndex).getBooleanCellValue());
-            case FORMULA -> row.getCell(columnIndex).getCellFormula();
-            default -> "";
-        };
+        switch (row.getCell(columnIndex).getCellType()) {
+            case STRING:
+                return row.getCell(columnIndex).getStringCellValue().trim();
+            case NUMERIC:
+                return String.valueOf(row.getCell(columnIndex).getNumericCellValue());
+            case BOOLEAN:
+                return String.valueOf(row.getCell(columnIndex).getBooleanCellValue());
+            case FORMULA:
+                return row.getCell(columnIndex).getCellFormula();
+            default:
+                return "";
+        }
     }
     
     /**
@@ -297,8 +309,15 @@ public class ImportExcelUseCase {
                 return BigDecimal.ZERO;
             }
             
-            // Substitui vírgula por ponto para parsing decimal
-            cleanValue = cleanValue.replace(",", ".");
+            // Trata formato brasileiro: 1.234,56 -> 1234.56
+            if (cleanValue.contains(".") && cleanValue.contains(",")) {
+                // Formato brasileiro com milhares: remove pontos e substitui vírgula por ponto
+                cleanValue = cleanValue.replace(".", "").replace(",", ".");
+            } else if (cleanValue.contains(",")) {
+                // Apenas vírgula decimal: substitui por ponto
+                cleanValue = cleanValue.replace(",", ".");
+            }
+            // Se contém apenas ponto, mantém como está (formato americano)
             
             return new BigDecimal(cleanValue);
         } catch (NumberFormatException e) {

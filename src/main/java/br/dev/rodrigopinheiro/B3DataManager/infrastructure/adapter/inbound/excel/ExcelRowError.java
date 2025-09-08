@@ -1,4 +1,4 @@
-package br.dev.rodrigopinheiro.B3DataManager.domain.model;
+package br.dev.rodrigopinheiro.B3DataManager.infrastructure.adapter.inbound.excel;
 
 import java.util.Map;
 

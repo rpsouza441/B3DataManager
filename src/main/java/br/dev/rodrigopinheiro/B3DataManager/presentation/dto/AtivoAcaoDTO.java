@@ -1,37 +1,38 @@
 package br.dev.rodrigopinheiro.B3DataManager.presentation.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroVariavel;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
-
-@Data
-@Builder
-public class AtivoAcaoDTO {
-    private String nome;
-    private double quantidade;
-    private BigDecimal precoMedio;
-    private BigDecimal precoAtual;   // null até API responder
-    private BigDecimal variacao;     // null até API responder
-    private BigDecimal total;        // total investido
-    private BigDecimal porcentagem;  // % do portfólio
-    private String tipoAcao;
-
+public record AtivoAcaoDTO(
+        String nome,
+        double quantidade,
+        BigDecimal precoMedio,
+        BigDecimal precoAtual,   // null até API responder
+        BigDecimal variacao,     // null até API responder
+        BigDecimal total,        // total investido
+        BigDecimal porcentagem,  // % do portfólio
+        String tipoAcao          // exposto como String; mapeado do enum
+) {
     /**
-     * Converte uma única RendaVariavel em um DTO de ação,
-     * deixando precoAtual e variacao = null para placeholder.
+     * Converte uma RendaVariavelEntity em AtivoAcaoDTO.
+     * precoAtual e variacao ficam null (placeholder).
      */
     public static AtivoAcaoDTO from(RendaVariavelEntity rv, BigDecimal totalQuantidadePortfolio) {
-        double quantidadeTotal = rv.getQuantidade();
-        BigDecimal totalInvestido = rv.getTotal().setScale(2, RoundingMode.HALF_UP);
+        Objects.requireNonNull(rv, "RendaVariavelEntity não pode ser nula");
+        // Trata nulos defensivamente
+        totalQuantidadePortfolio = totalQuantidadePortfolio == null ? BigDecimal.ZERO : totalQuantidadePortfolio;
+
+        double quantidadeTotal = rv.getQuantidade(); // mantém seu tipo atual (double)
+        BigDecimal totalInvestido = rv.getTotal() == null
+                ? BigDecimal.ZERO
+                : rv.getTotal().setScale(2, RoundingMode.HALF_UP);
 
         BigDecimal precoMedio = quantidadeTotal > 0
-                ? totalInvestido.divide(
-                BigDecimal.valueOf(quantidadeTotal),
-                2, RoundingMode.HALF_UP)
+                ? totalInvestido.divide(BigDecimal.valueOf(quantidadeTotal), 2, RoundingMode.HALF_UP)
                 : BigDecimal.ZERO;
 
         BigDecimal porcentagem = totalQuantidadePortfolio.compareTo(BigDecimal.ZERO) > 0
@@ -41,15 +42,20 @@ public class AtivoAcaoDTO {
                 .setScale(2, RoundingMode.HALF_UP)
                 : BigDecimal.ZERO;
 
-        return AtivoAcaoDTO.builder()
-                .nome(rv.getAtivoFinanceiro().getNome())
-                .quantidade(quantidadeTotal)
-                .precoMedio(precoMedio)
-                .precoAtual(null)
-                .variacao(null)
-                .total(totalInvestido)
-                .porcentagem(porcentagem)
-                .tipoAcao(rv.getTipoRendaVariavel())
-                .build();
+        // Corrige o erro: enum -> String (usa name(); troque por label se preferir)
+        String tipoAcaoStr = rv.getTipoRendaVariavel() == null
+                ? TipoAtivoFinanceiroVariavel.DESCONHECIDO.name()
+                : rv.getTipoRendaVariavel().name();
+
+        return new AtivoAcaoDTO(
+                rv.getAtivoFinanceiro().getNome(),
+                quantidadeTotal,
+                precoMedio,
+                null,                // precoAtual placeholder
+                null,                // variacao placeholder
+                totalInvestido,
+                porcentagem,
+                tipoAcaoStr
+        );
     }
 }

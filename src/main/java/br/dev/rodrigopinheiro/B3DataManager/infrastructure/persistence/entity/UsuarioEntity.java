@@ -64,7 +64,6 @@ public class UsuarioEntity {
     private Boolean deletado = false;
 
     public void associarInstituicao(InstituicaoEntity instituicao) {
-
             // Define explicitamente o AtivoFinanceiro na renda
             if (this.instituicoes == null) {
                     instituicoes = new HashSet<>();

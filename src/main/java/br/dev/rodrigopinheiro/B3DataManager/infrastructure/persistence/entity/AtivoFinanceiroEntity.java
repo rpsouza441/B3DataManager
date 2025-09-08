@@ -40,7 +40,7 @@ public class AtivoFinanceiroEntity {
 
     @OneToMany(mappedBy = "ativoFinanceiro")
     @ToString.Exclude // Evita loops
-    private List<RendaFixaEntity> rendaFixas;
+    private List<RendaFixaEntity> rendaFixas = new ArrayList<>();
 
     @Column(name = "deletado", nullable = false)
     private Boolean deletado = false;
@@ -52,23 +52,17 @@ public class AtivoFinanceiroEntity {
      *
      * @param renda A renda a ser adicionada.
      */
-    public void adicionarRenda(RendaEntity renda) {
-        if (renda == null) {
-            throw new IllegalArgumentException("Renda não pode ser nula.");
-        }
-        // Define explicitamente o AtivoFinanceiro na renda
+   
+    public void adicionarRenda(RendaFixaEntity renda) {
+        if (renda == null) throw new IllegalArgumentException("Renda fixa não pode ser nula.");
         renda.setAtivoFinanceiro(this);
-        if (renda instanceof RendaFixaEntity) {
-            if (rendaFixas == null) {
-                rendaFixas = new ArrayList<>();
-            }
-            rendaFixas.add((RendaFixaEntity) renda);
-        } else if (renda instanceof RendaVariavelEntity) {
-            if (rendaVariaveis == null) {
-                rendaVariaveis = new ArrayList<>();
-            }
-            rendaVariaveis.add((RendaVariavelEntity) renda);
-        }
+        rendaFixas.add(renda);
+    }
+
+    public void adicionarRenda(RendaVariavelEntity renda) {
+        if (renda == null) throw new IllegalArgumentException("Renda variável não pode ser nula.");
+        renda.setAtivoFinanceiro(this);
+        rendaVariaveis.add(renda);
     }
 
     /**

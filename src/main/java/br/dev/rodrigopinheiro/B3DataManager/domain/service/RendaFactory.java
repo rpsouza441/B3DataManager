@@ -5,7 +5,6 @@ import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroVari
 import java.math.BigDecimal;
 
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaFixaEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.RendaFixaRepository;
@@ -34,43 +33,50 @@ public class RendaFactory {
     }
 
     /**
-     * Cria uma instância de Renda (RendaFixa ou RendaVariavel) com base na operação e na transação.
+     * Cria uma instância de RendaFixa com base na operação.
      *
-     * @param operacao       A operação importada, que contém informações do produto.
-     * @return A instância de Renda (fixa ou variável) devidamente configurada.
+     * @param operacao A operação importada, que contém informações do produto.
+     * @return A instância de RendaFixa devidamente configurada.
      */
-    public RendaEntity criarRenda(OperacaoEntity operacao) {
+    public RendaFixaEntity criarRendaFixa(OperacaoEntity operacao) {
         String produto = operacao.getProduto();
+        
+        // Criação e configuração da RendaFixa
+        RendaFixaEntity rendaFixa = new RendaFixaEntity();
+        // Mapeia o tipo de ativo fixo a partir do produto
+        TipoAtivoFinanceiroFixa tipoFixa = tipoAtivoFixaMapper.mapear(produto);
+        log.debug("Tipo de renda fixa: {}", tipoFixa);
+        rendaFixa.setTipoRendaFixa(tipoFixa);
+        // Para renda fixa, o preço unitário, data, quantidade e total vêm da transação
+        rendaFixa.setPrecoUnitario(operacao.getPrecoUnitario());
+        rendaFixa.setDataCompra(operacao.getData());
+        rendaFixa.setQuantidade(operacao.getQuantidade());
+        rendaFixa.setTotal(operacao.getPrecoUnitario()
+                .multiply(BigDecimal.valueOf(operacao.getQuantidade())));
+        return rendaFixaRepository.save(rendaFixa);
+    }
 
-        if (produtoParser.isRendaFixa(operacao.getProduto())) {
-            // Criação e configuração da RendaFixa
-            RendaFixaEntity rendaFixa = new RendaFixaEntity();
-            // Mapeia o tipo de ativo fixo a partir do produto
-            TipoAtivoFinanceiroFixa tipoFixa = tipoAtivoFixaMapper.mapear(produto);
-            log.debug("Tipo de renda fixa: {}", tipoFixa);
-            rendaFixa.setTipoRendaFixa(tipoFixa);
-            // Para renda fixa, o preço unitário, data, quantidade e total vêm da transação
-            rendaFixa.setPrecoUnitario(operacao.getPrecoUnitario());
-            rendaFixa.setDataCompra(operacao.getData());
-            rendaFixa.setQuantidade(operacao.getQuantidade());
-            rendaFixa.setTotal(operacao.getPrecoUnitario()
-                    .multiply(BigDecimal.valueOf(operacao.getQuantidade())));
-            rendaFixa.setTipoRendaFixa(tipoAtivoFixaMapper.mapear(produto));
-            return rendaFixaRepository.save(rendaFixa);
-        } else {
-            // Criação e configuração da RendaVariavel
-            RendaVariavelEntity rendaVariavel = new RendaVariavelEntity();
-            // Para renda variável, o ticker deve ser extraído corretamente
-            String ticker = produtoParser.extrairTicker(produto);
-            log.debug("Ticker extraido: {}", ticker);
-            TipoAtivoFinanceiroVariavel tipoVariavel = tipoAtivoVariavelService.definirTipoAtivo(ticker);
-            rendaVariavel.setTipoRendaVariavel(tipoVariavel);
-            rendaVariavel.setPrecoUnitario(operacao.getPrecoUnitario());
-            rendaVariavel.setDataCompra(operacao.getData());
-            rendaVariavel.setQuantidade(operacao.getQuantidade());
-            rendaVariavel.setTotal(operacao.getPrecoUnitario()
-                    .multiply(BigDecimal.valueOf(operacao.getQuantidade())));
-            return rendaVariavelRepository.save(rendaVariavel);
-        }
+    /**
+     * Cria uma instância de RendaVariavel com base na operação.
+     *
+     * @param operacao A operação importada, que contém informações do produto.
+     * @return A instância de RendaVariavel devidamente configurada.
+     */
+    public RendaVariavelEntity criarRendaVariavel(OperacaoEntity operacao) {
+        String produto = operacao.getProduto();
+        
+        // Criação e configuração da RendaVariavel
+        RendaVariavelEntity rendaVariavel = new RendaVariavelEntity();
+        // Para renda variável, o ticker deve ser extraído corretamente
+        String ticker = produtoParser.extrairTicker(produto);
+        log.debug("Ticker extraido: {}", ticker);
+        TipoAtivoFinanceiroVariavel tipoVariavel = tipoAtivoVariavelService.definirTipoAtivo(ticker);
+        rendaVariavel.setTipoRendaVariavel(tipoVariavel);
+        rendaVariavel.setPrecoUnitario(operacao.getPrecoUnitario());
+        rendaVariavel.setDataCompra(operacao.getData());
+        rendaVariavel.setQuantidade(operacao.getQuantidade());
+        rendaVariavel.setTotal(operacao.getPrecoUnitario()
+                .multiply(BigDecimal.valueOf(operacao.getQuantidade())));
+        return rendaVariavelRepository.save(rendaVariavel);
     }
 }

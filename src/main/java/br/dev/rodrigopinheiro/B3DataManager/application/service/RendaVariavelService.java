@@ -476,37 +476,58 @@ public class RendaVariavelService {
      */
     public CompletableFuture<List<AtivoAcaoDTO>> atualizarPrecosAtuaisAsyncAcoes(List<AtivoAcaoDTO> ativos) {
         List<String> tickers = ativos.stream()
-                .map(dto -> dto.getNome().replace(".SA", ""))
+                .map(dto -> dto.nome().replace(".SA", ""))
                 .distinct()
                 .collect(Collectors.toList());
 
         return CompletableFuture.supplyAsync(() -> carregarPrecoMercado(tickers))
                 .orTimeout(30, TimeUnit.SECONDS)
                 .thenApply(precosMercado -> {
-                    ativos.forEach(dto -> {
-                        BigDecimal precoAtual = precosMercado
-                                .getOrDefault(dto.getNome().replace(".SA", ""), BigDecimal.ZERO)
-                                .setScale(2, RoundingMode.HALF_UP);
-                        dto.setPrecoAtual(precoAtual);
+                    List<AtivoAcaoDTO> ativosAtualizados = ativos.stream()
+                            .map(dto -> {
+                                BigDecimal precoAtual = precosMercado
+                                        .getOrDefault(dto.nome().replace(".SA", ""), BigDecimal.ZERO)
+                                        .setScale(2, RoundingMode.HALF_UP);
 
-                        if (dto.getPrecoMedio() != null && dto.getPrecoMedio().compareTo(BigDecimal.ZERO) > 0) {
-                            BigDecimal variacao = precoAtual.subtract(dto.getPrecoMedio())
-                                    .divide(dto.getPrecoMedio(), 4, RoundingMode.HALF_UP)
-                                    .multiply(BigDecimal.valueOf(100))
-                                    .setScale(2, RoundingMode.HALF_UP);
-                            dto.setVariacao(variacao);
-                        }
-                    });
+                                BigDecimal variacao = null;
+                                if (dto.precoMedio() != null && dto.precoMedio().compareTo(BigDecimal.ZERO) > 0) {
+                                    variacao = precoAtual.subtract(dto.precoMedio())
+                                            .divide(dto.precoMedio(), 4, RoundingMode.HALF_UP)
+                                            .multiply(BigDecimal.valueOf(100))
+                                            .setScale(2, RoundingMode.HALF_UP);
+                                }
+
+                                return new AtivoAcaoDTO(
+                                        dto.nome(),
+                                        dto.quantidade(),
+                                        dto.precoMedio(),
+                                        precoAtual,
+                                        variacao,
+                                        dto.total(),
+                                        dto.porcentagem(),
+                                        dto.tipoAcao()
+                                );
+                            })
+                            .collect(Collectors.toList());
+                    
                     log.info("Preços de ações atualizados via API.");
-                    return ativos;
+                    return ativosAtualizados;
                 })
                 .exceptionally(ex -> {
                     log.error("Erro ao atualizar preços de ações: {}", ex.getMessage(), ex);
-                    ativos.forEach(dto -> {
-                        dto.setPrecoAtual(BigDecimal.valueOf(-1));   // sentinela de falha
-                        dto.setVariacao(BigDecimal.valueOf(-1));
-                    });
-                    return ativos;
+                    List<AtivoAcaoDTO> ativosComFalha = ativos.stream()
+                            .map(dto -> new AtivoAcaoDTO(
+                                    dto.nome(),
+                                    dto.quantidade(),
+                                    dto.precoMedio(),
+                                    BigDecimal.valueOf(-1),   // sentinela de falha
+                                    BigDecimal.valueOf(-1),
+                                    dto.total(),
+                                    dto.porcentagem(),
+                                    dto.tipoAcao()
+                            ))
+                            .collect(Collectors.toList());
+                    return ativosComFalha;
                 });
     }
 
@@ -554,7 +575,8 @@ public class RendaVariavelService {
             throw new InvalidRendaVariavelException("quantidade.invalid", messageSource);
         }
 
-        if (rendaVariavel.getTipoRendaVariavel() == null || rendaVariavel.getTipoRendaVariavel().isEmpty()) {
+        if (rendaVariavel.getTipoRendaVariavel() == null
+                || rendaVariavel.getTipoRendaVariavel() == TipoAtivoFinanceiroVariavel.DESCONHECIDO) {
             throw new InvalidRendaVariavelException("tipo_renda_variavel.invalid", messageSource);
         }
     }

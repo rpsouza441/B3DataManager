@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaFixaEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
 
@@ -38,7 +37,7 @@ public class CalculoPrecoMedioService {
             return BigDecimal.ZERO;
         }
         // Ordena as rendas pela data de compra, do mais antigo para o mais recente
-        rendas.sort(Comparator.comparing(RendaEntity::getDataCompra));
+        rendas.sort(Comparator.comparing(RendaVariavelEntity::getDataCompra));
 
         BigDecimal totalCusto = BigDecimal.ZERO;
         double quantidadeRestante = quantidadeVenda;
@@ -86,7 +85,7 @@ public class CalculoPrecoMedioService {
             return BigDecimal.ZERO;
         }
         // Ordena as rendas fixas pela data de compra, do mais antigo para o mais recente
-        rendas.sort(Comparator.comparing(RendaEntity::getDataCompra));
+        rendas.sort(Comparator.comparing(RendaFixaEntity::getDataCompra));
 
         BigDecimal totalCusto = BigDecimal.ZERO;
         double quantidadeRestante = quantidadeVenda;

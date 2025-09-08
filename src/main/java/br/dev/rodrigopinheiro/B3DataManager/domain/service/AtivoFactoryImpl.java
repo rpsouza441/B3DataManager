@@ -4,7 +4,8 @@ import br.dev.rodrigopinheiro.B3DataManager.application.service.AtivoFinanceiroS
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.PortfolioEntity;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaFixaEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -33,8 +34,13 @@ public class AtivoFactoryImpl implements AtivoFactory {
         AtivoFinanceiroEntity ativoFinanceiro = ativoFinanceiroService.buscarOuCriarAtivoFinanceiro(
                 ticker, portfolio);
 
-        RendaEntity renda = rendaFactory.criarRenda(operacao);
-        ativoFinanceiro.adicionarRenda(renda);
+        if (produtoParser.isRendaFixa(operacao.getProduto())) {
+            RendaFixaEntity renda = rendaFactory.criarRendaFixa(operacao);
+            ativoFinanceiro.adicionarRenda(renda);
+        } else {
+            RendaVariavelEntity renda = rendaFactory.criarRendaVariavel(operacao);
+            ativoFinanceiro.adicionarRenda(renda);
+        }
 
         log.info("Ativo criado com sucesso: {}", ativoFinanceiro);
         return ativoFinanceiro;

@@ -1,6 +1,6 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.result.operacao;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.model.ExcelRowError;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.adapter.inbound.excel.ExcelRowError;
 import java.util.List;
 
 /**

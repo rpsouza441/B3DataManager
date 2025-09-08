@@ -130,33 +130,33 @@ public class GridwithFiltersAcoesView extends Div
     }
 
     private void configureGridColumns() {
-        grid.addColumn(AtivoAcaoDTO::getNome)
+        grid.addColumn(AtivoAcaoDTO::nome)
                 .setHeader(messages.getString("ativo.grid.nome")).setAutoWidth(true);
-        grid.addColumn(AtivoAcaoDTO::getQuantidade)
+        grid.addColumn(AtivoAcaoDTO::quantidade)
                 .setHeader(messages.getString("ativo.grid.quantidade")).setAutoWidth(true);
-        grid.addColumn(dto -> dto.getPrecoMedio().setScale(2, RoundingMode.HALF_UP))
+        grid.addColumn(dto -> dto.precoMedio().setScale(2, RoundingMode.HALF_UP))
                 .setHeader(messages.getString("ativo.grid.preco.medio")).setAutoWidth(true);
         grid.addColumn(dto -> {
-            if (dto.getPrecoAtual() == null) {
+            if (dto.precoAtual() == null) {
                 return messages.getString("ativo.grid.carregando");
-            } else if (dto.getPrecoAtual().compareTo(BigDecimal.valueOf(-1)) == 0) {
+            } else if (dto.precoAtual().compareTo(BigDecimal.valueOf(-1)) == 0) {
                 return messages.getString("ativo.grid.falha");
             } else {
-                return dto.getPrecoAtual().setScale(2, RoundingMode.HALF_UP).toString();
+                return dto.precoAtual().setScale(2, RoundingMode.HALF_UP).toString();
             }
         }).setHeader(messages.getString("ativo.grid.preco.atual")).setAutoWidth(true);
         grid.addColumn(dto -> {
-            if (dto.getVariacao() == null) {
+            if (dto.variacao() == null) {
                 return messages.getString("ativo.grid.carregando");
-            } else if (dto.getVariacao().compareTo(BigDecimal.valueOf(-1)) == 0) {
+            } else if (dto.variacao().compareTo(BigDecimal.valueOf(-1)) == 0) {
                 return messages.getString("ativo.grid.falha");
             } else {
-                return dto.getVariacao().setScale(2, RoundingMode.HALF_UP) + " %";
+                return dto.variacao().setScale(2, RoundingMode.HALF_UP) + " %";
             }
         }).setHeader(messages.getString("ativo.grid.variacao")).setAutoWidth(true);
-        grid.addColumn(dto -> dto.getTotal().setScale(2, RoundingMode.HALF_UP))
+        grid.addColumn(dto -> dto.total().setScale(2, RoundingMode.HALF_UP))
                 .setHeader(messages.getString("ativo.grid.total")).setAutoWidth(true);
-        grid.addColumn(dto -> dto.getPorcentagem().setScale(2, RoundingMode.HALF_UP) + " %")
+        grid.addColumn(dto -> dto.porcentagem().setScale(2, RoundingMode.HALF_UP) + " %")
                 .setHeader(messages.getString("ativo.grid.porcentagem")).setAutoWidth(true);
     }
 
