@@ -1,7 +1,5 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.model;
 
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -11,13 +9,13 @@ public class RendaVariavel {
     private BigDecimal precoUnitario;
     private double quantidade;
     private BigDecimal total;
-    private AtivoFinanceiroEntity ativoFinanceiro;
+    private AtivoFinanceiro ativoFinanceiro;
     private String tipoRendaVariavel;
 
     public RendaVariavel() {
     }
 
-    public RendaVariavel(Long id, LocalDate dataCompra, BigDecimal precoUnitario, double quantidade, BigDecimal total, AtivoFinanceiroEntity ativoFinanceiro, String tipoRendaVariavel) {
+    public RendaVariavel(Long id, LocalDate dataCompra, BigDecimal precoUnitario, double quantidade, BigDecimal total, AtivoFinanceiro ativoFinanceiro, String tipoRendaVariavel) {
         this.id = id;
         this.dataCompra = dataCompra;
         this.precoUnitario = precoUnitario;
@@ -67,11 +65,11 @@ public class RendaVariavel {
         this.total = total;
     }
 
-    public AtivoFinanceiroEntity getAtivoFinanceiro() {
+    public AtivoFinanceiro getAtivoFinanceiro() {
         return ativoFinanceiro;
     }
 
-    public void setAtivoFinanceiro(AtivoFinanceiroEntity ativoFinanceiro) {
+    public void setAtivoFinanceiro(AtivoFinanceiro ativoFinanceiro) {
         this.ativoFinanceiro = ativoFinanceiro;
     }
 

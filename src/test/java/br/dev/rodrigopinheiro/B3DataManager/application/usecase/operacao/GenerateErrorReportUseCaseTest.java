@@ -1,7 +1,7 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.usecase.operacao;
 
 import br.dev.rodrigopinheiro.B3DataManager.application.command.operacao.GenerateErrorReportCommand;
-import br.dev.rodrigopinheiro.B3DataManager.domain.model.ExcelRowError;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.adapter.inbound.excel.ExcelRowError;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.BeforeEach;

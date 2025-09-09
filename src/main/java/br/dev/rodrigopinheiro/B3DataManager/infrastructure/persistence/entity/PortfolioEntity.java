@@ -240,34 +240,26 @@ public class PortfolioEntity {
     }
 
     /**
-     * Busca os registros de Renda Fixa associados aos ativos financeiros deste portfolio.
-     * Retorna uma lista permitindo registros duplicados caso o mesmo investimento tenha sido realizado mais de uma vez.
-     *
-     * @return Lista de registros de Renda Fixa.
+     * Busca os ativos de renda fixa deste portfolio.
+     * 
+     * @return Lista de ativos de renda fixa.
      */
-    public List<RendaFixaEntity> buscarRendaFixa() {
+    public List<AtivoFinanceiroEntity> buscarAtivosRendaFixa() {
         return ativosFinanceiro.stream()
                 .filter(Objects::nonNull)
-                .flatMap(ativo -> {
-                    List<RendaFixaEntity> fixas = ativo.getRendaFixas();
-                    return fixas != null ? fixas.stream() : Stream.<RendaFixaEntity>empty();
-                })
+                .filter(ativo -> ativo.getTipoAtivo() != null && ativo.getTipoAtivo().isRendaFixa())
                 .collect(Collectors.toList());
     }
 
     /**
-     * Busca os registros de Renda Variável associados aos ativos financeiros deste portfolio.
-     * Retorna uma lista permitindo registros duplicados caso o mesmo investimento tenha sido realizado mais de uma vez.
-     *
-     * @return Lista de registros de Renda Variável.
+     * Busca os ativos de renda variável deste portfolio.
+     * 
+     * @return Lista de ativos de renda variável.
      */
-    public List<RendaVariavelEntity> buscarRendaVariavel() {
+    public List<AtivoFinanceiroEntity> buscarAtivosRendaVariavel() {
         return ativosFinanceiro.stream()
                 .filter(Objects::nonNull)
-                .flatMap(ativo -> {
-                    List<RendaVariavelEntity> variaveis = ativo.getRendaVariaveis();
-                    return variaveis != null ? variaveis.stream() : Stream.<RendaVariavelEntity>empty();
-                })
+                .filter(ativo -> ativo.getTipoAtivo() != null && ativo.getTipoAtivo().isRendaVariavel())
                 .collect(Collectors.toList());
     }
 

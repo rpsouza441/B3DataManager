@@ -5,12 +5,9 @@ import br.dev.rodrigopinheiro.B3DataManager.application.command.operacao.ImportE
 import br.dev.rodrigopinheiro.B3DataManager.application.command.operacao.RegisterOperacaoCommand;
 import br.dev.rodrigopinheiro.B3DataManager.application.result.operacao.CheckDuplicateResult;
 import br.dev.rodrigopinheiro.B3DataManager.application.result.operacao.ImportExcelResult;
-import br.dev.rodrigopinheiro.B3DataManager.application.usecase.operacao.CheckDuplicateOperacaoUseCase;
-import br.dev.rodrigopinheiro.B3DataManager.application.usecase.operacao.RegisterOperacaoUseCase;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.excel.ExcelProcessingException;
-import br.dev.rodrigopinheiro.B3DataManager.domain.exception.excel.InvalidDataException;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.operacao.OperacaoInvalidaException;
-import br.dev.rodrigopinheiro.B3DataManager.domain.model.ExcelRowError;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.adapter.inbound.excel.ExcelRowError;
 import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.UsuarioId;
 
 
@@ -28,9 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Map;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;

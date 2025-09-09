@@ -13,6 +13,11 @@ import java.util.Optional;
 public interface RendaFixaRepository extends JpaRepository<RendaFixaEntity, Long> {
 
     /**
+     * Busca todas as rendas fixas associadas a um ativo financeiro.
+     */
+    List<RendaFixaEntity> findByAtivoFinanceiroId(Long ativoFinanceiroId);
+
+    /**
      * Busca uma renda fixa de um tipo específico associada a um usuário.
      */
     @Query("SELECT rf FROM RendaFixaEntity rf " +

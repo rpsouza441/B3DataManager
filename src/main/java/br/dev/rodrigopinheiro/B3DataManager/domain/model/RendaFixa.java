@@ -5,19 +5,14 @@ package br.dev.rodrigopinheiro.B3DataManager.domain.model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class RendaFixa {private Long id;
-
+public class RendaFixa {
+    
+    private Long id;
     private LocalDate dataCompra;
-
     private BigDecimal precoUnitario;
-
     private double quantidade;
-
     private BigDecimal total;
-
-
     private AtivoFinanceiro ativoFinanceiro;
-
     private String tipoRendaFixa;
 
     public RendaFixa() {

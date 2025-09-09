@@ -1,61 +1,163 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.model;
 
+import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoMovimentacao;
+import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoTransacao;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * Domain Model - Transacao (Opção 1)
+ * 
+ * Representa o histórico completo de operações financeiras.
+ * Separado da Posicao (estado atual) para otimizar consultas.
+ * 
+ * Princípios da Opção 1:
+ * - Histórico imutável vs estado atual (Posicao)
+ * - Auditoria completa de operações
+ * - POJO puro sem dependências externas
+ */
 public class Transacao {
     private Long id;
 
-    private LocalDate data;
+    /**
+     * Data da operação
+     */
+    private LocalDate dataOperacao;
 
-    private String entradaSaida; // Entrada ou Saída
+    /**
+     * Tipo da transação (COMPRA, VENDA, RENDIMENTO, etc.)
+     */
+    private TipoTransacao tipoTransacao;
 
-    private double quantidade;
+    /**
+     * Tipo da movimentação (CREDITO, DEBITO, etc.)
+     */
+    private TipoMovimentacao tipoMovimentacao;
 
+    /**
+     * Quantidade de ativos na transação
+     */
+    private BigDecimal quantidade;
+
+    /**
+     * Preço unitário da transação
+     */
     private BigDecimal precoUnitario;
 
+    /**
+     * Valor total da transação (quantidade * precoUnitario)
+     */
     private BigDecimal valorTotal;
 
-    private BigDecimal precoMedio;
+    /**
+     * Taxas e custos da transação
+     */
+    private BigDecimal taxas;
 
-    private String tipoTransacao;
+    /**
+     * Valor líquido da transação (valorTotal - taxas)
+     */
+    private BigDecimal valorLiquido;
 
-    private String tipoMovimentacao;
+    /**
+     * Observações sobre a transação
+     */
+    private String observacoes;
 
-    private Boolean deletado = false;
-
+    /**
+     * Referência ao ativo financeiro (objeto completo)
+     */
     private AtivoFinanceiro ativoFinanceiro;
 
+    /**
+     * Referência à instituição (objeto completo)
+     */
     private Instituicao instituicao;
 
-    private Darf darf;
-
-    private Operacao operacao;
-
+    /**
+     * Referência ao portfolio (objeto completo)
+     */
     private Portfolio portfolio;
 
+    /**
+     * Referência à operação original (objeto completo)
+     */
+    private Operacao operacao;
+
+    /**
+     * Flag de controle para soft delete
+     */
+    private Boolean deletado = false;
+
     public Transacao() {
+        this.deletado = false;
+        this.taxas = BigDecimal.ZERO;
     }
 
-    public Transacao(Long id, LocalDate data, String entradaSaida, double quantidade, BigDecimal precoUnitario, BigDecimal valorTotal, BigDecimal precoMedio, String tipoTransacao, String tipoMovimentacao, Boolean deletado, AtivoFinanceiro ativoFinanceiro, Instituicao instituicao, Darf darf, Operacao operacao, Portfolio portfolio) {
-        this.id = id;
-        this.data = data;
-        this.entradaSaida = entradaSaida;
-        this.quantidade = quantidade;
-        this.precoUnitario = precoUnitario;
-        this.valorTotal = valorTotal;
-        this.precoMedio = precoMedio;
+    public Transacao(LocalDate dataOperacao, TipoTransacao tipoTransacao, TipoMovimentacao tipoMovimentacao, 
+                    BigDecimal quantidade, BigDecimal precoUnitario, AtivoFinanceiro ativoFinanceiro, 
+                    Portfolio portfolio, Instituicao instituicao) {
+        this.dataOperacao = dataOperacao;
         this.tipoTransacao = tipoTransacao;
         this.tipoMovimentacao = tipoMovimentacao;
-        this.deletado = deletado;
+        this.quantidade = quantidade;
+        this.precoUnitario = precoUnitario;
         this.ativoFinanceiro = ativoFinanceiro;
-        this.instituicao = instituicao;
-        this.darf = darf;
-        this.operacao = operacao;
         this.portfolio = portfolio;
+        this.instituicao = instituicao;
+        this.deletado = false;
+        this.taxas = BigDecimal.ZERO;
+        
+        // Calcula valores derivados
+        calcularValores();
+    }
+    
+    // Métodos de negócio
+    
+    /**
+     * Calcula valores derivados da transação
+     */
+    private void calcularValores() {
+        if (quantidade != null && precoUnitario != null) {
+            this.valorTotal = quantidade.multiply(precoUnitario);
+            this.valorLiquido = valorTotal.subtract(taxas != null ? taxas : BigDecimal.ZERO);
+        }
+    }
+    
+    /**
+     * Verifica se é uma transação de compra
+     */
+    public boolean isCompra() {
+        return TipoTransacao.ENTRADA.equals(tipoTransacao);
+    }
+    
+    /**
+     * Verifica se é uma transação de venda
+     */
+    public boolean isVenda() {
+        return TipoTransacao.VENDA.equals(tipoTransacao);
+    }
+    
+    /**
+     * Verifica se é uma transação de rendimento
+     */
+    public boolean isRendimento() {
+        return TipoTransacao.LUCRO_DIVIDENDO.equals(tipoTransacao) || 
+               TipoTransacao.LUCRO_JUROS.equals(tipoTransacao) || 
+               TipoTransacao.LUCRO_RENDIMENTO.equals(tipoTransacao);
+    }
+    
+    /**
+     * Adiciona taxas à transação e recalcula valores
+     */
+    public void adicionarTaxas(BigDecimal taxas) {
+        this.taxas = taxas != null ? taxas : BigDecimal.ZERO;
+        calcularValores();
     }
 
+    // Getters e Setters
+    
     public Long getId() {
         return id;
     }
@@ -64,28 +166,37 @@ public class Transacao {
         this.id = id;
     }
 
-    public LocalDate getData() {
-        return data;
+    public LocalDate getDataOperacao() {
+        return dataOperacao;
     }
 
-    public void setData(LocalDate data) {
-        this.data = data;
+    public void setDataOperacao(LocalDate dataOperacao) {
+        this.dataOperacao = dataOperacao;
     }
 
-    public String getEntradaSaida() {
-        return entradaSaida;
+    public TipoTransacao getTipoTransacao() {
+        return tipoTransacao;
     }
 
-    public void setEntradaSaida(String entradaSaida) {
-        this.entradaSaida = entradaSaida;
+    public void setTipoTransacao(TipoTransacao tipoTransacao) {
+        this.tipoTransacao = tipoTransacao;
     }
 
-    public double getQuantidade() {
+    public TipoMovimentacao getTipoMovimentacao() {
+        return tipoMovimentacao;
+    }
+
+    public void setTipoMovimentacao(TipoMovimentacao tipoMovimentacao) {
+        this.tipoMovimentacao = tipoMovimentacao;
+    }
+
+    public BigDecimal getQuantidade() {
         return quantidade;
     }
 
-    public void setQuantidade(double quantidade) {
+    public void setQuantidade(BigDecimal quantidade) {
         this.quantidade = quantidade;
+        calcularValores();
     }
 
     public BigDecimal getPrecoUnitario() {
@@ -94,6 +205,7 @@ public class Transacao {
 
     public void setPrecoUnitario(BigDecimal precoUnitario) {
         this.precoUnitario = precoUnitario;
+        calcularValores();
     }
 
     public BigDecimal getValorTotal() {
@@ -104,36 +216,29 @@ public class Transacao {
         this.valorTotal = valorTotal;
     }
 
-    public BigDecimal getPrecoMedio() {
-        return precoMedio;
+    public BigDecimal getTaxas() {
+        return taxas;
     }
 
-    public void setPrecoMedio(BigDecimal precoMedio) {
-        this.precoMedio = precoMedio;
+    public void setTaxas(BigDecimal taxas) {
+        this.taxas = taxas;
+        calcularValores();
     }
 
-    public String getTipoTransacao() {
-        return tipoTransacao;
+    public BigDecimal getValorLiquido() {
+        return valorLiquido;
     }
 
-    public void setTipoTransacao(String tipoTransacao) {
-        this.tipoTransacao = tipoTransacao;
+    public void setValorLiquido(BigDecimal valorLiquido) {
+        this.valorLiquido = valorLiquido;
     }
 
-    public String getTipoMovimentacao() {
-        return tipoMovimentacao;
+    public String getObservacoes() {
+        return observacoes;
     }
 
-    public void setTipoMovimentacao(String tipoMovimentacao) {
-        this.tipoMovimentacao = tipoMovimentacao;
-    }
-
-    public Boolean getDeletado() {
-        return deletado;
-    }
-
-    public void setDeletado(Boolean deletado) {
-        this.deletado = deletado;
+    public void setObservacoes(String observacoes) {
+        this.observacoes = observacoes;
     }
 
     public AtivoFinanceiro getAtivoFinanceiro() {
@@ -152,12 +257,12 @@ public class Transacao {
         this.instituicao = instituicao;
     }
 
-    public Darf getDarf() {
-        return darf;
+    public Portfolio getPortfolio() {
+        return portfolio;
     }
 
-    public void setDarf(Darf darf) {
-        this.darf = darf;
+    public void setPortfolio(Portfolio portfolio) {
+        this.portfolio = portfolio;
     }
 
     public Operacao getOperacao() {
@@ -168,12 +273,12 @@ public class Transacao {
         this.operacao = operacao;
     }
 
-    public Portfolio getPortfolio() {
-        return portfolio;
+    public Boolean getDeletado() {
+        return deletado;
     }
 
-    public void setPortfolio(Portfolio portfolio) {
-        this.portfolio = portfolio;
+    public void setDeletado(Boolean deletado) {
+        this.deletado = deletado;
     }
 }
 

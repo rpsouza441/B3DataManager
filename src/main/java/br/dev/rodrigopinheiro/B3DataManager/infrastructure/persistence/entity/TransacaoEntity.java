@@ -10,122 +10,207 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
+/**
+ * Infrastructure Entity - TransacaoEntity (Opção 1)
+ * 
+ * Representa o histórico completo de operações financeiras.
+ * Separado da PosicaoEntity (estado atual) para otimizar consultas.
+ * 
+ * Características da Opção 1:
+ * - Histórico imutável de operações
+ * - Enums tipados para tipos de transação e movimentação
+ * - Campos otimizados para auditoria
+ */
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "transacao")
+@Table(name = "transacao", indexes = {
+    @Index(name = "idx_transacao_data", columnList = "data_operacao"),
+    @Index(name = "idx_transacao_ativo", columnList = "ativo_financeiro_id"),
+    @Index(name = "idx_transacao_portfolio", columnList = "portfolio_id"),
+    @Index(name = "idx_transacao_tipo", columnList = "tipo_transacao")
+})
 public class TransacaoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name= "data")
-    private LocalDate data;
+    /**
+     * Data da operação
+     */
+    @Column(name = "data_operacao", nullable = false)
+    private LocalDate dataOperacao;
 
-    @Column(name = "entrada_saida")
-    private String entradaSaida; // Entrada ou Saída
+    /**
+     * Tipo da transação usando enum tipado
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_transacao", nullable = false, length = 20)
+    private TipoTransacao tipoTransacao;
 
-    @Column(name = "quantidade")
-    private double quantidade;
+    /**
+     * Tipo da movimentação usando enum tipado
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_movimentacao", nullable = false, length = 20)
+    private TipoMovimentacao tipoMovimentacao;
 
-    @Column(name = "preco_unitario")
+    /**
+     * Quantidade de ativos na transação
+     */
+    @Column(name = "quantidade", precision = 19, scale = 8, nullable = false)
+    private BigDecimal quantidade;
+
+    /**
+     * Preço unitário da transação
+     */
+    @Column(name = "preco_unitario", precision = 19, scale = 8, nullable = false)
     private BigDecimal precoUnitario;
 
-    @Column(name = "valor_total")
+    /**
+     * Valor total da transação (quantidade * precoUnitario)
+     */
+    @Column(name = "valor_total", precision = 19, scale = 2, nullable = false)
     private BigDecimal valorTotal;
 
-    @Column(name = "preco_medio")
-    private BigDecimal precoMedio;
+    /**
+     * Taxas e custos da transação
+     */
+    @Column(name = "taxas", precision = 19, scale = 2)
+    private BigDecimal taxas;
 
-    @Column(name = "tipo_transacao")
-    private String tipoTransacao;
+    /**
+     * Valor líquido da transação (valorTotal - taxas)
+     */
+    @Column(name = "valor_liquido", precision = 19, scale = 2)
+    private BigDecimal valorLiquido;
 
-    @Column(name = "tipo_movimentacao")
-    private String tipoMovimentacao;
+    /**
+     * Observações sobre a transação
+     */
+    @Column(name = "observacoes", length = 500)
+    private String observacoes;
 
-    @Column(name = "deletado")
-    private Boolean deletado = false;
+    /**
+     * Flag de controle para soft delete
+     */
+    @Column(name = "ativo", nullable = false)
+    private Boolean ativo = true;
 
-    @ManyToOne
-    @JoinColumn(name = "ativo_financeiro_id")
+    /**
+     * Referência ao ativo financeiro
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ativo_financeiro_id", nullable = false)
     private AtivoFinanceiroEntity ativoFinanceiro;
 
-    @ManyToOne
+    /**
+     * Referência à instituição
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "instituicao_id")
     private InstituicaoEntity instituicao;
 
-    @ManyToOne
-    @JoinColumn(name = "darf_id")
-    private DarfEntity darf;
+    /**
+     * Referência ao portfolio (agregado raiz)
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "portfolio_id", nullable = false)
+    private PortfolioEntity portfolio;
 
-    @ManyToOne
+    /**
+     * Referência à operação original (opcional)
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "operacao_id")
     private OperacaoEntity operacao;
 
-    // Associação com o Portfolio (agregado raiz financeiro)
-    @ManyToOne
-    @JoinColumn(name = "portfolio_id")
-    private PortfolioEntity portfolio;
-
-    public void setTipoMovimentacao(TipoMovimentacao tipoMovimentacao) {
-        this.tipoMovimentacao = tipoMovimentacao.name();
-    }
-
-    public void setTipoTransacao(TipoTransacao tipoTransacao) {
-        this.tipoTransacao = tipoTransacao.name();
-    }
-
-
-
     /**
-     * Associa um AtivoFinanceiro à Transação.
-     *
-     * Este métod garante que o ativo financeiro não seja nulo e
-     * pode conter validações adicionais caso haja a necessidade de
-     * impor invariantes, como verificar se a transação já possui um ativo associado.
-     *
-     * @param ativoFinanceiro o ativo financeiro a ser associado
-     * @throws IllegalArgumentException se o ativo financeiro for nulo
-     * @throws IllegalStateException se já houver um ativo financeiro associado (opcional)
+     * Controle de auditoria
+     */
+    @Column(name = "created_at", updatable = false)
+    private LocalDate createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDate updatedAt;
+
+    // Métodos de ciclo de vida JPA
+    
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDate.now();
+        this.updatedAt = LocalDate.now();
+        if (this.ativo == null) {
+            this.ativo = true;
+        }
+        if (this.taxas == null) {
+            this.taxas = BigDecimal.ZERO;
+        }
+        calcularValores();
+    }
+    
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDate.now();
+        calcularValores();
+    }
+    
+    // Métodos de negócio da Opção 1
+    
+    /**
+     * Calcula valores derivados da transação
+     */
+    private void calcularValores() {
+        if (quantidade != null && precoUnitario != null) {
+            this.valorTotal = quantidade.multiply(precoUnitario);
+            this.valorLiquido = valorTotal.subtract(taxas != null ? taxas : BigDecimal.ZERO);
+        }
+    }
+    
+    /**
+     * Verifica se é uma transação de compra
+     */
+    public boolean isCompra() {
+        return TipoTransacao.ENTRADA.equals(tipoTransacao);
+    }
+    
+    /**
+     * Verifica se é uma transação de venda
+     */
+    public boolean isVenda() {
+        return TipoTransacao.VENDA.equals(tipoTransacao);
+    }
+    
+    /**
+     * Verifica se é uma transação de rendimento
+     */
+    public boolean isRendimento() {
+        return TipoTransacao.LUCRO_DIVIDENDO.equals(tipoTransacao) || 
+               TipoTransacao.LUCRO_JUROS.equals(tipoTransacao) || 
+               TipoTransacao.LUCRO_RENDIMENTO.equals(tipoTransacao);
+    }
+    
+    /**
+     * Associa um ativo financeiro à transação
      */
     public void associarAtivoFinanceiro(AtivoFinanceiroEntity ativoFinanceiro) {
         if (ativoFinanceiro == null) {
             throw new IllegalArgumentException("Ativo financeiro não pode ser nulo.");
         }
-
-        // Se desejarmos evitar a substituição de um ativo já associado,
-        // podemos descomentar a validação abaixo:
-        // if (this.ativoFinanceiro != null && !this.ativoFinanceiro.equals(ativoFinanceiro)) {
-        //     throw new IllegalStateException("Transação já possui um ativo financeiro associado.");
-        // }
-
         this.ativoFinanceiro = ativoFinanceiro;
     }
-
+    
     /**
-     * Associa uma Instituição à Transação.
-     *
-     * Este métod garante que a instituição não seja nula, evitando que a transação seja associada a um
-     * objeto inválido. Caso a instituição já tenha sido definida e houver necessidade de evitar a sua substituição,
-     * pode-se adicionar uma validação extra (por exemplo, lançando uma exceção se já houver uma instituição associada).
-     *
-     * @param instituicao a instituição a ser associada à transação
-     * @throws IllegalArgumentException se a instituição for nula
+     * Associa uma instituição à transação
      */
     public void associarInstituicao(InstituicaoEntity instituicao) {
         if (instituicao == null) {
-            throw new IllegalArgumentException("Ativo financeiro não pode ser nulo.");
+            throw new IllegalArgumentException("Instituição não pode ser nula.");
         }
-
-        // Se desejarmos evitar a substituição da instituição já associada, podemos descomentar o trecho abaixo:
-        // if (this.instituicao != null && !this.instituicao.equals(instituicao)) {
-        //     throw new IllegalStateException("Transação já possui uma instituição associada.");
-        // }
-
         this.instituicao = instituicao;
     }
 

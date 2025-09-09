@@ -17,6 +17,11 @@ import java.util.List;
 public interface RendaVariavelRepository extends JpaRepository<RendaVariavelEntity, Long> {
 
     /**
+     * Busca todas as rendas variáveis associadas a um ativo financeiro.
+     */
+    List<RendaVariavelEntity> findByAtivoFinanceiroId(Long ativoFinanceiroId);
+
+    /**
      * Busca uma renda variável de um tipo específico associada a um usuário.
      */
     @Query("SELECT rv FROM RendaVariavelEntity rv " +

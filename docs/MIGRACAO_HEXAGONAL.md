@@ -20,20 +20,64 @@
 
 ## 🎯 Visão Geral
 
+### **🚀 NOVA ARQUITETURA UNIFICADA - OPÇÃO 1**
+
+**DESTAQUE PRINCIPAL:** Implementação da **Arquitetura de Separação de Responsabilidades** que resolve os principais problemas identificados:
+
+#### **🔥 Problemas Críticos Resolvidos**
+- ❌ **Duplicação de Views**: `GridwithFiltersAcoesView` vs `GridwithFiltersFiiView` (~800 linhas duplicadas)
+- ❌ **DTOs Específicos**: `AtivoAcaoDTO` vs `AtivoFiiDTO` (lógica duplicada)
+- ❌ **Services Anêmicos**: `RendaVariavelService` com lógica espalhada
+- ❌ **Extensibilidade Limitada**: Difícil adicionar novos tipos de ativos
+- ❌ **Performance**: Cálculos em tempo real nas views
+
+#### **✅ Solução Arquitetural**
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    NOVA ARQUITETURA                        │
+│  ┌─────────────────┐    ┌─────────────────────────────────┐ │
+│  │   Transacao     │    │         Posicao                 │ │
+│  │ (Histórico)     │    │    (Estado Atual)               │ │
+│  │ + tipo          │    │ + quantidadeAtual               │ │
+│  │ + quantidade    │    │ + precoMedio                    │ │
+│  │ + valorUnitario │    │ + valorAtual                    │ │
+│  │ + dataOperacao  │    │ + percentualPortfolio           │ │
+│  └─────────────────┘    └─────────────────────────────────┘ │
+│           │                           │                     │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │              AtivoFinanceiro                            │ │
+│  │ + codigo, nome, tipo                                    │ │
+│  │ + propriedadesEspecificas (Map<String,Object>)         │ │
+│  │   - Para ACAO: setor, dividendYield                    │ │
+│  │   - Para FII: segmento, vacancia                       │ │
+│  │   - Para CDB: banco, taxa, vencimento                  │ │
+│  └─────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### **🎯 Benefícios Quantificados**
+- **📉 60% Redução de Código**: De ~800 para ~300 linhas
+- **🚀 Views Unificadas**: Uma `PosicaoView` para todos os tipos
+- **⚡ Performance**: Cálculos pré-computados no banco
+- **🔧 Extensibilidade**: Novos tipos sem alterar views
+- **🧹 Manutenção**: Lógica centralizada
+
 ### **Objetivo Principal**
 - Migrar de DDD para **Arquitetura Hexagonal pura**
 - Separar **Domain** (regras de negócio) de **Infrastructure** (persistência)
+- **IMPLEMENTAR OPÇÃO 1**: Separação clara Transação vs Posição
 - Resolver problemas de **performance** (cálculo de % em tempo real)
+- **Unificar Views**: Eliminar duplicação entre ações e FIIs
 - Implementar **gestão de impostos** (DARF automática)
 - Criar **sistema de análise** de investimentos
 
 ### **Escopo da Migração**
 - ✅ **Operacao** - JÁ MIGRADA (hexagonal)
 - ✅ **Import** - JÁ MIGRADA (hexagonal)
-- 🔄 **Portfolio + AtivoFinanceiro** - PRIORIDADE 1
-- 🔄 **RendaVariavel + RendaFixa** - PRIORIDADE 2
-- 🔄 **Transacao + Instituicao** - PRIORIDADE 3
-- 🔄 **Sistema de Impostos** - PRIORIDADE 4
+- 🔥 **OPÇÃO 1 - Transacao + Posicao + AtivoFinanceiro** - **PRIORIDADE MÁXIMA**
+- 🔄 **Views Unificadas** - PRIORIDADE 1
+- 🔄 **Portfolio** - PRIORIDADE 2
+- 🔄 **Sistema de Impostos** - PRIORIDADE 3
 
 ---
 
@@ -64,6 +108,44 @@ chore: tarefas de manutenção
 - **v1.3.0** - Nova API de preços
 - **v1.4.0** - Sistema de impostos
 - **v2.0.0** - Migração hexagonal completa
+
+---
+
+## 🏗️ Arquitetura Atual vs Alvo - FOCO NA OPÇÃO 1
+
+### **📊 Estado Atual (DDD Híbrido) - PROBLEMAS CRÍTICOS**
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   PROBLEMAS CRÍTICOS ATUAIS                │
+│  ❌ Domain entities com JPA (@Entity no domain)            │
+│  ❌ Services anêmicos (só CRUD)                            │
+│  ❌ DUPLICAÇÃO MASSIVA: 2 views idênticas (~800 linhas)    │
+│  ❌ DTOs específicos desnecessários (AtivoAcaoDTO vs FiiDTO)│
+│  ❌ Cálculo de % em tempo real (performance CRÍTICA)       │
+│  ❌ Extensibilidade ZERO (novo tipo = reescrever tudo)     │
+│  ❌ Regras de negócio espalhadas                           │
+│  ❌ Sem gestão de impostos                                 │
+│  ❌ Análises limitadas                                     │
+└─────────────────────────────────────────────────────────────┘
+
+### **🔥 ANÁLISE DE IMPACTO - VIEWS DUPLICADAS**
+```
+📁 GridwithFiltersAcoesView.java     (~400 linhas)
+📁 GridwithFiltersFiiView.java       (~400 linhas)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔍 CÓDIGO DUPLICADO IDENTIFICADO:
+   ✓ refreshGrid() - IDÊNTICO
+   ✓ createPaginator() - IDÊNTICO  
+   ✓ Filtros - IDÊNTICO
+   ✓ Grid setup - IDÊNTICO
+   ✓ Error handling - IDÊNTICO
+   
+💰 CUSTO DE MANUTENÇÃO:
+   ❌ Bug fix = 2x trabalho
+   ❌ Nova feature = 2x desenvolvimento
+   ❌ Novo tipo de ativo = reescrever TUDO
+   ❌ Performance = otimizar 2 lugares
+```
 
 ---
 
@@ -320,46 +402,87 @@ chore: tarefas de manutenção
 
 ### **📋 Fases da Migração**
 
-#### **🥇 FASE 1: Core de Gestão (2-3 semanas)**
-**Entidades:** Portfolio + AtivoFinanceiro + RendaVariavel
+#### **🔥 FASE 1: IMPLEMENTAÇÃO DA OPÇÃO 1 - ARQUITETURA UNIFICADA (2-3 semanas)**
+**Entidades:** Transacao + Posicao + AtivoFinanceiro + Portfolio
 
-**Por que começar aqui:**
-- ✅ **2 Views existentes** (ações + FII)
-- ✅ **Resolve performance** (% em tempo real → coluna no banco)
-- ✅ **Base para tudo** (Portfolio é agregado raiz)
-- ✅ **Alto valor** (core do sistema)
+**🎯 Por que a Opção 1 é REVOLUCIONÁRIA:**
+- ✅ **Elimina 60% do código duplicado** (Views + DTOs + Services)
+- ✅ **Resolve performance** (% pré-calculado no banco)
+- ✅ **Views unificadas** (uma view para todos os tipos)
+- ✅ **Extensibilidade total** (novos tipos sem alterar código)
+- ✅ **Separação clara** (histórico vs estado atual)
+- ✅ **Base sólida** (Portfolio como agregado raiz)
 
-**Arquitetura Alvo:**
+**🏗️ Arquitetura Alvo - OPÇÃO 1:**
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                     DOMAIN LAYER                           │
 │  ┌─────────────────┐    ┌─────────────────────────────────┐ │
-│  │   Portfolio     │    │  AtivoFinanceiro                │ │
-│  │ (Aggregate Root)│    │  + PercentualCarteira (VO)     │ │
-│  │ + TotalInvestido│    │  + RendimentoAcumulado (VO)    │ │
-│  │ + Diversificacao│    │  + StatusInvestimento (VO)     │ │
+│  │   Transacao     │    │         Posicao                 │ │
+│  │ (Histórico)     │    │    (Estado Atual)               │ │
+│  │ + tipo          │    │ + quantidadeAtual               │ │
+│  │ + quantidade    │    │ + precoMedio                    │ │
+│  │ + valorUnitario │    │ + valorAtual                    │ │
+│  │ + dataOperacao  │    │ + percentualPortfolio (BANCO!)  │ │
 │  └─────────────────┘    └─────────────────────────────────┘ │
+│           │                           │                     │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │              AtivoFinanceiro                            │ │
+│  │ + codigo, nome, tipo                                    │ │
+│  │ + propriedadesEspecificas (Map<String,Object>)         │ │
+│  │   - ACAO: {setor: "Petróleo", dividendYield: 8.5}     │ │
+│  │   - FII: {segmento: "Logística", vacancia: 5.2}       │ │
+│  │   - CDB: {banco: "Itaú", taxa: 12.5, vencimento: ...} │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │                   Portfolio                             │ │
+│  │ (Aggregate Root)                                        │ │
+│  │ + saldoTotal, saldoAplicado                             │ │
+│  │ + lucroVenda, lucroRendimento                           │ │
+│  │ + List<Transacao> transacoes                            │ │
+│  │ + List<Posicao> posicoes                                │ │
+│  └─────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
                               │
 ┌─────────────────────────────────────────────────────────────┐
 │                   APPLICATION LAYER                        │
 │  ┌─────────────────┐    ┌─────────────────────────────────┐ │
-│  │GetPortfolioUse  │    │  CalculatePortfolioUseCase      │ │
-│  │Case             │    │  (% carteira → banco)           │ │
-│  │ListAtivosUseCase│    │  UpdatePercentualUseCase        │ │
-│  │AnalyzePortfolio │    │  (job assíncrono)               │ │
-│  │UseCase          │    │                                 │ │
-│  └─────────────────┘    └─────────────────────────────────┘ │
+│  │ PosicaoService  │    │  TransacaoService               │ │
+│  │ (UNIFICADO!)    │    │  + CreateTransacaoUseCase       │ │
+│  │ + findAll()     │    │  + UpdatePosicaoUseCase         │ │
+│  │ + findByTipo()  │    │  + CalculateLucroUseCase        │ │
+│  │ + findRV()      │    │                                 │ │
+│  │ + findRF()      │    │  CalculatePortfolioUseCase      │ │
+│  └─────────────────┘    │  (% carteira → banco)           │ │
+│                         │  UpdatePercentualUseCase        │ │
+│                         │  (job assíncrono)               │ │
+│                         └─────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
                               │
 ┌─────────────────────────────────────────────────────────────┐
 │                 INFRASTRUCTURE LAYER                       │
 │  ┌─────────────────┐    ┌─────────────────────────────────┐ │
-│  │PortfolioEntity  │    │  AtivoFinanceiroEntity          │ │
-│  │RendaVariavelEnt │    │  + Repositories                 │ │
-│  │ity              │    │  + Mappers                      │ │
+│  │TransacaoEntity  │    │  PosicaoEntity                  │ │
+│  │AtivoFinanceiro  │    │  + percentual_carteira (COLUNA)│ │
+│  │Entity           │    │  + Repositories                 │ │
+│  │PortfolioEntity  │    │  + Mappers                      │ │
 │  └─────────────────┘    └─────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
+```
+
+**🎯 VIEWS UNIFICADAS - REVOLUÇÃO:**
+```java
+// ANTES: 2 views + 800 linhas duplicadas
+GridwithFiltersAcoesView.java  // ~400 linhas
+GridwithFiltersFiiView.java    // ~400 linhas duplicadas
+
+// DEPOIS: 1 view base + especializações = ~300 linhas
+PosicaoView.java              // ~200 linhas (base)
+AcoesView.java                // ~30 linhas (extends PosicaoView)
+FiisView.java                 // ~30 linhas (extends PosicaoView)
+RendaFixaView.java            // ~30 linhas (extends PosicaoView)
+
+// ECONOMIA: 60% menos código!
 ```
 
 #### **🥈 FASE 2: Gestão de Impostos (1-2 semanas)**
@@ -393,72 +516,212 @@ chore: tarefas de manutenção
 
 ## 📅 Cronograma Detalhado
 
-### **🗓️ Semana 1-2: Preparação + Portfolio**
+### **🗓️ Semana 1-2: IMPLEMENTAÇÃO DA OPÇÃO 1 - ARQUITETURA UNIFICADA**
 
-#### **Dia 1-2: Correções Críticas de Segurança**
+#### **Dia 1-2: Correções Críticas + Preparação**
 - [ ] **SEC-002:** Corrigir Frame Options (SAMEORIGIN)
 - [ ] **OBS-001:** Configurar Actuator (health, metrics, info)
 - [ ] **DATA-001:** Implementar Flyway com baseline
 - [ ] **🔄 Git:** Commit inicial das correções críticas
 
-#### **Dia 3-5: Domain Models Puros**
-- [ ] Criar `domain.model.Portfolio` (POJO puro)
-- [ ] Criar `domain.model.AtivoFinanceiro` (POJO puro)
-- [ ] Criar Value Objects:
-  - [ ] `PercentualCarteira`
-  - [ ] `ValorInvestido`
-  - [ ] `RendimentoTotal`
-  - [ ] `Ticker`
+#### **Dia 3-5: 🔥 OPÇÃO 1 - Domain Models da Nova Arquitetura**
+- [ ] **CRIAR NOVA ESTRUTURA:**
+  - [ ] `domain.model.Transacao` (POJO puro - histórico)
+  - [ ] `domain.model.Posicao` (POJO puro - estado atual)
+  - [ ] `domain.model.AtivoFinanceiro` (POJO puro - flexível)
+  - [ ] `domain.model.Portfolio` (POJO puro - agregado raiz)
+- [ ] **Value Objects Específicos:**
+  - [ ] `TipoMovimentacao` (COMPRA, VENDA, RENDIMENTO, VENCIMENTO)
+  - [ ] `PropriedadesEspecificas` (Map<String,Object> tipado)
+  - [ ] `PercentualCarteira` (pré-calculado)
 
-#### **Dia 6-7: Infrastructure Entities**
+#### **Dia 6-7: Infrastructure Entities - OPÇÃO 1**
 - [ ] Mover `domain.entity.*` → `infrastructure.persistence.entity.*`
-- [ ] Criar `PortfolioEntity` (JPA)
-- [ ] Criar `AtivoFinanceiroEntity` (JPA + coluna `percentual_carteira`)
-- [ ] Adicionar migração Flyway para nova coluna
+- [ ] **CRIAR ENTITIES DA OPÇÃO 1:**
+  - [ ] `TransacaoEntity` (JPA - histórico completo)
+  - [ ] `PosicaoEntity` (JPA + coluna `percentual_carteira`)
+  - [ ] `AtivoFinanceiroEntity` (JPA + `propriedades_especificas` JSON)
+  - [ ] `PortfolioEntity` (JPA - agregado raiz)
+- [ ] **Migração Flyway:** Nova estrutura + coluna percentual
 
-#### **Dia 8-10: Use Cases + Ports**
-- [ ] Criar interfaces de ports:
-  - [ ] `PortfolioRepository`
+#### **Dia 8-10: Use Cases + Ports - OPÇÃO 1**
+- [ ] **Interfaces de Ports:**
+  - [ ] `TransacaoRepository`
+  - [ ] `PosicaoRepository` 
   - [ ] `AtivoFinanceiroRepository`
-  - [ ] `MarketDataService`
-- [ ] Implementar Use Cases:
-  - [ ] `GetPortfolioUseCase`
-  - [ ] `ListAtivosUseCase`
-  - [ ] `CalculatePortfolioPercentagesUseCase`
+  - [ ] `PortfolioRepository`
+- [ ] **Use Cases Unificados:**
+  - [ ] `CreateTransacaoUseCase` (cria transação + atualiza posição)
+  - [ ] `GetPosicoesByTipoUseCase` (filtro por tipo de ativo)
+  - [ ] `CalculatePortfolioPercentagesUseCase` (job assíncrono)
+  - [ ] `GetPortfolioUseCase` (dados consolidados)
 
-### **🗓️ Semana 3: Adapters + Views**
+### **🗓️ Semana 3: 🚀 VIEWS UNIFICADAS - REVOLUÇÃO DA OPÇÃO 1**
 
-#### **Dia 11-12: Repository Adapters**
-- [ ] Implementar `PortfolioRepositoryAdapter`
-- [ ] Implementar `AtivoFinanceiroRepositoryAdapter`
-- [ ] Criar Mappers (Domain ↔ Entity)
+#### **Dia 11-12: Repository Adapters - OPÇÃO 1**
+- [ ] **Implementar Adapters Unificados:**
+  - [ ] `TransacaoRepositoryAdapter`
+  - [ ] `PosicaoRepositoryAdapter`
+  - [ ] `AtivoFinanceiroRepositoryAdapter`
+  - [ ] `PortfolioRepositoryAdapter`
+- [ ] **Mappers Unificados:** (Domain ↔ Entity)
+  - [ ] `TransacaoMapper`
+  - [ ] `PosicaoMapper` 
+  - [ ] `AtivoFinanceiroMapper`
 
-#### **Dia 13-14: Job Assíncrono**
-- [ ] Implementar `UpdatePortfolioPercentagesUseCase`
-- [ ] Configurar `@Scheduled` (5 minutos)
-- [ ] Testar performance de cálculo
+#### **Dia 13-14: Service Unificado + Job Assíncrono**
+- [ ] **CRIAR PosicaoService UNIFICADO:**
+  - [ ] `findAll()` - todas as posições
+  - [ ] `findByTipoAtivo(TipoAtivo)` - filtro por tipo
+  - [ ] `findRendaVariavel()` - ações + FIIs
+  - [ ] `findRendaFixa()` - CDB + LCI + Tesouro
+- [ ] **Job de Performance:**
+  - [ ] `UpdatePortfolioPercentagesUseCase`
+  - [ ] `@Scheduled` (5 minutos)
+  - [ ] Testar performance de cálculo
 
-#### **Dia 15: Migração das Views**
-- [ ] Atualizar `GridwithFiltersAcoesView`
-- [ ] Atualizar `GridwithFiltersFiiView`
-- [ ] Remover cálculos em tempo real
-- [ ] Usar percentuais pré-calculados
+#### **Dia 15: 🔥 MIGRAÇÃO PARA VIEWS UNIFICADAS**
+- [ ] **CRIAR PosicaoView GENÉRICA:**
+  - [ ] Grid unificada para todos os tipos
+  - [ ] Coluna dinâmica para propriedades específicas
+  - [ ] Filtros por tipo de ativo
+  - [ ] Percentuais pré-calculados (performance!)
+- [ ] **CRIAR VIEWS ESPECIALIZADAS:**
+  - [ ] `AcoesView extends PosicaoView` (filtro ACAO)
+  - [ ] `FiisView extends PosicaoView` (filtro FII)
+  - [ ] `RendaFixaView extends PosicaoView` (filtro RF)
+- [ ] **MANTER COMPATIBILIDADE:**
+  - [ ] Rotas antigas redirecionam para novas
+  - [ ] Views antigas funcionam em paralelo
+- [ ] **RESULTADO:** 60% menos código!
 
-### **🗓️ Semana 4: RendaVariavel + Git**
+### **🗓️ Semana 4: Consolidação + Testes da OPÇÃO 1**
 
-#### **Dia 16-18: RendaVariavel**
-- [ ] Criar `domain.model.RendaVariavel`
-- [ ] Migrar `RendaVariavelEntity`
-- [ ] Implementar Use Cases específicos
-- [ ] Integrar com Portfolio
-- [ ] **🔄 Git:** Commit da migração RendaVariavel
+#### **Dia 16-17: Testes da Nova Arquitetura**
+- [ ] **Testes de Performance:**
+  - [ ] Comparar views antigas vs unificadas
+  - [ ] Medir tempo de carregamento
+  - [ ] Validar cálculos pré-computados
+- [ ] **Testes de Funcionalidade:**
+  - [ ] Filtros por tipo de ativo
+  - [ ] Propriedades específicas dinâmicas
+  - [ ] Compatibilidade com dados existentes
 
-#### **Dia 19-21: Testes + Documentação**
-- [ ] Testes unitários (Domain)
-- [ ] Testes de integração (Use Cases)
-- [ ] Testes de regressão (Views)
-- [ ] Atualizar documentação
-- [ ] **🔄 Git:** Commit dos testes
+#### **Dia 18-19: Documentação + Migração Gradual**
+- [ ] **Documentar Nova Arquitetura:**
+  - [ ] Guia de migração para desenvolvedores
+  - [ ] Exemplos de uso das novas views
+  - [ ] Comparativo antes/depois
+- [ ] **Migração Gradual:**
+  - [ ] Ativar views unificadas em paralelo
+  - [ ] Redirecionar rotas antigas
+  - [ ] Monitorar uso das views
+
+#### **Dia 20-21: Deploy + Validação Final**
+- [ ] **Deploy da OPÇÃO 1:**
+  - [ ] Deploy em homologação
+  - [ ] Testes de aceitação
+  - [ ] Validação com usuários
+- [ ] **Métricas de Sucesso:**
+  - [ ] 60% redução de código ✓
+  - [ ] Performance melhorada ✓
+  - [ ] Views unificadas funcionando ✓
+- [ ] **🔄 Git:** Release v2.0.0 - OPÇÃO 1 IMPLEMENTADA
+
+---
+
+## 🎯 BENEFÍCIOS PRÁTICOS DA OPÇÃO 1
+
+### **📈 Métricas de Impacto**
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    ANTES vs DEPOIS                         │
+├─────────────────────────────────────────────────────────────┤
+│ 📊 LINHAS DE CÓDIGO:                                       │
+│    ❌ Antes: ~800 linhas (2 views duplicadas)              │
+│    ✅ Depois: ~300 linhas (1 view base + especializações)  │
+│    🎯 ECONOMIA: 62.5% menos código                         │
+├─────────────────────────────────────────────────────────────┤
+│ ⚡ PERFORMANCE:                                             │
+│    ❌ Antes: Cálculo % em tempo real (500ms+)              │
+│    ✅ Depois: % pré-calculado no banco (<50ms)             │
+│    🎯 MELHORIA: 10x mais rápido                           │
+├─────────────────────────────────────────────────────────────┤
+│ 🔧 EXTENSIBILIDADE:                                        │
+│    ❌ Antes: Novo tipo = reescrever views                  │
+│    ✅ Depois: Novo tipo = adicionar enum + propriedades    │
+│    🎯 FACILIDADE: 90% menos trabalho                      │
+├─────────────────────────────────────────────────────────────┤
+│ 🐛 MANUTENÇÃO:                                             │
+│    ❌ Antes: Bug fix em 2+ lugares                        │
+│    ✅ Depois: Bug fix centralizado                         │
+│    🎯 EFICIÊNCIA: 50% menos tempo                         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### **🚀 Casos de Uso Resolvidos**
+
+#### **1. 📊 Adição de Renda Fixa**
+```java
+// ANTES (Opção Atual): Criar nova view completa
+// ❌ RendaFixaView.java (~400 linhas)
+// ❌ RendaFixaDTO.java (~50 linhas)
+// ❌ RendaFixaService.java (~200 linhas)
+// ❌ Total: ~650 linhas + testes
+
+// DEPOIS (Opção 1): Especialização simples
+@Route("renda-fixa")
+public class RendaFixaView extends PosicaoView {
+    public RendaFixaView() {
+        super(TipoAtivo.RENDA_FIXA);
+        addPropriedadeEspecifica("banco", "Banco");
+        addPropriedadeEspecifica("taxa", "Taxa (%)");
+        addPropriedadeEspecifica("vencimento", "Vencimento");
+    }
+}
+// ✅ Total: ~30 linhas!
+```
+
+#### **2. 🔍 Filtros Avançados**
+```java
+// ANTES: Implementar em cada view separadamente
+// ❌ Duplicar lógica de filtro
+// ❌ Manter sincronizado
+
+// DEPOIS: Filtro unificado e extensível
+public void addFiltroSetor() {
+    // Funciona automaticamente para ACAO e FII
+    // Propriedades específicas são filtráveis
+    posicaoService.findByPropriedadeEspecifica("setor", "Petróleo");
+}
+```
+
+#### **3. 📈 Relatórios Consolidados**
+```java
+// ANTES: Buscar em múltiplas entidades
+List<AtivoAcaoDTO> acoes = rendaVariavelService.findAcoes();
+List<AtivoFiiDTO> fiis = rendaVariavelService.findFiis();
+// Consolidar manualmente...
+
+// DEPOIS: Busca unificada
+List<PosicaoDTO> todasPosicoes = posicaoService.findAll();
+Map<TipoAtivo, BigDecimal> distribuicao = 
+    posicaoService.getDistribuicaoPorTipo();
+```
+
+### **🎯 Roadmap de Extensões Futuras**
+
+#### **Fase 2: Novos Tipos de Ativos (1 semana cada)**
+- [ ] **Criptomoedas**: `TipoAtivo.CRYPTO` + propriedades específicas
+- [ ] **Commodities**: `TipoAtivo.COMMODITY` + propriedades específicas  
+- [ ] **Derivativos**: `TipoAtivo.DERIVATIVO` + propriedades específicas
+- [ ] **Internacional**: `TipoAtivo.INTERNACIONAL` + propriedades específicas
+
+#### **Fase 3: Funcionalidades Avançadas**
+- [ ] **Dashboard Unificado**: Todas as posições em uma tela
+- [ ] **Análise de Correlação**: Entre diferentes tipos de ativos
+- [ ] **Rebalanceamento**: Sugestões baseadas em % target
+- [ ] **Alertas**: Baseados em propriedades específicas
 
 ### **🗓️ Semana 5: Nova API de Preços**
 

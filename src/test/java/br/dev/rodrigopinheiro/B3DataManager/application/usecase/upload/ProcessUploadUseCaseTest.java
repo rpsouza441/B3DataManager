@@ -8,7 +8,7 @@ import br.dev.rodrigopinheiro.B3DataManager.application.result.upload.UploadProc
 import br.dev.rodrigopinheiro.B3DataManager.application.usecase.operacao.GenerateErrorReportUseCase;
 import br.dev.rodrigopinheiro.B3DataManager.application.usecase.operacao.ImportExcelUseCase;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.excel.ExcelProcessingException;
-import br.dev.rodrigopinheiro.B3DataManager.domain.model.ExcelRowError;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.adapter.inbound.excel.ExcelRowError;
 import br.dev.rodrigopinheiro.B3DataManager.domain.valueobject.UsuarioId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

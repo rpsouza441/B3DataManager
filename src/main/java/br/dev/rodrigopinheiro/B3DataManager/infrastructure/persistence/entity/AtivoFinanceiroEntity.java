@@ -1,5 +1,6 @@
 package br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity;
 
+import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivo;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
@@ -8,13 +9,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Infrastructure Entity - AtivoFinanceiroEntity (Arquitetura Corrigida)
+ * 
+ * Representa um ativo financeiro unificado que pode ser:
+ * - Renda Variável (ACAO, FII, ETF)
+ * - Renda Fixa (CDB, LCI, TESOURO)
+ * 
+ * Características da arquitetura corrigida:
+ * - Uso de enums tipados (TipoAtivo)
+ * - Type safety completa
+ * - Sem propriedades genéricas (Map<String, Object>)
+ * - JPA Entity para persistência
+ */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @Entity
-@Table(name = "ativo_financeiro")
+@Table(name = "ativo_financeiro", indexes = {
+    @Index(name = "idx_ativo_codigo", columnList = "codigo"),
+    @Index(name = "idx_ativo_tipo", columnList = "tipo_ativo"),
+    @Index(name = "idx_ativo_portfolio", columnList = "portfolio_id")
+})
 public class AtivoFinanceiroEntity {
 
     @Id
@@ -22,67 +40,97 @@ public class AtivoFinanceiroEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "nome", nullable = false)
+    /**
+     * Código do ativo (ticker para ações/FIIs, código para RF)
+     */
+    @Column(name = "codigo", nullable = false, unique = true, length = 20)
+    private String codigo;
+
+    /**
+     * Nome completo do ativo
+     */
+    @Column(name = "nome", nullable = false, length = 200)
     private String nome;
 
-    // Agora, o ativo pertence ao Portfolio
-    @ManyToOne
-    @JoinColumn(name = "portfolio_id")
+    /**
+     * Tipo do ativo (RENDA_FIXA, RENDA_VARIAVEL)
+     * Enum tipado para classificação segura
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_ativo", nullable = false, length = 20)
+    private TipoAtivo tipoAtivo;
+
+    /**
+     * Referência ao portfolio
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "portfolio_id", nullable = false)
     private PortfolioEntity portfolio;
 
-    @OneToMany(mappedBy = "ativoFinanceiro")
+    /**
+     * Transações relacionadas ao ativo (Opção 1: histórico)
+     */
+    @OneToMany(mappedBy = "ativoFinanceiro", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude // Evita loops
-    private List<TransacaoEntity> transacoes;
+    private List<TransacaoEntity> transacoes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "ativoFinanceiro")
+    /**
+     * Posições atuais do ativo (Opção 1: estado atual)
+     */
+    @OneToMany(mappedBy = "ativoFinanceiro", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude // Evita loops
-    private List<RendaVariavelEntity> rendaVariaveis = new ArrayList<>();
+    private List<PosicaoEntity> posicoes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "ativoFinanceiro")
-    @ToString.Exclude // Evita loops
-    private List<RendaFixaEntity> rendaFixas = new ArrayList<>();
-
+    /**
+     * Flag de controle para soft delete
+     */
     @Column(name = "deletado", nullable = false)
     private Boolean deletado = false;
 
-
     /**
-     * Adiciona uma renda (fixa ou variável) ao ativo financeiro.
-     * Além de inserir na coleção, garante que a associação com este AtivoFinanceiro seja definida.
-     *
-     * @param renda A renda a ser adicionada.
+     * Métodos de negócio
      */
-   
-    public void adicionarRenda(RendaFixaEntity renda) {
-        if (renda == null) throw new IllegalArgumentException("Renda fixa não pode ser nula.");
-        renda.setAtivoFinanceiro(this);
-        rendaFixas.add(renda);
-    }
-
-    public void adicionarRenda(RendaVariavelEntity renda) {
-        if (renda == null) throw new IllegalArgumentException("Renda variável não pode ser nula.");
-        renda.setAtivoFinanceiro(this);
-        rendaVariaveis.add(renda);
-    }
-
+    
     /**
-     * Adiciona uma transacao  ao ativo financeiro.
-     * Além de inserir na coleção, garante que a associação com este AtivoFinanceiro seja definida.
-     *
-     * @param transacao A renda a ser adicionada.
+     * Verifica se é um ativo de renda variável
      */
-    public void adicionarTransacoes(TransacaoEntity transacao) {
+    public boolean isRendaVariavel() {
+        return TipoAtivo.RENDA_VARIAVEL.equals(tipoAtivo);
+    }
+    
+    /**
+     * Verifica se é um ativo de renda fixa
+     */
+    public boolean isRendaFixa() {
+        return TipoAtivo.RENDA_FIXA.equals(tipoAtivo);
+    }
+    
+    /**
+     * Adiciona uma transação ao ativo financeiro
+     */
+    public void adicionarTransacao(TransacaoEntity transacao) {
         if (transacao == null) {
-            throw new IllegalArgumentException("Transacao não pode ser nula.");
+            throw new IllegalArgumentException("Transação não pode ser nula.");
         }
-        // Define explicitamente o AtivoFinanceiro na renda
         transacao.setAtivoFinanceiro(this);
-
-            if (transacoes == null) {
-                transacoes = new ArrayList<>();
-            }
+        if (transacoes == null) {
+            transacoes = new ArrayList<>();
+        }
         transacoes.add(transacao);
-
+    }
+    
+    /**
+     * Adiciona uma posição ao ativo financeiro
+     */
+    public void adicionarPosicao(PosicaoEntity posicao) {
+        if (posicao == null) {
+            throw new IllegalArgumentException("Posição não pode ser nula.");
+        }
+        posicao.setAtivoFinanceiro(this);
+        if (posicoes == null) {
+            posicoes = new ArrayList<>();
+        }
+        posicoes.add(posicao);
     }
 
     @Override

@@ -1,113 +1,91 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.service;
 
+import br.dev.rodrigopinheiro.B3DataManager.domain.model.Transacao;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaFixaEntity;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Comparator;
 
+/**
+ * Domain Service para cálculos de preço médio
+ * Trabalha apenas com domain models, sem dependências de infrastructure
+ */
 @Slf4j
-@Service
 public class CalculoPrecoMedioService {
 
     /**
-     * Calcula o custo médio (preço médio) para uma venda de ativos de renda variável utilizando o métod FIFO.
+     * Calcula o preço médio de compra utilizando o método FIFO.
      * <p>
      * A lógica consiste em:
-     * - Ordenar as operações de compra (rendas) pela data de compra (mais antiga primeiro).
+     * - Ordenar as transações de compra pela data (mais antiga primeiro).
      * - Percorrer a lista e deduzir, sequencialmente, a quantidade vendida das operações mais antigas.
      * - Somar os custos correspondentes e, ao final, dividir pelo total vendido para obter o preço médio.
      * </p>
      *
-     * @param ativo         O ativo financeiro cujo custo médio será calculado.
-     * @param quantidadeVenda A quantidade vendida.
-     * @return O custo médio calculado como BigDecimal.
+     * @param transacoesCompra Lista de transações de compra do ativo
+     * @param quantidadeVenda A quantidade vendida
+     * @return O custo médio calculado como BigDecimal
      */
-    public BigDecimal calcularPrecoMedioVendaFifoRendaVariavel(AtivoFinanceiroEntity ativo, double quantidadeVenda) {
-        List<RendaVariavelEntity> rendas = new ArrayList<>(ativo.getRendaVariaveis());
-        if (rendas.isEmpty()) {
-            log.warn("Nenhuma operação de renda variável encontrada para o ativo: {}", ativo.getNome());
+    public BigDecimal calcularPrecoMedioVendaFifo(List<Transacao> transacoesCompra, BigDecimal quantidadeVenda) {
+        if (transacoesCompra.isEmpty()) {
+            log.warn("Nenhuma transação de compra encontrada para calcular preço médio");
             return BigDecimal.ZERO;
         }
-        // Ordena as rendas pela data de compra, do mais antigo para o mais recente
-        rendas.sort(Comparator.comparing(RendaVariavelEntity::getDataCompra));
+        
+        // Ordena as transações pela data, do mais antigo para o mais recente
+        transacoesCompra.sort(Comparator.comparing(Transacao::getDataOperacao));
 
         BigDecimal totalCusto = BigDecimal.ZERO;
-        double quantidadeRestante = quantidadeVenda;
+        BigDecimal quantidadeRestante = quantidadeVenda;
 
-        for (RendaVariavelEntity renda : rendas) {
-            double disponivel = renda.getQuantidade();
-            if (quantidadeRestante <= disponivel) {
-                totalCusto = totalCusto.add(renda.getPrecoUnitario().multiply(BigDecimal.valueOf(quantidadeRestante)));
-                // Aqui, opcionalmente, atualize a quantidade disponível na operação de compra (se o estoque for gerenciado)
-                quantidadeRestante = 0;
+        for (Transacao transacao : transacoesCompra) {
+            BigDecimal disponivel = transacao.getQuantidade();
+            if (quantidadeRestante.compareTo(disponivel) <= 0) {
+                totalCusto = totalCusto.add(transacao.getPrecoUnitario().multiply(quantidadeRestante));
+                quantidadeRestante = BigDecimal.ZERO;
                 break;
             } else {
-                totalCusto = totalCusto.add(renda.getPrecoUnitario().multiply(BigDecimal.valueOf(disponivel)));
-                quantidadeRestante -= disponivel;
-                // Marcar esta operação como totalmente "quitada", se for o caso
+                totalCusto = totalCusto.add(transacao.getPrecoUnitario().multiply(disponivel));
+                quantidadeRestante = quantidadeRestante.subtract(disponivel);
             }
         }
-        if (quantidadeRestante > 0) {
-            throw new IllegalStateException("Quantidade vendida excede a disponível para o ativo " + ativo.getNome());
+        
+        if (quantidadeRestante.compareTo(BigDecimal.ZERO) > 0) {
+            throw new IllegalStateException("Quantidade vendida excede a disponível nas transações de compra");
         }
-        BigDecimal precoMedio = totalCusto.divide(BigDecimal.valueOf(quantidadeVenda), 4, RoundingMode.HALF_UP);
-        log.info("Custo médio calculado (renda variável) para {}: {}", ativo.getNome(), precoMedio);
+        
+        BigDecimal precoMedio = totalCusto.divide(quantidadeVenda, 4, RoundingMode.HALF_UP);
+        log.info("Preço médio calculado (FIFO): {}", precoMedio);
         return precoMedio;
     }
 
     /**
-     * Calcula o lucro para uma venda de ativos de renda fixa utilizando o métod FIFO.
+     * Calcula o lucro de uma venda utilizando o método FIFO.
      * <p>
      * A lógica consiste em:
-     * - Considerar todas as operações de compra de renda fixa do ativo que possuem o mesmo identificador (por exemplo, "CDB - CDB6248PGO1").
-     * - Ordenar essas operações pela data de compra (mais antiga primeiro) e deduzir a quantidade vendida sequencialmente.
-     * - Calcular o custo total das operações quitadas e, a partir disso, determinar o custo médio.
-     * - O lucro é calculado subtraindo o custo médio aplicado à quantidade vendida do valor total da venda.
+     * - Ordenar as transações de compra pela data (mais antiga primeiro)
+     * - Calcular o custo médio baseado no FIFO
+     * - O lucro é a diferença entre o valor da venda e o custo médio
      * </p>
      *
-     * @param ativo          O ativo financeiro.
-     * @param quantidadeVenda A quantidade vendida.
-     * @param valorVenda      O valor total da venda.
-     * @return O lucro obtido na venda, calculado com base no custo médio FIFO.
+     * @param transacoesCompra Lista de transações de compra do ativo
+     * @param quantidadeVenda A quantidade vendida
+     * @param valorVenda O valor total da venda
+     * @return O lucro obtido na venda, calculado com base no custo médio FIFO
      */
-    public BigDecimal calcularLucroVendaFifoRendaFixa(AtivoFinanceiroEntity ativo, double quantidadeVenda, BigDecimal valorVenda) {
-        List<RendaFixaEntity> rendas = new ArrayList<>(ativo.getRendaFixas());
-        if (rendas.isEmpty()) {
-            log.warn("Nenhuma operação de renda fixa encontrada para o ativo: {}", ativo.getNome());
+    public BigDecimal calcularLucroVendaFifo(List<Transacao> transacoesCompra, BigDecimal quantidadeVenda, BigDecimal valorVenda) {
+        if (transacoesCompra.isEmpty()) {
+            log.warn("Nenhuma transação de compra encontrada para calcular lucro");
             return BigDecimal.ZERO;
         }
-        // Ordena as rendas fixas pela data de compra, do mais antigo para o mais recente
-        rendas.sort(Comparator.comparing(RendaFixaEntity::getDataCompra));
-
-        BigDecimal totalCusto = BigDecimal.ZERO;
-        double quantidadeRestante = quantidadeVenda;
-
-        for (RendaFixaEntity renda : rendas) {
-            double disponivel = renda.getQuantidade();
-            if (quantidadeRestante <= disponivel) {
-                totalCusto = totalCusto.add(renda.getPrecoUnitario().multiply(BigDecimal.valueOf(quantidadeRestante)));
-                quantidadeRestante = 0;
-                break;
-            } else {
-                totalCusto = totalCusto.add(renda.getPrecoUnitario().multiply(BigDecimal.valueOf(disponivel)));
-                quantidadeRestante -= disponivel;
-            }
-        }
-        if (quantidadeRestante > 0) {
-            throw new IllegalStateException("Quantidade vendida excede a disponível para o ativo fixo " + ativo.getNome());
-        }
-        // Calcula o custo médio com base na quantidade vendida
-        BigDecimal custoMedio = totalCusto.divide(BigDecimal.valueOf(quantidadeVenda), 4, RoundingMode.HALF_UP);
-        BigDecimal lucro = valorVenda.subtract(custoMedio.multiply(BigDecimal.valueOf(quantidadeVenda)));
-        log.info("Lucro calculado (renda fixa) para {}: {}", ativo.getNome(), lucro);
+        
+        BigDecimal precoMedio = calcularPrecoMedioVendaFifo(transacoesCompra, quantidadeVenda);
+        BigDecimal custoTotal = precoMedio.multiply(quantidadeVenda);
+        BigDecimal lucro = valorVenda.subtract(custoTotal);
+        
+        log.info("Lucro calculado (FIFO): {}", lucro);
         return lucro;
     }
 }

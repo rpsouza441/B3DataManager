@@ -1,7 +1,6 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.model;
 
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.Roles;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.PortfolioEntity;
 
 import java.util.Set;
 
@@ -13,13 +12,13 @@ public class Usuario {
     private String email;
     private Set<Roles> roles;
     private Set<Instituicao> instituicoes;
-    private PortfolioEntity portfolio;
+    private Portfolio portfolio;
     private Boolean deletado = false;
 
     public Usuario() {
     }
 
-    public Usuario(Long id, String username, String password, String email, Set<Roles> roles, Set<Instituicao> instituicoes, PortfolioEntity portfolio, Boolean deletado) {
+    public Usuario(Long id, String username, String password, String email, Set<Roles> roles, Set<Instituicao> instituicoes, Portfolio portfolio, Boolean deletado) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -78,11 +77,11 @@ public class Usuario {
         this.instituicoes = instituicoes;
     }
 
-    public PortfolioEntity getPortfolio() {
+    public Portfolio getPortfolio() {
         return portfolio;
     }
 
-    public void setPortfolio(PortfolioEntity portfolio) {
+    public void setPortfolio(Portfolio portfolio) {
         this.portfolio = portfolio;
     }
 
