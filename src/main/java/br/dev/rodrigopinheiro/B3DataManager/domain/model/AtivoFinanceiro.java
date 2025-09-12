@@ -74,7 +74,7 @@ public class AtivoFinanceiro {
         this.tipoAtivo = TipoAtivo.RENDA_VARIAVEL;
         this.tipoRendaVariavel = tipoRendaVariavel;
         this.portfolio = portfolio;
-        this.ativo = true;
+        this.deletado = true;
     }
 
     // Construtor para Renda Fixa
@@ -84,7 +84,7 @@ public class AtivoFinanceiro {
         this.tipoAtivo = TipoAtivo.RENDA_FIXA;
         this.tipoRendaFixa = tipoRendaFixa;
         this.portfolio = portfolio;
-        this.ativo = true;
+        this.deletado = true;
     }
 
     // Métodos de negócio

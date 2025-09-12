@@ -2,8 +2,6 @@ package br.dev.rodrigopinheiro.B3DataManager.domain.enums;
 
 import lombok.Getter;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Getter
 public enum TipoAtivoFinanceiroFixa {

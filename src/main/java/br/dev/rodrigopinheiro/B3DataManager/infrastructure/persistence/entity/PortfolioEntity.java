@@ -1,5 +1,8 @@
 package br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity;
 
+import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivo;
+import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoMovimentacao;
+import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoTransacao;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +11,6 @@ import org.hibernate.proxy.HibernateProxy;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Getter
@@ -86,7 +88,7 @@ public class PortfolioEntity {
 
     /**
      * Adiciona uma transação ao portfolio.
-     * Após a adição, atualiza os saldos de forma incremental.
+     * NOTA: Cálculos de saldo devem ser feitos na camada de domínio/aplicação.
      *
      * @param transacao A transação a ser adicionada.
      */
@@ -96,11 +98,11 @@ public class PortfolioEntity {
         }
         transacao.setPortfolio(this);
         this.transacoes.add(transacao);
-        atualizarSaldos(transacao);
     }
 
     /**
-     * Remove uma transação do portfolio e recalcula os saldos.
+     * Remove uma transação do portfolio.
+     * NOTA: Recálculos de saldo devem ser feitos na camada de domínio/aplicação.
      *
      * @param transacao A transação a ser removida.
      */
@@ -110,123 +112,18 @@ public class PortfolioEntity {
         }
         if (this.transacoes.remove(transacao)) {
             transacao.setPortfolio(null);
-            recalcularSaldos();
         }
     }
 
-    /**
-     * Atualiza os saldos do portfolio de forma incremental com base na transação informada.
-     *
-     * Este métod utiliza a lógica centralizada do métod privado {@code calcularImpactoTransacao}
-     * para determinar o impacto da transação nos saldos do portfolio. A transação pode impactar:
-     *
-     * - {@code saldoTotal}: sempre acrescido do valor total da transação (exceto em transferências);
-     * - {@code saldoAplicado}: acrescido do valor total quando a transação for de entrada e não for
-     *   um rendimento;
-     * - {@code lucroVenda}: acrescido do valor resultante da subtração entre o valor total e o custo total
-     *   (preço médio multiplicado pela quantidade) para transações de saída;
-     * - {@code lucroRendimento}: acrescido do valor total da transação quando esta representar um rendimento
-     *   (por exemplo, LUCRO_RENDIMENTO, LUCRO_DIVIDENDO, LUCRO_JUROS ou LUCRO_OUTRA) em entradas.
-     *
-     * Caso a transação seja do tipo "TRANSFERENCIA" ou seu valor total seja nulo, nenhum saldo será alterado.
-     *
-     * @param transacao a transação utilizada para atualizar os saldos do portfolio.
-     * @throws IllegalArgumentException se o valor total da transação for nulo.
-     */
-    public void atualizarSaldos(TransacaoEntity transacao) {
-        Map<String, BigDecimal> impacto = calcularImpactoTransacao(transacao);
-        this.saldoTotal = this.saldoTotal.add(impacto.get("saldoTotal"));
-        this.saldoAplicado = this.saldoAplicado.add(impacto.get("saldoAplicado"));
-        this.lucroVenda = this.lucroVenda.add(impacto.get("lucroVenda"));
-        this.lucroRendimento = this.lucroRendimento.add(impacto.get("lucroRendimento"));
-    }
+    // REMOVIDO: Métodos de cálculo de saldo movidos para a camada de domínio/aplicação
+    // conforme arquitetura hexagonal. Entidades de infraestrutura devem ser apenas
+    // estruturas de dados para persistência.
 
 
-    /**
-     * Recalcula todos os saldos do portfolio com base na lista completa de transações.
-     *
-     * Este métod itera por todas as transações associadas ao portfolio e, para cada uma, utiliza
-     * o métod privado {@code calcularImpactoTransacao} para determinar o impacto nos saldos.
-     * As transações do tipo "TRANSFERENCIA" são ignoradas, ou seja, não alteram nenhum saldo.
-     *
-     * Os saldos recalculados são:
-     *
-     * - {@code saldoTotal}: soma dos valores totais de todas as transações (exceto transferências);
-     * - {@code saldoAplicado}: soma dos valores dos aportes (transações de entrada que não são rendimentos);
-     * - {@code lucroVenda}: soma dos lucros obtidos nas transações de saída, calculados como a diferença
-     *   entre o valor total e o custo total (preço médio x quantidade);
-     * - {@code lucroRendimento}: soma dos valores das transações de entrada que representam rendimentos.
-     *
-     * Ao final, os campos do portfolio são atualizados com os valores recalculados.
-     */
-    public void recalcularSaldos() {
-        BigDecimal novoSaldoTotal = BigDecimal.ZERO;
-        BigDecimal novoSaldoAplicado = BigDecimal.ZERO;
-        BigDecimal novoLucroVenda = BigDecimal.ZERO;
-        BigDecimal novoLucroRendimento = BigDecimal.ZERO;
-
-        for (TransacaoEntity transacao : transacoes) {
-            Map<String, BigDecimal> impacto = calcularImpactoTransacao(transacao);
-            novoSaldoTotal = novoSaldoTotal.add(impacto.get("saldoTotal"));
-            novoSaldoAplicado = novoSaldoAplicado.add(impacto.get("saldoAplicado"));
-            novoLucroVenda = novoLucroVenda.add(impacto.get("lucroVenda"));
-            novoLucroRendimento = novoLucroRendimento.add(impacto.get("lucroRendimento"));
-        }
-
-        this.saldoTotal = novoSaldoTotal;
-        this.saldoAplicado = novoSaldoAplicado;
-        this.lucroVenda = novoLucroVenda;
-        this.lucroRendimento = novoLucroRendimento;
-    }
+    // REMOVIDO: recalcularSaldos() - Lógica de negócio movida para camada de domínio
 
 
-    /**
-     * Métod privado que calcula o impacto de uma transação nos saldos do portfolio.
-     * Retorna um Map com as chaves:
-     *   "saldoTotal", "saldoAplicado", "lucroVenda" e "lucroRendimento".
-     *
-     * Se a transação for do tipo "TRANSFERENCIA" ou tiver valor nulo, retorna um Map com zeros.
-     */
-    private Map<String, BigDecimal> calcularImpactoTransacao(TransacaoEntity transacao) {
-        // Cria e inicializa o Map com valores zerados.
-        Map<String, BigDecimal> impacto = new HashMap<>();
-        impacto.put("saldoTotal", BigDecimal.ZERO);
-        impacto.put("saldoAplicado", BigDecimal.ZERO);
-        impacto.put("lucroVenda", BigDecimal.ZERO);
-        impacto.put("lucroRendimento", BigDecimal.ZERO);
-
-        if (transacao.getValorTotal() == null) {
-            return impacto;
-        }
-        // Se a transação for de transferência, não altera nenhum saldo.
-        if ("TRANSFERENCIA".equalsIgnoreCase(transacao.getTipoMovimentacao())) {
-            return impacto;
-        }
-
-        // O valor total sempre compõe o saldoTotal.
-        impacto.put("saldoTotal", transacao.getValorTotal());
-
-        if ("ENTRADA".equalsIgnoreCase(transacao.getEntradaSaida())) {
-            String tipoTransacao = transacao.getTipoTransacao();
-            if (tipoTransacao != null && (
-                    tipoTransacao.equalsIgnoreCase("LUCRO_RENDIMENTO") ||
-                            tipoTransacao.equalsIgnoreCase("LUCRO_DIVIDENDO") ||
-                            tipoTransacao.equalsIgnoreCase("LUCRO_JUROS") ||
-                            tipoTransacao.equalsIgnoreCase("LUCRO_OUTRA")
-            )) {
-                impacto.put("lucroRendimento", transacao.getValorTotal());
-            } else {
-                impacto.put("saldoAplicado", transacao.getValorTotal());
-            }
-        } else { // Transação de SAÍDA
-            BigDecimal precoMedio = transacao.getPrecoMedio() != null ? transacao.getPrecoMedio() : BigDecimal.ZERO;
-            BigDecimal custoTotal = precoMedio.multiply(BigDecimal.valueOf(transacao.getQuantidade()));
-            BigDecimal lucro = transacao.getValorTotal().subtract(custoTotal);
-            impacto.put("lucroVenda", lucro);
-        }
-
-        return impacto;
-    }
+    // REMOVIDO: calcularImpactoTransacao() - Lógica de negócio movida para camada de domínio
 
 
     /**

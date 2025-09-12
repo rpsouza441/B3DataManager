@@ -887,6 +887,27 @@ private Set<String> instituicoes;
 - [ ] **Flyway baseline** executado com sucesso
 - [ ] **Testes de regressão** passando
 
+### **🚨 FASE 0: Correções Críticas de Segurança (Semana 1)**
+
+#### **Segurança Crítica**
+- [ ] **TASK-SEC-001:** Frame Options configurado (SAMEORIGIN)
+- [ ] **TASK-SEC-002:** Actuator implementado com segurança
+- [ ] **TASK-SEC-003:** Flyway configurado com baseline
+- [ ] **Validação:** Scan de segurança sem vulnerabilidades críticas
+- [ ] **Teste:** Verificação de clickjacking bloqueado
+
+#### **Performance Crítica**
+- [ ] **TASK-PERF-001:** Eager Loading corrigido em Usuario.java
+- [ ] **TASK-PERF-002:** Open-in-View desabilitado
+- [ ] **Validação:** Tempo de resposta < 100ms
+- [ ] **Teste:** Queries otimizadas funcionando
+
+#### **Frontend Melhorado**
+- [ ] **TASK-UI-001:** Design System implementado
+- [ ] **TASK-UI-002:** Componentes Vaadin modernizados
+- [ ] **Validação:** Interface responsiva e atrativa
+- [ ] **Teste:** Compatibilidade cross-browser
+
 ### **📋 Fase 1: Portfolio + AtivoFinanceiro**
 
 #### **Domain Layer**
@@ -1028,6 +1049,153 @@ private Set<String> instituicoes;
 
 ---
 
+## 🚨 TASKS PRIORITÁRIAS - CORREÇÕES CRÍTICAS
+
+### **🔴 URGENTE - Correções de Segurança (Semana 1)**
+
+#### **TASK-SEC-001: Configurar Frame Options (SAMEORIGIN)**
+- **Arquivo:** `SecurityConfig.java:44`
+- **Problema:** `frameOptions().disable()` - Vulnerabilidade a clickjacking
+- **Solução:**
+```java
+.headers(headers -> headers
+    .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+)
+```
+- **Esforço:** 30 minutos
+- **Prioridade:** CRÍTICA
+- **Status:** ❌ Pendente
+
+#### **TASK-SEC-002: Implementar Actuator com Segurança**
+- **Arquivo:** `application.properties` + `pom.xml`
+- **Problema:** Ausência de monitoramento
+- **Solução:**
+```properties
+# Actuator seguro
+management.endpoints.web.exposure.include=health,metrics,info
+management.endpoint.health.show-details=when-authorized
+management.security.enabled=true
+```
+- **Esforço:** 4 horas
+- **Prioridade:** ALTA
+- **Status:** ❌ Pendente
+
+#### **TASK-SEC-003: Implementar Flyway com Baseline**
+- **Arquivo:** `pom.xml` + migrations
+- **Problema:** Inconsistências de schema
+- **Solução:**
+```properties
+spring.flyway.enabled=true
+spring.flyway.baseline-on-migrate=true
+spring.flyway.baseline-version=1
+```
+- **Esforço:** 8 horas
+- **Prioridade:** ALTA
+- **Status:** ❌ Pendente
+
+### **🟠 ALTA PRIORIDADE - Melhorias de Performance (Semana 2)**
+
+#### **TASK-PERF-001: Corrigir Eager Loading**
+- **Arquivo:** `Usuario.java:40`
+- **Problema:** `@ElementCollection(fetch = FetchType.EAGER)`
+- **Solução:**
+```java
+@ElementCollection(fetch = FetchType.LAZY)
+private Set<String> instituicoes;
+```
+- **Esforço:** 3 horas
+- **Prioridade:** ALTA
+- **Status:** ❌ Pendente
+
+#### **TASK-PERF-002: Desabilitar Open-in-View**
+- **Arquivo:** `application.properties`
+- **Problema:** Queries durante renderização
+- **Solução:**
+```properties
+spring.jpa.open-in-view=false
+```
+- **Esforço:** 6 horas (incluindo DTOs)
+- **Prioridade:** ALTA
+- **Status:** ❌ Pendente
+
+### **🔵 FRONTEND - Melhorias Visuais (Semana 3)**
+
+#### **TASK-UI-001: Implementar Design System Consistente**
+- **Arquivos:** `src/main/frontend/themes/my-app/views/*.css`
+- **Problema:** Interface não atrativa, estilos inconsistentes
+- **Solução:**
+  - Criar variáveis CSS globais para cores, tipografia e espaçamentos
+  - Implementar componentes reutilizáveis
+  - Adicionar animações e transições suaves
+- **Esforço:** 12 horas
+- **Prioridade:** MÉDIA
+- **Status:** ❌ Pendente
+
+#### **TASK-UI-002: Modernizar Componentes Vaadin**
+- **Arquivos:** Views existentes
+- **Problema:** Componentes básicos sem personalização
+- **Solução:**
+  - Implementar tema customizado
+  - Adicionar ícones e indicadores visuais
+  - Melhorar responsividade
+- **Esforço:** 8 horas
+- **Prioridade:** MÉDIA
+- **Status:** ❌ Pendente
+
+### **🟢 ARQUITETURA - Implementação Opção 1 (Semanas 4-6)**
+
+#### **TASK-ARCH-001: Unificar Views Duplicadas**
+- **Arquivos:** `GridwithFiltersAcoesView.java`, `GridwithFiltersFiiView.java`
+- **Problema:** ~800 linhas de código duplicado
+- **Solução:**
+  - Criar `PosicaoView` base genérica
+  - Especializar para `AcoesView` e `FiisView`
+  - Eliminar duplicação de filtros e grid
+- **Esforço:** 16 horas
+- **Prioridade:** ALTA
+- **Status:** ❌ Pendente
+
+#### **TASK-ARCH-002: Migrar Services para Use Cases**
+- **Arquivos:** `RendaVariavelService`, `AtivoFinanceiroService`, `PortfolioService`
+- **Problema:** Services anêmicos violando arquitetura hexagonal
+- **Solução:**
+  - Criar Use Cases específicos
+  - Mover lógica de negócio para domain
+  - Implementar ports e adapters
+- **Esforço:** 24 horas
+- **Prioridade:** ALTA
+- **Status:** ❌ Pendente
+
+#### **TASK-ARCH-003: Implementar Cálculo Pré-computado**
+- **Arquivos:** `Posicao.java`, banco de dados
+- **Problema:** Cálculo de percentuais em tempo real (performance)
+- **Solução:**
+  - Adicionar coluna `percentual_carteira`
+  - Criar job assíncrono para atualização
+  - Otimizar queries
+- **Esforço:** 12 horas
+- **Prioridade:** ALTA
+- **Status:** ❌ Pendente
+
+### **📊 Resumo de Tasks**
+
+| Categoria | Tasks | Esforço Total | Prioridade |
+|-----------|-------|---------------|------------|
+| Segurança | 3 | 12.5 horas | CRÍTICA |
+| Performance | 2 | 9 horas | ALTA |
+| Frontend | 2 | 20 horas | MÉDIA |
+| Arquitetura | 3 | 52 horas | ALTA |
+| **TOTAL** | **10** | **93.5 horas** | - |
+
+### **🎯 Cronograma de Execução**
+
+- **Semana 1:** TASK-SEC-001, TASK-SEC-002, TASK-SEC-003
+- **Semana 2:** TASK-PERF-001, TASK-PERF-002
+- **Semana 3:** TASK-UI-001, TASK-UI-002
+- **Semanas 4-6:** TASK-ARCH-001, TASK-ARCH-002, TASK-ARCH-003
+
+---
+
 ## 📊 Métricas de Sucesso
 
 ### **🎯 KPIs Técnicos**
@@ -1088,7 +1256,29 @@ private Set<String> instituicoes;
 
 ---
 
-**🎯 Próximo Passo:** Executar correções críticas de segurança (Dia 1-2)
+## 🎯 PRÓXIMOS PASSOS IMEDIATOS
+
+### **🚨 AÇÃO URGENTE (Esta Semana)**
+1. **TASK-SEC-001:** Corrigir Frame Options (30 min) - **CRÍTICO**
+2. **TASK-SEC-002:** Implementar Actuator (4h) - **ALTA**
+3. **TASK-SEC-003:** Configurar Flyway (8h) - **ALTA**
+
+### **📋 Sequência de Execução Recomendada**
+```
+Semana 1: Segurança Crítica (TASK-SEC-001, SEC-002, SEC-003)
+    ↓
+Semana 2: Performance (TASK-PERF-001, PERF-002)
+    ↓
+Semana 3: Frontend (TASK-UI-001, UI-002)
+    ↓
+Semanas 4-6: Arquitetura Opção 1 (TASK-ARCH-001, ARCH-002, ARCH-003)
+```
+
+### **⚡ Impacto Esperado**
+- **Segurança:** Vulnerabilidades críticas eliminadas
+- **Performance:** Melhoria de 40-60% no tempo de resposta
+- **Frontend:** Interface moderna e atrativa
+- **Arquitetura:** 60% redução de código duplicado
 
 **📞 Contato:** Para dúvidas ou ajustes no plano, consulte a documentação ou abra uma issue.
 

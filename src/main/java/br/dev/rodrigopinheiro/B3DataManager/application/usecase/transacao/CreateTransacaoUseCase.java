@@ -11,6 +11,8 @@ import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.At
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.InstituicaoEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.PortfolioEntity;
+import br.dev.rodrigopinheiro.B3DataManager.domain.model.Transacao;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.mapper.TransacaoMapper;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.TransacaoEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.UsuarioEntity;
 import lombok.extern.slf4j.Slf4j;
@@ -67,18 +69,21 @@ public class CreateTransacaoUseCase {
     private final TransacaoFactory transacaoFactory;
     private final AggregatePersistenceService aggregatePersistenceService;
     private final AtivoFactoryImpl ativoFactoryImpl;
+    private final TransacaoMapper transacaoMapper;
     
     public CreateTransacaoUseCase(
             PortfolioService portfolioService,
             InstituicaoService instituicaoService,
             TransacaoFactory transacaoFactory,
             AggregatePersistenceService aggregatePersistenceService,
-            AtivoFactoryImpl ativoFactoryImpl) {
+            AtivoFactoryImpl ativoFactoryImpl,
+            TransacaoMapper transacaoMapper) {
         this.portfolioService = portfolioService;
         this.instituicaoService = instituicaoService;
         this.transacaoFactory = transacaoFactory;
         this.aggregatePersistenceService = aggregatePersistenceService;
         this.ativoFactoryImpl = ativoFactoryImpl;
+        this.transacaoMapper = transacaoMapper;
     }
     
     /**
@@ -111,15 +116,17 @@ public class CreateTransacaoUseCase {
         InstituicaoEntity instituicao = instituicaoService.buscarOuCriarInstituicao(operacao.getInstituicao());
         
         // Cria a transação a partir da operação
-        TransacaoEntity transacao = transacaoFactory.criarTransacao(operacao);
-        transacao.setDarf(null);
+        Transacao transacao = transacaoFactory.criarTransacao(operacao);
+        
+        // Converte para entity para uso na infrastructure
+        TransacaoEntity transacaoEntity = transacaoMapper.toEntity(transacao);
         
         log.debug("Transação criada: tipo={}, valor={}", 
                  transacao.getTipoTransacao(), transacao.getValorTotal());
         
         // Associa a transação aos agregados comuns
-        portfolio.adicionarTransacao(transacao);
-        instituicao.adicionarTransacoes(transacao);
+        portfolio.adicionarTransacao(transacaoEntity);
+        instituicao.adicionarTransacoes(transacaoEntity);
         usuario.associarInstituicao(instituicao);
         instituicao.associarUsuario(usuario);
         
@@ -129,18 +136,18 @@ public class CreateTransacaoUseCase {
             
             // Fluxo para operações não lucro: cria o ativo financeiro e realiza as associações
             AtivoFinanceiroEntity ativoFinanceiro = ativoFactoryImpl.criarAtivo(operacao, portfolio);
-            ativoFinanceiro.adicionarTransacoes(transacao);
+            ativoFinanceiro.adicionarTransacoes(transacaoEntity);
             portfolio.adicionarAtivoFinanceiro(ativoFinanceiro);
             
             // Persiste o agregado com o ativo financeiro
-            aggregatePersistenceService.persistAggregate(transacao, usuario, portfolio, instituicao, ativoFinanceiro);
+            aggregatePersistenceService.persistAggregate(transacaoEntity, usuario, portfolio, instituicao, ativoFinanceiro);
             
             log.debug("Transação criada com ativo financeiro: {}", ativoFinanceiro.getNome());
         } else {
             log.debug("Transação é lucro, não criando ativo financeiro");
             
             // Fluxo para operações de lucro: não cria nem associa o ativo financeiro
-            aggregatePersistenceService.persistAggregate(transacao, usuario, portfolio, instituicao);
+            aggregatePersistenceService.persistAggregate(transacaoEntity, usuario, portfolio, instituicao);
         }
         
         log.info("Transação criada com sucesso para operação: {}", operacao.getId());
@@ -152,11 +159,11 @@ public class CreateTransacaoUseCase {
      * @param transacao A transação a ser verificada
      * @return true se a transação for de lucro; false caso contrário
      */
-    private boolean isTransacaoLucro(TransacaoEntity transacao) {
+    private boolean isTransacaoLucro(Transacao transacao) {
         return transacao.getTipoTransacao() != null &&
-                (transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_RENDIMENTO.name())
-                        || transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_DIVIDENDO.name())
-                        || transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_JUROS.name())
-                        || transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_OUTRA.name()));
+                (transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_RENDIMENTO)
+                        || transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_DIVIDENDO)
+                        || transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_JUROS)
+                        || transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_OUTRA));
     }
 }

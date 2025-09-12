@@ -7,6 +7,8 @@ import br.dev.rodrigopinheiro.B3DataManager.application.service.PortfolioService
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoTransacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.service.AtivoFactoryImpl;
 import br.dev.rodrigopinheiro.B3DataManager.domain.service.TransacaoFactory;
+import br.dev.rodrigopinheiro.B3DataManager.domain.model.Transacao;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.mapper.TransacaoMapper;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.InstituicaoEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
@@ -55,13 +57,17 @@ class CreateTransacaoUseCaseTest {
     @Mock
     private AtivoFactoryImpl ativoFactoryImpl;
     
+    @Mock
+    private TransacaoMapper transacaoMapper;
+    
     private CreateTransacaoUseCase createTransacaoUseCase;
     
     private OperacaoEntity operacao;
     private UsuarioEntity usuario;
     private PortfolioEntity portfolio;
     private InstituicaoEntity instituicao;
-    private TransacaoEntity transacao;
+    private Transacao transacao;
+    private TransacaoEntity transacaoEntity;
     private AtivoFinanceiroEntity ativoFinanceiro;
     
     @BeforeEach
@@ -71,7 +77,8 @@ class CreateTransacaoUseCaseTest {
             instituicaoService,
             transacaoFactory,
             aggregatePersistenceService,
-            ativoFactoryImpl
+            ativoFactoryImpl,
+            transacaoMapper
         );
         
         // Setup mocks
@@ -86,12 +93,14 @@ class CreateTransacaoUseCaseTest {
         
         portfolio = mock(PortfolioEntity.class);
         instituicao = mock(InstituicaoEntity.class);
-        transacao = mock(TransacaoEntity.class);
+        transacao = mock(Transacao.class);
+        transacaoEntity = mock(TransacaoEntity.class);
         ativoFinanceiro = mock(AtivoFinanceiroEntity.class);
         
         when(portfolioService.obterOuCriarPortfolio(1L)).thenReturn(portfolio);
         when(instituicaoService.buscarOuCriarInstituicao("XP INVESTIMENTOS")).thenReturn(instituicao);
         when(transacaoFactory.criarTransacao(operacao)).thenReturn(transacao);
+        when(transacaoMapper.toEntity(transacao)).thenReturn(transacaoEntity);
         when(ativoFactoryImpl.criarAtivo(operacao, portfolio)).thenReturn(ativoFinanceiro);
     }
     
@@ -103,7 +112,7 @@ class CreateTransacaoUseCaseTest {
         @DisplayName("Deve criar transação para operação normal")
         void deveCriarTransacaoParaOperacaoNormal() {
             // Arrange
-            when(transacao.getTipoTransacao()).thenReturn("COMPRA");
+            when(transacao.getTipoTransacao()).thenReturn(TipoTransacao.ENTRADA);
             CreateTransacaoCommand command = new CreateTransacaoCommand(operacao);
             
             // Act
@@ -113,19 +122,19 @@ class CreateTransacaoUseCaseTest {
             verify(portfolioService).obterOuCriarPortfolio(1L);
             verify(instituicaoService).buscarOuCriarInstituicao("XP INVESTIMENTOS");
             verify(transacaoFactory).criarTransacao(operacao);
-            verify(transacao).setDarf(null);
+            verify(transacaoMapper).toEntity(transacao);
             
-            verify(portfolio).adicionarTransacao(transacao);
-            verify(instituicao).adicionarTransacoes(transacao);
+            verify(portfolio).adicionarTransacao(transacaoEntity);
+            verify(instituicao).adicionarTransacoes(transacaoEntity);
             verify(usuario).associarInstituicao(instituicao);
             verify(instituicao).associarUsuario(usuario);
             
             verify(ativoFactoryImpl).criarAtivo(operacao, portfolio);
-            verify(ativoFinanceiro).adicionarTransacoes(transacao);
+            verify(ativoFinanceiro).adicionarTransacoes(transacaoEntity);
             verify(portfolio).adicionarAtivoFinanceiro(ativoFinanceiro);
             
             verify(aggregatePersistenceService).persistAggregate(
-                transacao, usuario, portfolio, instituicao, ativoFinanceiro
+                transacaoEntity, usuario, portfolio, instituicao, ativoFinanceiro
             );
         }
         
@@ -133,7 +142,7 @@ class CreateTransacaoUseCaseTest {
         @DisplayName("Deve criar transação de lucro sem ativo financeiro")
         void deveCriarTransacaoDeLucroSemAtivoFinanceiro() {
             // Arrange
-            when(transacao.getTipoTransacao()).thenReturn(TipoTransacao.LUCRO_DIVIDENDO.name());
+            when(transacao.getTipoTransacao()).thenReturn(TipoTransacao.LUCRO_DIVIDENDO);
             CreateTransacaoCommand command = new CreateTransacaoCommand(operacao);
             
             // Act
@@ -143,6 +152,7 @@ class CreateTransacaoUseCaseTest {
             verify(portfolioService).obterOuCriarPortfolio(1L);
             verify(instituicaoService).buscarOuCriarInstituicao("XP INVESTIMENTOS");
             verify(transacaoFactory).criarTransacao(operacao);
+            verify(transacaoMapper).toEntity(transacao);
             
             // Não deve criar ativo financeiro para lucros
             verify(ativoFactoryImpl, never()).criarAtivo(any(), any());
@@ -150,7 +160,7 @@ class CreateTransacaoUseCaseTest {
             
             // Deve persistir sem ativo financeiro
             verify(aggregatePersistenceService).persistAggregate(
-                transacao, usuario, portfolio, instituicao
+                transacaoEntity, usuario, portfolio, instituicao
             );
         }
         
@@ -158,14 +168,14 @@ class CreateTransacaoUseCaseTest {
         @DisplayName("Deve identificar todos os tipos de lucro")
         void deveIdentificarTodosTiposDeLucro() {
             // Arrange
-            String[] tiposLucro = {
-                TipoTransacao.LUCRO_RENDIMENTO.name(),
-                TipoTransacao.LUCRO_DIVIDENDO.name(),
-                TipoTransacao.LUCRO_JUROS.name(),
-                TipoTransacao.LUCRO_OUTRA.name()
+            TipoTransacao[] tiposLucro = {
+                TipoTransacao.LUCRO_RENDIMENTO,
+                TipoTransacao.LUCRO_DIVIDENDO,
+                TipoTransacao.LUCRO_JUROS,
+                TipoTransacao.LUCRO_OUTRA
             };
             
-            for (String tipoLucro : tiposLucro) {
+            for (TipoTransacao tipoLucro : tiposLucro) {
                 // Reset mocks
                 reset(ativoFactoryImpl, aggregatePersistenceService);
                 
@@ -178,7 +188,7 @@ class CreateTransacaoUseCaseTest {
                 // Assert
                 verify(ativoFactoryImpl, never()).criarAtivo(any(), any());
                 verify(aggregatePersistenceService).persistAggregate(
-                    transacao, usuario, portfolio, instituicao
+                    transacaoEntity, usuario, portfolio, instituicao
                 );
             }
         }
@@ -247,7 +257,7 @@ class CreateTransacaoUseCaseTest {
         @DisplayName("Deve chamar todos os services necessários")
         void deveChamarTodosOsServicesNecessarios() {
             // Arrange
-            when(transacao.getTipoTransacao()).thenReturn("COMPRA");
+            when(transacao.getTipoTransacao()).thenReturn(TipoTransacao.ENTRADA);
             CreateTransacaoCommand command = new CreateTransacaoCommand(operacao);
             
             // Act
@@ -257,9 +267,10 @@ class CreateTransacaoUseCaseTest {
             verify(portfolioService).obterOuCriarPortfolio(1L);
             verify(instituicaoService).buscarOuCriarInstituicao("XP INVESTIMENTOS");
             verify(transacaoFactory).criarTransacao(operacao);
+            verify(transacaoMapper).toEntity(transacao);
             verify(ativoFactoryImpl).criarAtivo(operacao, portfolio);
             verify(aggregatePersistenceService).persistAggregate(
-                transacao, usuario, portfolio, instituicao, ativoFinanceiro
+                transacaoEntity, usuario, portfolio, instituicao, ativoFinanceiro
             );
         }
         
@@ -267,16 +278,16 @@ class CreateTransacaoUseCaseTest {
         @DisplayName("Deve configurar transação corretamente")
         void deveConfigurarTransacaoCorretamente() {
             // Arrange
-            when(transacao.getTipoTransacao()).thenReturn("VENDA");
+            when(transacao.getTipoTransacao()).thenReturn(TipoTransacao.VENDA);
             CreateTransacaoCommand command = new CreateTransacaoCommand(operacao);
             
             // Act
             createTransacaoUseCase.execute(command);
             
             // Assert
-            verify(transacao).setDarf(null);
-            verify(portfolio).adicionarTransacao(transacao);
-            verify(instituicao).adicionarTransacoes(transacao);
+            verify(transacaoEntity).setDarf(null);
+            verify(portfolio).adicionarTransacao(transacaoEntity);
+            verify(instituicao).adicionarTransacoes(transacaoEntity);
             verify(usuario).associarInstituicao(instituicao);
             verify(instituicao).associarUsuario(usuario);
         }
@@ -285,7 +296,7 @@ class CreateTransacaoUseCaseTest {
         @DisplayName("Deve associar ativo financeiro para operações não lucro")
         void deveAssociarAtivoFinanceiroParaOperacoesNaoLucro() {
             // Arrange
-            when(transacao.getTipoTransacao()).thenReturn("COMPRA");
+            when(transacao.getTipoTransacao()).thenReturn(TipoTransacao.ENTRADA);
             when(ativoFinanceiro.getNome()).thenReturn("ITSA4");
             CreateTransacaoCommand command = new CreateTransacaoCommand(operacao);
             
@@ -293,7 +304,7 @@ class CreateTransacaoUseCaseTest {
             createTransacaoUseCase.execute(command);
             
             // Assert
-            verify(ativoFinanceiro).adicionarTransacoes(transacao);
+            verify(ativoFinanceiro).adicionarTransacoes(transacaoEntity);
             verify(portfolio).adicionarAtivoFinanceiro(ativoFinanceiro);
         }
     }

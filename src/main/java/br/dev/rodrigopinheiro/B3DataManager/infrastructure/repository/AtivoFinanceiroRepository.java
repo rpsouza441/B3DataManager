@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivo;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.PortfolioEntity;
 
@@ -57,7 +58,7 @@ public interface AtivoFinanceiroRepository extends JpaRepository<AtivoFinanceiro
     /**
      * Busca ativos por tipo usando enum tipado
      */
-    List<AtivoFinanceiroEntity> findByTipoAtivoAndPortfolioIdAndDeletadoFalse(br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivo tipoAtivo, Long portfolioId);
+    List<AtivoFinanceiroEntity> findByTipoAtivoAndPortfolioIdAndDeletadoFalse(TipoAtivo tipoAtivo, Long portfolioId);
     
     /**
      * Busca ativos de renda variável

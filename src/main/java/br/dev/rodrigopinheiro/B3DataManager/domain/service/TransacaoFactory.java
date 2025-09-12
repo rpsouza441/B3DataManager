@@ -2,8 +2,9 @@ package br.dev.rodrigopinheiro.B3DataManager.domain.service;
 
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoMovimentacao;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoTransacao;
+import br.dev.rodrigopinheiro.B3DataManager.domain.model.Operacao;
+import br.dev.rodrigopinheiro.B3DataManager.domain.model.Transacao;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.TransacaoEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +50,7 @@ public class TransacaoFactory {
      * @return A transação criada, com o ativo financeiro associado.
      */
     @Transactional
-    public TransacaoEntity criarTransacao(OperacaoEntity operacao) {
+    public Transacao criarTransacao(OperacaoEntity operacao) {
         log.info("Iniciando criação da transação para a operação: {}", operacao);
 
         // 3. Extração e parsing dos dados da operação
@@ -63,22 +64,21 @@ public class TransacaoFactory {
         TipoMovimentacao tipoMovimentacao = TipoMovimentacao.valueOf(tipoMovimentacaoStr);
         TipoTransacao tipoTransacao = tipoTransacaoMapper.mapear(operacao.getEntradaSaida(), operacao.getMovimentacao());
 
-        // 5. Criação da transação (idealmente via construtor ou builder)
-        TransacaoEntity transacao = new TransacaoEntity();
-        transacao.setData(operacao.getData());
-        transacao.setEntradaSaida(entradaSaida);
-        transacao.setQuantidade(quantidade);
-        transacao.setPrecoUnitario(precoUnitario);
-        transacao.setValorTotal(valorTotal);
+        // 5. Criação da transação domain object
+        Transacao transacao = new Transacao();
+        transacao.setDataOperacao(operacao.getData());
         transacao.setTipoTransacao(tipoTransacao);
         transacao.setTipoMovimentacao(tipoMovimentacao);
+        transacao.setQuantidade(BigDecimal.valueOf(quantidade));
+        transacao.setPrecoUnitario(precoUnitario);
+        transacao.setValorTotal(valorTotal);
         transacao.setDeletado(false);
-
-        // 9. Darf ainda não foi gerado; mantemos null para preenchimento futuro
-        transacao.setDarf(null);
-
-        // 10. adiciona operacao
-        transacao.setOperacao(operacao);
+        
+        // TODO: Adicionar objetos completos quando disponíveis no contexto
+        // transacao.setAtivoFinanceiro(ativoFinanceiro);
+        // transacao.setPortfolio(portfolio);
+        // transacao.setInstituicao(instituicao);
+        // transacao.setOperacao(operacaoDomain);
 
         log.info("Transação criada com sucesso: {}", transacao);
         return transacao;

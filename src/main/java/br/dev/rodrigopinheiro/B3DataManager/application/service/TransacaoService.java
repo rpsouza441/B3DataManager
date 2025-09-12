@@ -143,10 +143,10 @@ public class TransacaoService {
      */
     private boolean isTransacaoLucro(TransacaoEntity transacao) {
         return transacao.getTipoTransacao() != null &&
-                (transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_RENDIMENTO.name())
-                        || transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_DIVIDENDO.name())
-                        || transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_JUROS.name())
-                        || transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_OUTRA.name()));
+                (transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_RENDIMENTO)
+                        || transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_DIVIDENDO)
+                        || transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_JUROS)
+                        || transacao.getTipoTransacao().equals(TipoTransacao.LUCRO_OUTRA));
     }
 
 }
