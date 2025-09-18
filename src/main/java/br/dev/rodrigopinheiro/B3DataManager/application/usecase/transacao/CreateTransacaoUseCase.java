@@ -121,6 +121,9 @@ public class CreateTransacaoUseCase {
         // Converte para entity para uso na infrastructure
         TransacaoEntity transacaoEntity = transacaoMapper.toEntity(transacao);
         
+        // Inicializa DARF como null (será configurado posteriormente se necessário)
+        transacaoEntity.setDarf(null);
+        
         log.debug("Transação criada: tipo={}, valor={}", 
                  transacao.getTipoTransacao(), transacao.getValorTotal());
         
@@ -136,7 +139,7 @@ public class CreateTransacaoUseCase {
             
             // Fluxo para operações não lucro: cria o ativo financeiro e realiza as associações
             AtivoFinanceiroEntity ativoFinanceiro = ativoFactoryImpl.criarAtivo(operacao, portfolio);
-            ativoFinanceiro.adicionarTransacoes(transacaoEntity);
+            ativoFinanceiro.adicionarTransacao(transacaoEntity);
             portfolio.adicionarAtivoFinanceiro(ativoFinanceiro);
             
             // Persiste o agregado com o ativo financeiro

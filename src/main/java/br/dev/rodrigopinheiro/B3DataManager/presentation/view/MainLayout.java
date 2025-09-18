@@ -24,6 +24,26 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+/**
+ * Layout principal da aplicação B3DataManager.
+ * 
+ * Responsável pela estrutura base da interface web, incluindo:
+ * - Menu lateral de navegação
+ * - Cabeçalho com controles de usuário
+ * - Suporte a temas (claro/escuro)
+ * - Internacionalização
+ * - Controle de autenticação
+ * 
+ * Características:
+ * - Design responsivo com Vaadin AppLayout
+ * - Navegação dinâmica baseada em permissões
+ * - Alternância de tema persistente
+ * - Suporte a múltiplos idiomas
+ * - Integração com sistema de segurança
+ * 
+ * @author Rodrigo Pinheiro
+ * @since 1.0
+ */
 @Layout
 @AnonymousAllowed
 public class MainLayout extends AppLayout {

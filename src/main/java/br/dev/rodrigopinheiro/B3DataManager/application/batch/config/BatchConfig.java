@@ -16,6 +16,26 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
+/**
+ * Configuração principal do Spring Batch para processamento de operações financeiras.
+ * 
+ * Centraliza a configuração de jobs e steps para processamento em lote, incluindo:
+ * - Job de processamento de operações
+ * - Step de transformação de dados
+ * - Configuração de chunk processing
+ * - Integração com transações
+ * 
+ * Características:
+ * - Processamento em chunks de 10 itens
+ * - Transações gerenciadas automaticamente
+ * - Reader, Processor e Writer configuráveis
+ * - Integração com JobRepository
+ * - Suporte a restart e recovery
+ * - Logging detalhado de execução
+ * 
+ * @author Rodrigo Pinheiro
+ * @since 1.0
+ */
 @Configuration
 @EnableBatchProcessing
 public class BatchConfig {

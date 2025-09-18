@@ -54,7 +54,6 @@ class OperacaoRepositoryAdapterIntegrationTest {
         usuario1.setUsername("user1");
         usuario1.setEmail("user1@test.com");
         usuario1.setPassword("password");
-        usuario1.setDeletado(false);
         
         when(usuarioRepository.findById(1L)).thenReturn(java.util.Optional.of(usuario1));
     }
@@ -74,9 +73,9 @@ class OperacaoRepositoryAdapterIntegrationTest {
             false, false, null, false, new UsuarioId(1L)
         );
         
-        when(operacaoMapper.toJpaEntity(operacao)).thenReturn(operacaoEntity);
+        when(operacaoMapper.toEntity(operacao)).thenReturn(operacaoEntity);
         when(jpaRepository.save(operacaoEntity)).thenReturn(operacaoEntity);
-        when(operacaoMapper.toDomainEntity(operacaoEntity)).thenReturn(operacaoComId);
+        when(operacaoMapper.toDomain(operacaoEntity)).thenReturn(operacaoComId);
         when(jpaRepository.findById(1L)).thenReturn(Optional.of(operacaoEntity));
         
         // Act - Salvar
@@ -140,7 +139,7 @@ class OperacaoRepositoryAdapterIntegrationTest {
         
         when(jpaRepository.findByIdOriginalAndUsuario_Id(idOriginal, usuarioId.value()))
             .thenReturn(Optional.of(jpaEntity));
-        when(operacaoMapper.toDomainEntity(jpaEntity)).thenReturn(operacaoEsperada);
+        when(operacaoMapper.toDomain(jpaEntity)).thenReturn(operacaoEsperada);
         
         // Act
         Optional<Operacao> resultado = repositoryAdapter.findByIdOriginalAndUsuarioId(idOriginal, usuarioId);
@@ -177,9 +176,9 @@ class OperacaoRepositoryAdapterIntegrationTest {
             false, false, null, false, new UsuarioId(1L)
         );
         
-        when(operacaoMapper.toJpaEntity(operacao)).thenReturn(operacaoEntity);
+        when(operacaoMapper.toEntity(operacao)).thenReturn(operacaoEntity);
         when(jpaRepository.save(operacaoEntity)).thenReturn(operacaoEntity);
-        when(operacaoMapper.toDomainEntity(operacaoEntity)).thenReturn(operacaoSalva);
+        when(operacaoMapper.toDomain(operacaoEntity)).thenReturn(operacaoSalva);
         when(jpaRepository.findById(1L)).thenReturn(Optional.of(operacaoEntity));
         
         // Act

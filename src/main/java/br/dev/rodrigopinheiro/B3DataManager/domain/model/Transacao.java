@@ -281,4 +281,3 @@ public class Transacao {
         this.deletado = deletado;
     }
 }
-

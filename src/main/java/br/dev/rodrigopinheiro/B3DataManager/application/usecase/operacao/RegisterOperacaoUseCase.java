@@ -126,7 +126,7 @@ public class RegisterOperacaoUseCase {
         entity.setPrecoUnitario(operacao.getPrecoUnitario().getValue());
         entity.setValorOperacao(operacao.getValorOperacao().getValue());
         entity.setDuplicado(operacao.getDuplicado());
-        entity.setDimensionado(operacao.getDimensionado());
+        entity.setProcessado(operacao.getProcessado());
         entity.setIdOriginal(operacao.getIdOriginal());
         entity.setDeletado(operacao.getDeletado());
         

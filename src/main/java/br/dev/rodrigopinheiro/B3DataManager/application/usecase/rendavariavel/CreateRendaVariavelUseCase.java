@@ -4,15 +4,12 @@ import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroVari
 import br.dev.rodrigopinheiro.B3DataManager.domain.model.AtivoFinanceiro;
 import br.dev.rodrigopinheiro.B3DataManager.domain.model.RendaVariavel;
 import br.dev.rodrigopinheiro.B3DataManager.domain.port.AtivoFinanceiroRepositoryPort;
-import br.dev.rodrigopinheiro.B3DataManager.domain.port.RendaVariavelRepositoryPort;
+import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CreateRendaVariavelUseCase {
-
-    @Autowired
-    private RendaVariavelRepositoryPort rendaVariavelRepository;
 
     @Autowired
     private AtivoFinanceiroRepositoryPort ativoFinanceiroRepository;
@@ -41,15 +38,15 @@ public class CreateRendaVariavelUseCase {
             throw new IllegalArgumentException("Não é possível criar renda variável para um ativo deletado");
         }
 
-        // Criar a renda variável
-        RendaVariavel rendaVariavel = new RendaVariavel();
-        rendaVariavel.setTicker(request.getTicker().trim().toUpperCase());
-        rendaVariavel.setTipoAtivoFinanceiroVariavel(request.getTipoAtivoFinanceiroVariavel());
-        rendaVariavel.setAtivoFinanceiro(ativoFinanceiro);
-        rendaVariavel.setDeletado(false);
+        // Verificar se o ativo é do tipo renda variável
+        if (ativoFinanceiro.getTipoAtivo() != TipoAtivo.RENDA_VARIAVEL) {
+            throw new IllegalArgumentException("O ativo financeiro deve ser do tipo RENDA_VARIAVEL");
+        }
 
-        // Salvar e retornar
-        return rendaVariavelRepository.save(rendaVariavel);
+        // Criar uma nova instância de RendaVariavel
+        RendaVariavel rendaVariavel = new RendaVariavel();
+        rendaVariavel.setAtivoFinanceiro(ativoFinanceiro);
+        return rendaVariavel;
     }
 
     public static class CreateRendaVariavelRequest {

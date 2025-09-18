@@ -6,7 +6,7 @@ import br.dev.rodrigopinheiro.B3DataManager.application.service.RendaVariavelSer
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroVariavel;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.ServiceException;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
+import br.dev.rodrigopinheiro.B3DataManager.domain.model.AtivoRendaVariavel;
 import br.dev.rodrigopinheiro.B3DataManager.presentation.dto.AtivoAcaoDTO;
 import br.dev.rodrigopinheiro.B3DataManager.presentation.view.components.PaginationHelper;
 import br.dev.rodrigopinheiro.B3DataManager.presentation.view.components.ToastNotification;
@@ -232,8 +232,8 @@ public class GridwithFiltersAcoesView extends Div
             );
             totalAmountOfPages = PaginationHelper.calculateTotalPages(totalRegistros, itemsPerPage);
 
-            // 3) Busca página de RendaVariavel já com filtros aplicados
-            List<RendaVariavelEntity> rendasPaginadas = rendaVariavelService.findWithFiltersIn(
+            // 3) Busca página de AtivoRendaVariavel já com filtros aplicados
+            List<AtivoRendaVariavel> rendasPaginadas = rendaVariavelService.findWithFiltersIn(
                     tiposAcoes,
                     filters.nome.getValue(),
                     filters.startDate.getValue(),

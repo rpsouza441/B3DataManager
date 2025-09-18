@@ -12,6 +12,23 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+/**
+ * Classe principal da aplicação B3DataManager.
+ * 
+ * Sistema de gerenciamento de dados financeiros da B3 (Brasil, Bolsa, Balcão)
+ * que permite importação, processamento e análise de operações financeiras.
+ * 
+ * Características principais:
+ * - Interface web moderna com Vaadin
+ * - Processamento em lote com Spring Batch
+ * - Arquitetura hexagonal
+ * - Gestão de portfólio e transações
+ * - Integração com APIs externas
+ * - Relatórios fiscais (DARF)
+ * 
+ * @author Rodrigo Pinheiro
+ * @since 1.0
+ */
 @Push
 @SpringBootApplication
 @NpmPackage(value = "@fontsource/roboto-condensed", version = "4.5.0")

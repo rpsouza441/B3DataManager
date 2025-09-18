@@ -1,7 +1,9 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.model;
 
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.Roles;
+import br.dev.rodrigopinheiro.B3DataManager.domain.enums.StatusConta;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 public class Usuario {
@@ -13,12 +15,12 @@ public class Usuario {
     private Set<Roles> roles;
     private Set<Instituicao> instituicoes;
     private Portfolio portfolio;
-    private Boolean deletado = false;
+    private StatusConta statusConta = StatusConta.ATIVA;
 
     public Usuario() {
     }
 
-    public Usuario(Long id, String username, String password, String email, Set<Roles> roles, Set<Instituicao> instituicoes, Portfolio portfolio, Boolean deletado) {
+    public Usuario(Long id, String username, String password, String email, Set<Roles> roles, Set<Instituicao> instituicoes, Portfolio portfolio, StatusConta statusConta) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -26,7 +28,7 @@ public class Usuario {
         this.roles = roles;
         this.instituicoes = instituicoes;
         this.portfolio = portfolio;
-        this.deletado = deletado;
+        this.statusConta = statusConta;
     }
 
     public Long getId() {
@@ -85,12 +87,14 @@ public class Usuario {
         this.portfolio = portfolio;
     }
 
-    public Boolean getDeletado() {
-        return deletado;
+    public StatusConta getStatusConta() {
+        return statusConta;
     }
 
-    public void setDeletado(Boolean deletado) {
-        this.deletado = deletado;
+    public void setStatusConta(StatusConta statusConta) {
+        this.statusConta = statusConta;
     }
+
+
     
 }

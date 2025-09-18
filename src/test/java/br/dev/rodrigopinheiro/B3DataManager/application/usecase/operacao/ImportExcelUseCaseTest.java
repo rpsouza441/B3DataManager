@@ -262,16 +262,13 @@ class ImportExcelUseCaseTest {
         @Test
         @DisplayName("Deve rejeitar stream nulo")
         void deveRejeitarStreamNulo() {
-            // Arrange
-            ImportExcelCommand commandStreamNulo = new ImportExcelCommand(null, usuarioId);
-            
-            // Act & Assert
+            // Act & Assert - A exceção é lançada no construtor do ImportExcelCommand
             IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> importExcelUseCase.execute(commandStreamNulo)
+                () -> new ImportExcelCommand(null, usuarioId)
             );
             
-            assertEquals("InputStream não pode ser nulo", exception.getMessage());
+            assertEquals("InputStream do arquivo Excel é obrigatório", exception.getMessage());
         }
         
         @Test
@@ -279,15 +276,14 @@ class ImportExcelUseCaseTest {
         void deveRejeitarUsuarioNulo() throws IOException {
             // Arrange
             InputStream excelStream = createValidExcelStream();
-            ImportExcelCommand commandUsuarioNulo = new ImportExcelCommand(excelStream, null);
             
-            // Act & Assert
+            // Act & Assert - A exceção é lançada no construtor do ImportExcelCommand
             IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> importExcelUseCase.execute(commandUsuarioNulo)
+                () -> new ImportExcelCommand(excelStream, null)
             );
             
-            assertEquals("Usuário é obrigatório", exception.getMessage());
+            assertEquals("ID do usuário é obrigatório", exception.getMessage());
         }
     }
     
@@ -298,8 +294,13 @@ class ImportExcelUseCaseTest {
         @Test
         @DisplayName("Deve tratar erro de leitura do Excel")
         void deveTratarErroDeleituraDoExcel() {
-            // Arrange
-            InputStream invalidStream = new ByteArrayInputStream("conteudo invalido".getBytes());
+            // Arrange - Criando um stream que realmente cause IOException no Apache POI
+            InputStream invalidStream = new InputStream() {
+                @Override
+                public int read() throws IOException {
+                    throw new IOException("Stream corrompido");
+                }
+            };
             validCommand = new ImportExcelCommand(invalidStream, usuarioId);
             
             // Act & Assert
@@ -341,13 +342,18 @@ class ImportExcelUseCaseTest {
             when(registerOperacaoUseCase.execute(any(RegisterOperacaoCommand.class)))
                 .thenThrow(new RuntimeException("Erro inesperado"));
             
-            // Act & Assert
-            ExcelProcessingException exception = assertThrows(
-                ExcelProcessingException.class,
-                () -> importExcelUseCase.execute(validCommand)
-            );
+            // Act
+            ImportExcelResult result = importExcelUseCase.execute(validCommand);
             
-            assertTrue(exception.getMessage().contains("Erro inesperado durante importação"));
+            // Assert
+            assertTrue(result.hasErrors());
+            assertEquals(2, result.processedRows());
+            assertEquals(0, result.successfulRows());
+            assertEquals(2, result.errors().size());
+            
+            result.errors().forEach(error -> {
+                assertTrue(error.errorMessage().contains("Erro interno: Erro inesperado"));
+            });
         }
     }
     

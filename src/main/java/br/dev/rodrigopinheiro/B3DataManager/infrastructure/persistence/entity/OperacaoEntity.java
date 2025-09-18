@@ -1,24 +1,41 @@
 package br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
 /**
- * Entidade JPA que representa uma operação na camada de infraestrutura.
- * Espelho da entidade de domínio para persistência.
+ * Entidade JPA que representa uma operação financeira na camada de infraestrutura.
+ * 
+ * Centraliza todas as informações relacionadas a operações de mercado, incluindo:
+ * - Dados da operação (entrada/saída, data, movimentação)
+ * - Informações do produto e instituição
+ * - Valores financeiros (quantidade, preço, valor total)
+ * - Controles de processamento e duplicação
+ * - Relacionamento com usuário proprietário
+ * 
+ * Características:
+ * - Espelho da entidade de domínio para persistência
+ * - Auditoria automática via AuditableEntity
+ * - Soft delete para manter integridade
+ * - Controle de duplicação e processamento
+ * - Relacionamento lazy com usuário
+ * - Suporte a operações de importação em lote
+ * 
+ * @author Rodrigo Pinheiro
+ * @since 1.0
  */
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@ToString(callSuper = true)
 @Entity
 @Table(name = "operacao")
-public class OperacaoEntity {
+public class OperacaoEntity extends AuditableEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,8 +71,8 @@ public class OperacaoEntity {
     @Column(name = "duplicado", nullable = false)
     private Boolean duplicado = false;
     
-    @Column(name = "dimensionado", nullable = false)
-    private Boolean dimensionado = false;
+    @Column(name = "processado", nullable = false)
+    private Boolean processado = false;
     
     @Column(name = "id_original", nullable = true)
     private Long idOriginal;
@@ -67,7 +84,7 @@ public class OperacaoEntity {
     @JoinColumn(name = "usuario_id", nullable = false)
     private UsuarioEntity usuario;
     
-    // Mantém campo para compatibilidade com queries existentes
+    // Campo para facilitar consultas sem carregar a entidade completa
     @Column(name = "usuario_id", insertable = false, updatable = false)
     private Long usuarioId;
     
@@ -75,7 +92,7 @@ public class OperacaoEntity {
     public OperacaoEntity(String entradaSaida, LocalDate data, String movimentacao,
                           String produto, String instituicao, double quantidade,
                           BigDecimal precoUnitario, BigDecimal valorOperacao,
-                          Boolean duplicado, Boolean dimensionado, Long idOriginal,
+                          Boolean duplicado, Boolean processado, Long idOriginal,
                           Boolean deletado, UsuarioEntity usuario) {
         this.entradaSaida = entradaSaida;
         this.data = data;
@@ -86,7 +103,7 @@ public class OperacaoEntity {
         this.precoUnitario = precoUnitario;
         this.valorOperacao = valorOperacao;
         this.duplicado = duplicado;
-        this.dimensionado = dimensionado;
+        this.processado = processado;
         this.idOriginal = idOriginal;
         this.deletado = deletado;
         this.usuario = usuario;
@@ -96,7 +113,7 @@ public class OperacaoEntity {
     public OperacaoEntity(String entradaSaida, LocalDate data, String movimentacao,
                           String produto, String instituicao, double quantidade,
                           BigDecimal precoUnitario, BigDecimal valorOperacao,
-                          Boolean duplicado, Boolean dimensionado, Long idOriginal,
+                          Boolean duplicado, Boolean processado, Long idOriginal,
                           Boolean deletado, Long usuarioId) {
         this.entradaSaida = entradaSaida;
         this.data = data;
@@ -107,7 +124,7 @@ public class OperacaoEntity {
         this.precoUnitario = precoUnitario;
         this.valorOperacao = valorOperacao;
         this.duplicado = duplicado;
-        this.dimensionado = dimensionado;
+        this.processado = processado;
         this.idOriginal = idOriginal;
         this.deletado = deletado;
         this.usuarioId = usuarioId;
@@ -127,15 +144,5 @@ public class OperacaoEntity {
         return Objects.hash(id);
     }
     
-    @Override
-    public String toString() {
-        return "OperacaoJpaEntity{" +
-                "id=" + id +
-                ", produto='" + produto + '\'' +
-                ", data=" + data +
-                ", quantidade=" + quantidade +
-                ", valorOperacao=" + valorOperacao +
-                ", usuarioId=" + (usuario != null ? usuario.getId() : usuarioId) +
-                '}';
-    }
+
 }

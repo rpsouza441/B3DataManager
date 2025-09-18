@@ -15,21 +15,21 @@ import java.util.Objects;
  */
 public class Operacao {
     
-    private final Long id;
-    private final String entradaSaida;
-    private final LocalDate data;
-    private final String movimentacao;
-    private final String produto;
-    private final String instituicao;
-    private final Quantidade quantidade;
-    private final Dinheiro precoUnitario;
-    private final Dinheiro valorOperacao;  // Valor original da B3
-    private final Dinheiro valorCalculado; // Valor calculado (quantidade × preço)
-    private final Boolean duplicado;
-    private final Boolean dimensionado;
-    private final Long idOriginal;
-    private final Boolean deletado;
-    private final UsuarioId usuarioId;
+    private Long id;
+    private String entradaSaida;
+    private LocalDate data;
+    private String movimentacao;
+    private String produto;
+    private String instituicao;
+    private Quantidade quantidade;
+    private Dinheiro precoUnitario;
+    private Dinheiro valorOperacao;  // Valor original da B3
+    private Dinheiro valorCalculado; // Valor calculado (quantidade × preço)
+    private Boolean duplicado;
+    private Boolean processado; // Renomeado de dimensionado
+    private Long idOriginal;
+    private Boolean deletado;
+    private UsuarioId usuarioId;
     
     // Constante removida: TOLERANCIA_VALOR
     // Não é mais necessária pois removemos a validação de coerência de valor
@@ -37,7 +37,7 @@ public class Operacao {
     public Operacao(Long id, String entradaSaida, LocalDate data, String movimentacao,
                    String produto, String instituicao, Quantidade quantidade,
                    Dinheiro precoUnitario, Dinheiro valorOperacao, Boolean duplicado,
-                   Boolean dimensionado, Long idOriginal, Boolean deletado, UsuarioId usuarioId) {
+                   Boolean processado, Long idOriginal, Boolean deletado, UsuarioId usuarioId) {
         
         // Validar invariantes
         validarInvariantes(data, quantidade, precoUnitario, valorOperacao, usuarioId);
@@ -57,7 +57,7 @@ public class Operacao {
         this.valorOperacao = valorOperacao;  // Valor original da B3
         this.valorCalculado = calcularValorCorreto(quantidade, precoUnitario); // Valor calculado
         this.duplicado = duplicado != null ? duplicado : false;
-        this.dimensionado = dimensionado != null ? dimensionado : false;
+        this.processado = processado != null ? processado : false;
         this.idOriginal = idOriginal;
         this.deletado = deletado != null ? deletado : false;
         this.usuarioId = usuarioId;
@@ -174,8 +174,8 @@ public class Operacao {
         return duplicado;
     }
     
-    public Boolean getDimensionado() {
-        return dimensionado;
+    public Boolean getProcessado() {
+        return processado;
     }
     
     public Long getIdOriginal() {
@@ -188,6 +188,74 @@ public class Operacao {
     
     public UsuarioId getUsuarioId() {
         return usuarioId;
+    }
+        
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
+    public void setEntradaSaida(String entradaSaida) {
+        this.entradaSaida = entradaSaida;
+    }
+    
+    public void setData(LocalDate data) {
+        this.data = data;
+    }
+    
+    public void setMovimentacao(String movimentacao) {
+        this.movimentacao = movimentacao;
+    }
+    
+    public void setProduto(String produto) {
+        this.produto = produto;
+    }
+    
+    public void setInstituicao(String instituicao) {
+        this.instituicao = instituicao;
+    }
+    
+    public void setQuantidade(Quantidade quantidade) {
+        this.quantidade = quantidade;
+        // Recalcular valor quando quantidade muda
+        if (this.precoUnitario != null) {
+            this.valorCalculado = calcularValorCorreto(quantidade, this.precoUnitario);
+        }
+    }
+    
+    public void setPrecoUnitario(Dinheiro precoUnitario) {
+        this.precoUnitario = precoUnitario;
+        // Recalcular valor quando preço muda
+        if (this.quantidade != null) {
+            this.valorCalculado = calcularValorCorreto(this.quantidade, precoUnitario);
+        }
+    }
+    
+    public void setValorOperacao(Dinheiro valorOperacao) {
+        this.valorOperacao = valorOperacao;
+    }
+    
+    public void setValorCalculado(Dinheiro valorCalculado) {
+        this.valorCalculado = valorCalculado;
+    }
+    
+    public void setDuplicado(Boolean duplicado) {
+        this.duplicado = duplicado;
+    }
+    
+    public void setProcessado(Boolean processado) {
+        this.processado = processado;
+    }
+    
+    public void setIdOriginal(Long idOriginal) {
+        this.idOriginal = idOriginal;
+    }
+    
+    public void setDeletado(Boolean deletado) {
+        this.deletado = deletado;
+    }
+    
+    public void setUsuarioId(UsuarioId usuarioId) {
+        this.usuarioId = usuarioId;
     }
     
     @Override

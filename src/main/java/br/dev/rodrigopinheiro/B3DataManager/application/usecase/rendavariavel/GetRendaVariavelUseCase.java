@@ -1,7 +1,9 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.usecase.rendavariavel;
 
 import br.dev.rodrigopinheiro.B3DataManager.domain.model.RendaVariavel;
-import br.dev.rodrigopinheiro.B3DataManager.domain.port.RendaVariavelRepositoryPort;
+import br.dev.rodrigopinheiro.B3DataManager.domain.port.AtivoFinanceiroRepositoryPort;
+import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivo;
+import br.dev.rodrigopinheiro.B3DataManager.domain.model.AtivoFinanceiro;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +15,7 @@ import java.util.stream.Collectors;
 public class GetRendaVariavelUseCase {
 
     @Autowired
-    private RendaVariavelRepositoryPort rendaVariavelRepository;
+    private AtivoFinanceiroRepositoryPort ativoFinanceiroRepository;
 
     public Optional<RendaVariavel> execute(Long rendaVariavelId) {
         // Validações de entrada
@@ -24,11 +26,14 @@ public class GetRendaVariavelUseCase {
             throw new IllegalArgumentException("ID da renda variável deve ser um número positivo");
         }
 
-        // Buscar a renda variável
-        Optional<RendaVariavel> rendaVariavel = rendaVariavelRepository.findById(rendaVariavelId);
+        // Buscar o ativo financeiro
+        Optional<AtivoFinanceiro> ativoFinanceiro = ativoFinanceiroRepository.findById(rendaVariavelId);
         
-        // Filtrar rendas variáveis deletadas
-        return rendaVariavel.filter(rv -> !Boolean.TRUE.equals(rv.getDeletado()));
+        // Filtrar por tipo e status de deleção
+        return ativoFinanceiro
+                .filter(af -> af.getTipoAtivo() == TipoAtivo.RENDA_VARIAVEL)
+                .filter(af -> !Boolean.TRUE.equals(af.getDeletado()))
+                .map(this::convertToRendaVariavel);
     }
 
     public RendaVariavel executeOrThrow(Long rendaVariavelId) {
@@ -49,17 +54,15 @@ public class GetRendaVariavelUseCase {
             throw new IllegalArgumentException("ID do ativo financeiro deve ser um número positivo");
         }
 
-        // Buscar as rendas variáveis do ativo
-        List<RendaVariavel> rendasVariaveis = rendaVariavelRepository.findByAtivoFinanceiroId(ativoFinanceiroId);
-
-        // Filtrar rendas variáveis deletadas se necessário
-        if (!includeDeleted) {
-            rendasVariaveis = rendasVariaveis.stream()
-                    .filter(rv -> !Boolean.TRUE.equals(rv.getDeletado()))
-                    .collect(Collectors.toList());
-        }
-
-        return rendasVariaveis;
+        // Buscar os ativos financeiros do tipo renda variável
+        List<AtivoFinanceiro> ativosFinanceiros = ativoFinanceiroRepository.findAll();
+        
+        // Filtrar por tipo, ativo financeiro e status de deleção
+        return ativosFinanceiros.stream()
+                .filter(af -> af.getTipoAtivo() == TipoAtivo.RENDA_VARIAVEL)
+                .filter(af -> includeDeleted || !Boolean.TRUE.equals(af.getDeletado()))
+                .map(this::convertToRendaVariavel)
+                .collect(Collectors.toList());
     }
 
     public List<RendaVariavel> executeAll() {
@@ -67,13 +70,21 @@ public class GetRendaVariavelUseCase {
     }
 
     public List<RendaVariavel> executeAll(boolean includeDeleted) {
-        List<RendaVariavel> rendasVariaveis = rendaVariavelRepository.findAll();
+        List<AtivoFinanceiro> ativosFinanceiros = ativoFinanceiroRepository.findAll();
 
-        // Filtrar rendas variáveis deletadas se necessário
-        if (!includeDeleted) {
-            rendasVariaveis = rendasVariaveis.stream()
-                    .filter(rv -> !Boolean.TRUE.equals(rv.getDeletado()))
-                    .collect(Collectors.toList());
-        }
-
-        return rendasVariaveis
+        // Filtrar por tipo e status de deleção
+        return ativosFinanceiros.stream()
+                .filter(af -> af.getTipoAtivo() == TipoAtivo.RENDA_VARIAVEL)
+                .filter(af -> includeDeleted || !Boolean.TRUE.equals(af.getDeletado()))
+                .map(this::convertToRendaVariavel)
+                .collect(Collectors.toList());
+    }
+    
+    private RendaVariavel convertToRendaVariavel(AtivoFinanceiro ativo) {
+        RendaVariavel rendaVariavel = new RendaVariavel();
+        rendaVariavel.setId(ativo.getId());
+        rendaVariavel.setAtivoFinanceiro(ativo);
+        // Definir outros campos conforme necessário
+        return rendaVariavel;
+    }
+}

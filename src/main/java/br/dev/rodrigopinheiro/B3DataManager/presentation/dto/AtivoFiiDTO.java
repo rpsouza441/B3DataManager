@@ -7,7 +7,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
+import br.dev.rodrigopinheiro.B3DataManager.domain.model.AtivoRendaVariavel;
 
 @Builder
 @Data
@@ -22,16 +22,20 @@ public class AtivoFiiDTO {
     private BigDecimal porcentagem; // porcentagem do portfólio
 
     /**
-     * Converte uma entidade RendaVariavel para um DTO AtivoFiiDTO,
+     * Converte um AtivoRendaVariavel para um DTO AtivoFiiDTO,
      * calculando o total investido neste ativo e a porcentagem do portfólio.
      *
-     * @param rv             Registro de RendaVariavel
+     * @param rv             Registro de AtivoRendaVariavel
      * @param totalInvestido Total investido em FIIs no portfólio do usuário
      * @return AtivoFiiDTO correspondente
      */
-    public static AtivoFiiDTO from(RendaVariavelEntity rv, BigDecimal totalInvestido) {
-        BigDecimal totalDoAtivo = rv.getPrecoUnitario()
-                .multiply(BigDecimal.valueOf(rv.getQuantidade()))
+    public static AtivoFiiDTO from(AtivoRendaVariavel rv, BigDecimal totalInvestido) {
+        // TODO: Obter quantidade e preço das Posições ou Transações relacionadas ao ativo
+        double quantidade = 0.0; // rv.getQuantidade() não existe
+        BigDecimal precoUnitario = BigDecimal.ZERO; // rv.getPrecoUnitario() não existe
+        
+        BigDecimal totalDoAtivo = precoUnitario
+                .multiply(BigDecimal.valueOf(quantidade))
                 .setScale(2, RoundingMode.HALF_UP);
         BigDecimal porcentagem = BigDecimal.ZERO;
         if (totalInvestido.compareTo(BigDecimal.ZERO) > 0) {
@@ -40,9 +44,9 @@ public class AtivoFiiDTO {
                     .setScale(2, RoundingMode.HALF_UP);
         }
         return AtivoFiiDTO.builder()
-                .nome(rv.getAtivoFinanceiro().getNome())
-                .quantidade(rv.getQuantidade())
-                .precoMedio(rv.getPrecoUnitario().setScale(2, RoundingMode.HALF_UP))
+                .nome(rv.getNome())
+                .quantidade(quantidade)
+                .precoMedio(precoUnitario.setScale(2, RoundingMode.HALF_UP))
                 .precoAtual(null)  // Será atualizado posteriormente via API
                 .variacao(null)    // Será calculado posteriormente via API
                 .total(totalDoAtivo)

@@ -6,7 +6,7 @@ import br.dev.rodrigopinheiro.B3DataManager.application.service.RendaVariavelSer
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroVariavel;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.ServiceException;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
+import br.dev.rodrigopinheiro.B3DataManager.domain.model.AtivoRendaVariavel;
 import br.dev.rodrigopinheiro.B3DataManager.presentation.dto.AtivoFiiDTO;
 import br.dev.rodrigopinheiro.B3DataManager.presentation.view.components.PaginationHelper;
 import br.dev.rodrigopinheiro.B3DataManager.presentation.view.components.ToastNotification;
@@ -286,7 +286,7 @@ public class GridwithFiltersFiiView extends Div implements HasDynamicTitle, HasU
             );
 
             // 2. Busca paginada dos FIIs com os filtros (e com o tipo FII fixo)
-            List<RendaVariavelEntity> ativos = rendaVariavelService.findWithFilters(
+            List<AtivoRendaVariavel> ativos = rendaVariavelService.findWithFilters(
                     TipoAtivoFinanceiroVariavel.FII.name(),
                     filters.nome.getValue(),
                     filters.startDate.getValue(),
@@ -301,7 +301,7 @@ public class GridwithFiltersFiiView extends Div implements HasDynamicTitle, HasU
             // 3. Calcula o total investido em FIIs (todos os registros do usuário do tipo FII)
             BigDecimal totalInvestidoEmFiis = rendaVariavelService.calcularTotalInvestidoEmFiis(usuarioId);
 
-            // 4. Converte os registros (RendaVariavel) para DTO (AtivoFiiDTO) passando o total investido para o cálculo da porcentagem
+            // 4. Converte os registros (AtivoRendaVariavel) para DTO (AtivoFiiDTO) passando o total investido para o cálculo da porcentagem
             List<AtivoFiiDTO> ativosDTO = ativos.stream()
                     .map(rv -> AtivoFiiDTO.from(rv, totalInvestidoEmFiis))
                     .toList();

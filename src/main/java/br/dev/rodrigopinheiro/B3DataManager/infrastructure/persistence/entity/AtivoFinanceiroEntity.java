@@ -5,22 +5,26 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * Infrastructure Entity - AtivoFinanceiroEntity (Arquitetura Corrigida)
+ * Infrastructure Entity - AtivoFinanceiroEntity (SINGLE_TABLE Strategy)
  * 
- * Representa um ativo financeiro unificado que pode ser:
- * - Renda Variável (ACAO, FII, ETF)
- * - Renda Fixa (CDB, LCI, TESOURO)
+ * Classe abstrata base para hierarquia de ativos financeiros.
+ * Implementa padrão SINGLE_TABLE para máxima performance.
  * 
- * Características da arquitetura corrigida:
- * - Uso de enums tipados (TipoAtivo)
- * - Type safety completa
- * - Sem propriedades genéricas (Map<String, Object>)
- * - JPA Entity para persistência
+ * Subclasses:
+ * - AtivoRendaFixaEntity: CDBs, Tesouro Direto, LCI/LCA, etc.
+ * - AtivoRendaVariavelEntity: Ações, FIIs, ETFs, BDRs, etc.
+ * 
+ * Características:
+ * - SINGLE_TABLE: Uma tabela para todos os tipos
+ * - Discriminator: Campo tipo_ativo identifica o tipo
+ * - Performance: Consultas sem JOINs
+ * - Flexibilidade: Campos específicos nullable
  */
 @Getter
 @Setter
@@ -33,7 +37,9 @@ import java.util.Objects;
     @Index(name = "idx_ativo_tipo", columnList = "tipo_ativo"),
     @Index(name = "idx_ativo_portfolio", columnList = "portfolio_id")
 })
-public class AtivoFinanceiroEntity {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tipo_ativo", discriminatorType = DiscriminatorType.STRING)
+public abstract class AtivoFinanceiroEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,57 +58,60 @@ public class AtivoFinanceiroEntity {
     @Column(name = "nome", nullable = false, length = 200)
     private String nome;
 
-    /**
-     * Tipo do ativo (RENDA_FIXA, RENDA_VARIAVEL)
-     * Enum tipado para classificação segura
-     */
-    @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_ativo", nullable = false, length = 20)
-    private TipoAtivo tipoAtivo;
 
     /**
-     * Referência ao portfolio
+     * Referência ao portfolio (agregado raiz)
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "portfolio_id", nullable = false)
     private PortfolioEntity portfolio;
 
     /**
-     * Transações relacionadas ao ativo (Opção 1: histórico)
+     * Transações relacionadas a este ativo
      */
     @OneToMany(mappedBy = "ativoFinanceiro", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude // Evita loops
     private List<TransacaoEntity> transacoes = new ArrayList<>();
 
     /**
-     * Posições atuais do ativo (Opção 1: estado atual)
+     * Posições relacionadas a este ativo
      */
     @OneToMany(mappedBy = "ativoFinanceiro", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude // Evita loops
     private List<PosicaoEntity> posicoes = new ArrayList<>();
 
     /**
-     * Flag de controle para soft delete
+     * Indica se o ativo foi deletado (soft delete)
      */
     @Column(name = "deletado", nullable = false)
-    private Boolean deletado = false;
+    private boolean deletado = false;
 
+    // Métodos abstratos para polimorfismo
+    
     /**
-     * Métodos de negócio
+     * Retorna o tipo geral do ativo (RENDA_FIXA ou RENDA_VARIAVEL)
      */
+    public abstract TipoAtivo getTipoAtivo();
+    
+    /**
+     * Retorna uma descrição completa do ativo com informações específicas
+     */
+    public abstract String getDescricaoCompleta();
+    
+    // Métodos de negócio comuns
     
     /**
      * Verifica se é um ativo de renda variável
      */
     public boolean isRendaVariavel() {
-        return TipoAtivo.RENDA_VARIAVEL.equals(tipoAtivo);
+        return TipoAtivo.RENDA_VARIAVEL.equals(getTipoAtivo());
     }
     
     /**
      * Verifica se é um ativo de renda fixa
      */
     public boolean isRendaFixa() {
-        return TipoAtivo.RENDA_FIXA.equals(tipoAtivo);
+        return TipoAtivo.RENDA_FIXA.equals(getTipoAtivo());
     }
     
     /**
@@ -134,7 +143,7 @@ public class AtivoFinanceiroEntity {
     }
 
     @Override
-    public final boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null) return false;
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
@@ -145,7 +154,7 @@ public class AtivoFinanceiroEntity {
     }
 
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 }

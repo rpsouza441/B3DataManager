@@ -91,6 +91,11 @@ public class CheckDuplicateOperacaoUseCase {
      */
     @Transactional(readOnly = true, timeout = 30)
     public CheckDuplicateResult execute(CheckDuplicateCommand command) {
+        // Validação inicial
+        if (command == null) {
+            throw new IllegalArgumentException("Comando não pode ser nulo");
+        }
+        
         log.debug("Iniciando verificação de duplicidade para operação: data={}, produto={}, usuário={}", 
                  command.data(), command.produto(), command.usuarioId().value());
         
@@ -133,7 +138,7 @@ public class CheckDuplicateOperacaoUseCase {
         }
         
         if (command.produto() == null || command.produto().trim().isEmpty()) {
-            throw new IllegalArgumentException("Produto é obrigatório para verificação de duplicidade");
+            throw new IllegalArgumentException("Produto é obrigatório");
         }
         
         if (command.instituicao() == null || command.instituicao().trim().isEmpty()) {

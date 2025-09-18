@@ -23,7 +23,7 @@ import java.util.Objects;
  */
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -33,7 +33,7 @@ import java.util.Objects;
     @Index(name = "idx_transacao_portfolio", columnList = "portfolio_id"),
     @Index(name = "idx_transacao_tipo", columnList = "tipo_transacao")
 })
-public class TransacaoEntity {
+public class TransacaoEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -128,22 +128,19 @@ public class TransacaoEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "operacao_id")
     private OperacaoEntity operacao;
-
+    
     /**
-     * Controle de auditoria
+     * Referência ao DARF que incluiu esta transação (opcional)
+     * Preenchido quando a transação é incluída em um cálculo de imposto
      */
-    @Column(name = "created_at", updatable = false)
-    private LocalDate createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDate updatedAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "darf_id")
+    private DarfEntity darf;
 
     // Métodos de ciclo de vida JPA
     
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDate.now();
-        this.updatedAt = LocalDate.now();
         if (this.ativo == null) {
             this.ativo = true;
         }
@@ -155,7 +152,6 @@ public class TransacaoEntity {
     
     @PreUpdate
     protected void onUpdate() {
-        this.updatedAt = LocalDate.now();
         calcularValores();
     }
     
@@ -212,6 +208,27 @@ public class TransacaoEntity {
             throw new IllegalArgumentException("Instituição não pode ser nula.");
         }
         this.instituicao = instituicao;
+    }
+    
+    /**
+     * Associa um DARF à transação
+     */
+    public void associarDarf(DarfEntity darf) {
+        this.darf = darf;
+    }
+    
+    /**
+     * Getter para DARF
+     */
+    public DarfEntity getDarf() {
+        return darf;
+    }
+    
+    /**
+     * Setter para DARF
+     */
+    public void setDarf(DarfEntity darf) {
+        this.darf = darf;
     }
 
     @Override

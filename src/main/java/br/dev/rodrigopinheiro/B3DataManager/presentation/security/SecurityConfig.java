@@ -15,8 +15,29 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@EnableWebSecurity
+/**
+ * Configuração de segurança do sistema B3DataManager.
+ * 
+ * Centraliza todas as configurações relacionadas à segurança, incluindo:
+ * - Autenticação e autorização
+ * - Configuração de endpoints protegidos
+ * - Integração com Vaadin Security
+ * - Configuração de encoders de senha
+ * - Headers de segurança
+ * 
+ * Características:
+ * - Integração com VaadinWebSecurity
+ * - BCrypt para hash de senhas
+ * - Configuração de CSRF e headers
+ * - Proteção de rotas Vaadin
+ * - Suporte a diferentes métodos HTTP
+ * - Configuração de UserDetailsService
+ * 
+ * @author Rodrigo Pinheiro
+ * @since 1.0
+ */
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig extends VaadinWebSecurity {
 
     private final RouteUtil routeUtil;

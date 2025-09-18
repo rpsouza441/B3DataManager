@@ -15,6 +15,27 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+/**
+ * Service responsável pela gestão de instituições financeiras do sistema.
+ * 
+ * Centraliza todas as operações relacionadas a instituições, incluindo:
+ * - Cadastro e validação de novas instituições
+ * - Associação com usuários proprietários
+ * - Operações CRUD com validações de negócio
+ * - Verificação e criação automática de instituições
+ * - Gestão de relacionamentos com operações
+ * 
+ * Características:
+ * - Validação de nomes únicos por usuário
+ * - Soft delete para manter integridade referencial
+ * - Transações para consistência de dados
+ * - Suporte a internacionalização
+ * - Logging detalhado para auditoria
+ * - Criação automática quando necessário
+ * 
+ * @author Rodrigo Pinheiro
+ * @since 1.0
+ */
 @Slf4j
 @Service
 public class InstituicaoService {

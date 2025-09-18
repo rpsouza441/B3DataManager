@@ -129,6 +129,11 @@ public class ImportExcelUseCase {
      */
     @Transactional(timeout = 300) // 5 minutos para importações grandes
     public ImportExcelResult execute(ImportExcelCommand command) {
+        // Validação básica - as validações detalhadas estão no construtor do ImportExcelCommand
+        if (command == null) {
+            throw new IllegalArgumentException("Comando não pode ser nulo");
+        }
+        
         log.info("Iniciando importação Excel para usuário: {}", command.usuarioId().value());
         
         List<ExcelRowError> errors = new ArrayList<>();

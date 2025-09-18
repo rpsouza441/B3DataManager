@@ -5,10 +5,9 @@ import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroVari
 import java.math.BigDecimal;
 
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.OperacaoEntity;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaFixaEntity;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.RendaFixaRepository;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.RendaVariavelRepository;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoRendaFixaEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoRendaVariavelEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.AtivoFinanceiroRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -19,64 +18,56 @@ public class RendaFactory {
     private final ProdutoParser produtoParser;
     private final TipoAtivoFixaMapper tipoAtivoFixaMapper;
     private final TipoAtivoVariavelService tipoAtivoVariavelService;
-    private final RendaFixaRepository rendaFixaRepository;
-    private final RendaVariavelRepository rendaVariavelRepository;
+    private final AtivoFinanceiroRepository ativoFinanceiroRepository;
 
     public RendaFactory(ProdutoParser produtoParser,
                         TipoAtivoFixaMapper tipoAtivoFixaMapper,
-                        TipoAtivoVariavelService tipoAtivoVariavelService, RendaFixaRepository rendaFixaRepository, RendaVariavelRepository rendaVariavelRepository) {
+                        TipoAtivoVariavelService tipoAtivoVariavelService, 
+                        AtivoFinanceiroRepository ativoFinanceiroRepository) {
         this.produtoParser = produtoParser;
         this.tipoAtivoFixaMapper = tipoAtivoFixaMapper;
         this.tipoAtivoVariavelService = tipoAtivoVariavelService;
-        this.rendaFixaRepository = rendaFixaRepository;
-        this.rendaVariavelRepository = rendaVariavelRepository;
+        this.ativoFinanceiroRepository = ativoFinanceiroRepository;
     }
 
     /**
-     * Cria uma instância de RendaFixa com base na operação.
+     * Cria uma instância de AtivoRendaFixa com base na operação.
      *
      * @param operacao A operação importada, que contém informações do produto.
-     * @return A instância de RendaFixa devidamente configurada.
+     * @return A instância de AtivoRendaFixa devidamente configurada.
      */
-    public RendaFixaEntity criarRendaFixa(OperacaoEntity operacao) {
+    public AtivoRendaFixaEntity criarRendaFixa(OperacaoEntity operacao) {
         String produto = operacao.getProduto();
         
         // Criação e configuração da RendaFixa
-        RendaFixaEntity rendaFixa = new RendaFixaEntity();
+        AtivoRendaFixaEntity rendaFixa = new AtivoRendaFixaEntity();
         // Mapeia o tipo de ativo fixo a partir do produto
         TipoAtivoFinanceiroFixa tipoFixa = tipoAtivoFixaMapper.mapear(produto);
         log.debug("Tipo de renda fixa: {}", tipoFixa);
         rendaFixa.setTipoRendaFixa(tipoFixa);
-        // Para renda fixa, o preço unitário, data, quantidade e total vêm da transação
-        rendaFixa.setPrecoUnitario(operacao.getPrecoUnitario());
-        rendaFixa.setDataCompra(operacao.getData());
-        rendaFixa.setQuantidade(operacao.getQuantidade());
-        rendaFixa.setTotal(operacao.getPrecoUnitario()
-                .multiply(BigDecimal.valueOf(operacao.getQuantidade())));
-        return rendaFixaRepository.save(rendaFixa);
+        rendaFixa.setCodigo(produto);
+        rendaFixa.setNome(produto);
+        return ativoFinanceiroRepository.save(rendaFixa);
     }
 
     /**
-     * Cria uma instância de RendaVariavel com base na operação.
+     * Cria uma instância de AtivoRendaVariavel com base na operação.
      *
      * @param operacao A operação importada, que contém informações do produto.
-     * @return A instância de RendaVariavel devidamente configurada.
+     * @return A instância de AtivoRendaVariavel devidamente configurada.
      */
-    public RendaVariavelEntity criarRendaVariavel(OperacaoEntity operacao) {
+    public AtivoRendaVariavelEntity criarRendaVariavel(OperacaoEntity operacao) {
         String produto = operacao.getProduto();
         
         // Criação e configuração da RendaVariavel
-        RendaVariavelEntity rendaVariavel = new RendaVariavelEntity();
+        AtivoRendaVariavelEntity rendaVariavel = new AtivoRendaVariavelEntity();
         // Para renda variável, o ticker deve ser extraído corretamente
         String ticker = produtoParser.extrairTicker(produto);
         log.debug("Ticker extraido: {}", ticker);
         TipoAtivoFinanceiroVariavel tipoVariavel = tipoAtivoVariavelService.definirTipoAtivo(ticker);
         rendaVariavel.setTipoRendaVariavel(tipoVariavel);
-        rendaVariavel.setPrecoUnitario(operacao.getPrecoUnitario());
-        rendaVariavel.setDataCompra(operacao.getData());
-        rendaVariavel.setQuantidade(operacao.getQuantidade());
-        rendaVariavel.setTotal(operacao.getPrecoUnitario()
-                .multiply(BigDecimal.valueOf(operacao.getQuantidade())));
-        return rendaVariavelRepository.save(rendaVariavel);
+        rendaVariavel.setCodigo(ticker);
+        rendaVariavel.setNome(produto);
+        return ativoFinanceiroRepository.save(rendaVariavel);
     }
 }

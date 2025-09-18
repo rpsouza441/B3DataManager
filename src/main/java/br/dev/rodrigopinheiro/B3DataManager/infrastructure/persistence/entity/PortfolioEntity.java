@@ -1,8 +1,5 @@
 package br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity;
 
-import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivo;
-import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoMovimentacao;
-import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoTransacao;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +16,8 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "portifolio")
-public class PortfolioEntity {
+@Table(name = "portfolio")
+public class PortfolioEntity extends AuditableEntity {
 
 
     @Id
@@ -53,6 +50,9 @@ public class PortfolioEntity {
 
     @Column(name = "lucro_rendimento")
     private BigDecimal lucroRendimento;
+
+    @Column(name = "lucro_nao_realizado")
+    private BigDecimal lucroNaoRealizado;
 
     /**
      * Adiciona um ativo financeiro ao portfolio, evitando duplicações.
@@ -144,7 +144,7 @@ public class PortfolioEntity {
     public List<AtivoFinanceiroEntity> buscarAtivosRendaFixa() {
         return ativosFinanceiro.stream()
                 .filter(Objects::nonNull)
-                .filter(ativo -> ativo.getTipoAtivo() != null && ativo.getTipoAtivo().isRendaFixa())
+                .filter(AtivoFinanceiroEntity::isRendaFixa)
                 .collect(Collectors.toList());
     }
 
@@ -156,7 +156,7 @@ public class PortfolioEntity {
     public List<AtivoFinanceiroEntity> buscarAtivosRendaVariavel() {
         return ativosFinanceiro.stream()
                 .filter(Objects::nonNull)
-                .filter(ativo -> ativo.getTipoAtivo() != null && ativo.getTipoAtivo().isRendaVariavel())
+                .filter(AtivoFinanceiroEntity::isRendaVariavel)
                 .collect(Collectors.toList());
     }
 

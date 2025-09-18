@@ -130,7 +130,7 @@ class CreateTransacaoUseCaseTest {
             verify(instituicao).associarUsuario(usuario);
             
             verify(ativoFactoryImpl).criarAtivo(operacao, portfolio);
-            verify(ativoFinanceiro).adicionarTransacoes(transacaoEntity);
+            verify(ativoFinanceiro).adicionarTransacao(transacaoEntity);
             verify(portfolio).adicionarAtivoFinanceiro(ativoFinanceiro);
             
             verify(aggregatePersistenceService).persistAggregate(
@@ -304,7 +304,7 @@ class CreateTransacaoUseCaseTest {
             createTransacaoUseCase.execute(command);
             
             // Assert
-            verify(ativoFinanceiro).adicionarTransacoes(transacaoEntity);
+            verify(ativoFinanceiro).adicionarTransacao(transacaoEntity);
             verify(portfolio).adicionarAtivoFinanceiro(ativoFinanceiro);
         }
     }

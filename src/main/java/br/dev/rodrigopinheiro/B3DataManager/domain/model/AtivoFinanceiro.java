@@ -1,21 +1,24 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.model;
 
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivo;
-import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroFixa;
-import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroVariavel;
 
 /**
- * Domain Model - AtivoFinanceiro (Arquitetura Corrigida)
+ * Domain Model - AtivoFinanceiro (SINGLE_TABLE Strategy)
  * 
- * Representa um ativo financeiro unificado que pode ser:
- * - Renda Variável (usando TipoAtivoFinanceiroVariavel)
- * - Renda Fixa (usando TipoAtivoFinanceiroFixa)
+ * Classe abstrata base para hierarquia de ativos financeiros.
+ * Implementa padrão SINGLE_TABLE para máxima performance.
  * 
- * Utiliza enums tipados para classificação precisa.
- * Dados específicos vêm das operações (Transacao).
- * POJO puro sem dependências externas.
+ * Subclasses:
+ * - AtivoRendaFixa: CDBs, Tesouro Direto, LCI/LCA, etc.
+ * - AtivoRendaVariavel: Ações, FIIs, ETFs, BDRs, etc.
+ * 
+ * Princípios:
+ * - POJO puro sem dependências externas
+ * - Type safety através de herança
+ * - Polimorfismo para operações genéricas
+ * - Métodos abstratos para comportamentos específicos
  */
-public class AtivoFinanceiro {
+public abstract class AtivoFinanceiro {
     private Long id;
     
     /**
@@ -27,23 +30,6 @@ public class AtivoFinanceiro {
      * Nome completo do ativo
      */
     private String nome;
-    
-    /**
-     * Categoria geral do ativo (RENDA_FIXA ou RENDA_VARIAVEL)
-     */
-    private TipoAtivo tipoAtivo;
-    
-    /**
-     * Tipo específico para renda variável (se aplicável)
-     */
-    private TipoAtivoFinanceiroVariavel tipoRendaVariavel;
-    
-    /**
-     * Tipo específico para renda fixa (se aplicável)
-     */
-    private TipoAtivoFinanceiroFixa tipoRendaFixa;
-    
-
     
     /**
      * Referência ao portfolio (objeto completo)
@@ -59,63 +45,73 @@ public class AtivoFinanceiro {
         this.deletado = false;
     }
 
-    public AtivoFinanceiro(String codigo, String nome, TipoAtivo tipoAtivo, Portfolio portfolio) {
+    public AtivoFinanceiro(String codigo, String nome, Portfolio portfolio) {
         this.codigo = codigo;
         this.nome = nome;
-        this.tipoAtivo = tipoAtivo;
         this.portfolio = portfolio;
         this.deletado = false;
     }
 
-    // Construtor para Renda Variável
-    public AtivoFinanceiro(String codigo, String nome, TipoAtivoFinanceiroVariavel tipoRendaVariavel, Portfolio portfolio) {
-        this.codigo = codigo;
-        this.nome = nome;
-        this.tipoAtivo = TipoAtivo.RENDA_VARIAVEL;
-        this.tipoRendaVariavel = tipoRendaVariavel;
-        this.portfolio = portfolio;
-        this.deletado = true;
-    }
-
-    // Construtor para Renda Fixa
-    public AtivoFinanceiro(String codigo, String nome, TipoAtivoFinanceiroFixa tipoRendaFixa, Portfolio portfolio) {
-        this.codigo = codigo;
-        this.nome = nome;
-        this.tipoAtivo = TipoAtivo.RENDA_FIXA;
-        this.tipoRendaFixa = tipoRendaFixa;
-        this.portfolio = portfolio;
-        this.deletado = true;
-    }
-
-    // Métodos de negócio
+    // Métodos abstratos para polimorfismo
+    
+    /**
+     * Retorna o tipo geral do ativo (RENDA_FIXA ou RENDA_VARIAVEL)
+     */
+    public abstract TipoAtivo getTipoAtivo();
+    
+    /**
+     * Retorna uma descrição completa do ativo com informações específicas
+     */
+    public abstract String getDescricaoCompleta();
+    
+    /**
+     * Valida se todos os campos obrigatórios estão preenchidos
+     */
+    public abstract void validarCamposObrigatorios();
+    
+    // Métodos de negócio comuns
     
     /**
      * Verifica se é um ativo de renda variável
      */
     public boolean isRendaVariavel() {
-        return TipoAtivo.RENDA_VARIAVEL.equals(tipoAtivo);
+        return TipoAtivo.RENDA_VARIAVEL.equals(getTipoAtivo());
     }
     
     /**
      * Verifica se é um ativo de renda fixa
      */
     public boolean isRendaFixa() {
-        return TipoAtivo.RENDA_FIXA.equals(tipoAtivo);
+        return TipoAtivo.RENDA_FIXA.equals(getTipoAtivo());
     }
     
-
+    /**
+     * Retorna uma representação string do ativo
+     */
+    @Override
+    public String toString() {
+        return String.format("%s [%s] - %s", 
+            codigo, getTipoAtivo(), nome);
+    }
     
     /**
-     * Obtém o tipo específico como string (para compatibilidade)
+     * Implementação de equals baseada no código do ativo
      */
-    public String getTipoEspecifico() {
-        if (tipoRendaVariavel != null) {
-            return tipoRendaVariavel.name();
-        }
-        if (tipoRendaFixa != null) {
-            return tipoRendaFixa.name();
-        }
-        return null;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        
+        AtivoFinanceiro that = (AtivoFinanceiro) obj;
+        return codigo != null ? codigo.equals(that.codigo) : that.codigo == null;
+    }
+    
+    /**
+     * Implementação de hashCode baseada no código do ativo
+     */
+    @Override
+    public int hashCode() {
+        return codigo != null ? codigo.hashCode() : 0;
     }
     
     // Getters e Setters
@@ -143,40 +139,6 @@ public class AtivoFinanceiro {
     public void setNome(String nome) {
         this.nome = nome;
     }
-
-    public TipoAtivo getTipoAtivo() {
-        return tipoAtivo;
-    }
-
-    public void setTipoAtivo(TipoAtivo tipoAtivo) {
-        this.tipoAtivo = tipoAtivo;
-    }
-
-    public TipoAtivoFinanceiroVariavel getTipoRendaVariavel() {
-        return tipoRendaVariavel;
-    }
-
-    public void setTipoRendaVariavel(TipoAtivoFinanceiroVariavel tipoRendaVariavel) {
-        this.tipoRendaVariavel = tipoRendaVariavel;
-        if (tipoRendaVariavel != null) {
-            this.tipoAtivo = TipoAtivo.RENDA_VARIAVEL;
-            this.tipoRendaFixa = null;
-        }
-    }
-
-    public TipoAtivoFinanceiroFixa getTipoRendaFixa() {
-        return tipoRendaFixa;
-    }
-
-    public void setTipoRendaFixa(TipoAtivoFinanceiroFixa tipoRendaFixa) {
-        this.tipoRendaFixa = tipoRendaFixa;
-        if (tipoRendaFixa != null) {
-            this.tipoAtivo = TipoAtivo.RENDA_FIXA;
-            this.tipoRendaVariavel = null;
-        }
-    }
-
-
 
     public Portfolio getPortfolio() {
         return portfolio;

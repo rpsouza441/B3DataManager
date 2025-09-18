@@ -49,6 +49,11 @@ public class Posicao {
     private BigDecimal lucroNaoRealizado;
     
     /**
+     * Percentual de ganho/perda da posição ((valor atual - valor investido) / valor investido * 100)
+     */
+    private BigDecimal percentualGanho;
+    
+    /**
      * Valor total investido na posição (soma das compras - vendas)
      */
     private BigDecimal valorInvestido;
@@ -80,6 +85,7 @@ public class Posicao {
         this.valorAtual = BigDecimal.ZERO;
         this.percentualPortfolio = BigDecimal.ZERO;
         this.lucroNaoRealizado = BigDecimal.ZERO;
+        this.percentualGanho = BigDecimal.ZERO;
         this.valorInvestido = BigDecimal.ZERO;
         this.dataUltimaAtualizacao = LocalDate.now();
         this.ativo = true;
@@ -199,6 +205,14 @@ public class Posicao {
     
     public void setLucroNaoRealizado(BigDecimal lucroNaoRealizado) {
         this.lucroNaoRealizado = lucroNaoRealizado;
+    }
+    
+    public BigDecimal getPercentualGanho() {
+        return percentualGanho;
+    }
+    
+    public void setPercentualGanho(BigDecimal percentualGanho) {
+        this.percentualGanho = percentualGanho;
     }
     
     public BigDecimal getValorInvestido() {

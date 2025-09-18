@@ -1,6 +1,7 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,9 +24,9 @@ public class Portfolio {
     private Long id;
     
     /**
-     * Referência ao usuário (ID apenas para manter pureza do domain)
+     * Referência ao usuário (objeto completo para manter consistência do domain)
      */
-    private Long usuarioId;
+    private Usuario usuario;
     
     /**
      * Catálogo de ativos financeiros do portfolio
@@ -85,12 +86,57 @@ public class Portfolio {
         this.deletado = false;
     }
 
-    public Portfolio(Long usuarioId) {
+    public Portfolio(Usuario usuario) {
         this();
-        this.usuarioId = usuarioId;
+        this.usuario = usuario;
     }
     
     // Métodos de negócio da Opção 1
+    
+    /**
+     * Adiciona um ativo financeiro ao catálogo do portfolio
+     */
+    public void adicionarAtivoFinanceiro(AtivoFinanceiro ativo) {
+        if (ativo == null) return;
+        
+        // Validar campos obrigatórios do ativo
+        ativo.validarCamposObrigatorios();
+        
+        // Associar ao portfolio
+        ativo.setPortfolio(this);
+        
+        this.ativosFinanceiro.add(ativo);
+    }
+    
+    /**
+     * Remove um ativo financeiro do portfolio (soft delete)
+     */
+    public void removerAtivoFinanceiro(AtivoFinanceiro ativo) {
+        if (ativo == null) return;
+        
+        ativo.setDeletado(true);
+        // Não remove da coleção para manter histórico
+    }
+    
+    /**
+     * Busca um ativo financeiro pelo código
+     */
+    public AtivoFinanceiro buscarAtivoPorCodigo(String codigo) {
+        return ativosFinanceiro.stream()
+            .filter(ativo -> !Boolean.TRUE.equals(ativo.getDeletado()))
+            .filter(ativo -> codigo.equals(ativo.getCodigo()))
+            .findFirst()
+            .orElse(null);
+    }
+    
+    /**
+     * Retorna apenas ativos ativos (não deletados)
+     */
+    public Set<AtivoFinanceiro> getAtivosAtivos() {
+        return ativosFinanceiro.stream()
+            .filter(ativo -> !Boolean.TRUE.equals(ativo.getDeletado()))
+            .collect(java.util.stream.Collectors.toSet());
+    }
     
     /**
      * Adiciona uma nova transação e atualiza a posição correspondente
@@ -156,7 +202,7 @@ public class Portfolio {
             posicoes.forEach(posicao -> {
                 if (posicao.isPosicaoAtiva()) {
                     BigDecimal percentual = posicao.getValorAtual()
-                        .divide(saldoTotal, 4, java.math.RoundingMode.HALF_UP)
+                        .divide(saldoTotal, 4, RoundingMode.HALF_UP)
                         .multiply(BigDecimal.valueOf(100));
                     posicao.setPercentualPortfolio(percentual);
                 }
@@ -172,6 +218,76 @@ public class Portfolio {
             .filter(Posicao::isPosicaoAtiva)
             .collect(java.util.stream.Collectors.toList());
     }
+    
+    /**
+     * Retorna apenas ativos de renda fixa
+     */
+    public Set<AtivoRendaFixa> getAtivosRendaFixa() {
+        return ativosFinanceiro.stream()
+            .filter(ativo -> !Boolean.TRUE.equals(ativo.getDeletado()))
+            .filter(ativo -> ativo instanceof AtivoRendaFixa)
+            .map(ativo -> (AtivoRendaFixa) ativo)
+            .collect(java.util.stream.Collectors.toSet());
+    }
+    
+    /**
+     * Retorna apenas ativos de renda variável
+     */
+    public Set<AtivoRendaVariavel> getAtivosRendaVariavel() {
+        return ativosFinanceiro.stream()
+            .filter(ativo -> !Boolean.TRUE.equals(ativo.getDeletado()))
+            .filter(ativo -> ativo instanceof AtivoRendaVariavel)
+            .map(ativo -> (AtivoRendaVariavel) ativo)
+            .collect(java.util.stream.Collectors.toSet());
+    }
+    
+    /**
+     * Calcula o valor total investido em renda fixa
+     */
+    public BigDecimal getValorRendaFixa() {
+        return posicoes.stream()
+            .filter(Posicao::isPosicaoAtiva)
+            .filter(posicao -> posicao.getAtivoFinanceiro().isRendaFixa())
+            .map(Posicao::getValorAtual)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+    
+    /**
+     * Calcula o valor total investido em renda variável
+     */
+    public BigDecimal getValorRendaVariavel() {
+        return posicoes.stream()
+            .filter(Posicao::isPosicaoAtiva)
+            .filter(posicao -> posicao.getAtivoFinanceiro().isRendaVariavel())
+            .map(Posicao::getValorAtual)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+    
+    /**
+     * Calcula o percentual de alocação em renda fixa
+     */
+    public BigDecimal getPercentualRendaFixa() {
+        if (saldoTotal == null || saldoTotal.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+        
+        return getValorRendaFixa()
+            .divide(saldoTotal, 4, RoundingMode.HALF_UP)
+            .multiply(BigDecimal.valueOf(100));
+    }
+    
+    /**
+     * Calcula o percentual de alocação em renda variável
+     */
+    public BigDecimal getPercentualRendaVariavel() {
+        if (saldoTotal == null || saldoTotal.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+        
+        return getValorRendaVariavel()
+            .divide(saldoTotal, 4, RoundingMode.HALF_UP)
+            .multiply(BigDecimal.valueOf(100));
+    }
 
     // Getters e Setters
     
@@ -183,12 +299,19 @@ public class Portfolio {
         this.id = id;
     }
 
-    public Long getUsuarioId() {
-        return usuarioId;
+    public Usuario getUsuario() {
+        return usuario;
     }
 
-    public void setUsuarioId(Long usuarioId) {
-        this.usuarioId = usuarioId;
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    /**
+     * Método de conveniência para obter o ID do usuário
+     */
+    public Long getUsuarioId() {
+        return usuario != null ? usuario.getId() : null;
     }
 
     public Set<AtivoFinanceiro> getAtivosFinanceiro() {

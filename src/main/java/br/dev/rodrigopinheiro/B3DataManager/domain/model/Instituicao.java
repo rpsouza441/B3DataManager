@@ -1,19 +1,17 @@
 package br.dev.rodrigopinheiro.B3DataManager.domain.model;
 
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.TransacaoEntity;
-
 import java.util.List;
 
 public class Instituicao {
     private Long id;
     private String nome;
     private List<Usuario> usuarios;
-    private List<TransacaoEntity> transacoes;
+    private List<Transacao> transacoes;
 
     public Instituicao() {
     }
 
-    public Instituicao(Long id, String nome, List<Usuario> usuarios, List<TransacaoEntity> transacoes) {
+    public Instituicao(Long id, String nome, List<Usuario> usuarios, List<Transacao> transacoes) {
         this.id = id;
         this.nome = nome;
         this.usuarios = usuarios;
@@ -44,11 +42,11 @@ public class Instituicao {
         this.usuarios = usuarios;
     }
 
-    public List<TransacaoEntity> getTransacoes() {
+    public List<Transacao> getTransacoes() {
         return transacoes;
     }
 
-    public void setTransacoes(List<TransacaoEntity> transacoes) {
+    public void setTransacoes(List<Transacao> transacoes) {
         this.transacoes = transacoes;
     }
 }

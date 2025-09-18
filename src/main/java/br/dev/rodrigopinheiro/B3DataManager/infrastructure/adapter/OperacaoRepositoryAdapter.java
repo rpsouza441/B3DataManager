@@ -14,8 +14,31 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 /**
- * Adaptador que implementa a port OperacaoRepository.
- * Faz a ponte entre a camada de aplicação e a infraestrutura JPA.
+ * Adapter que implementa o port de repositório de operações.
+ * 
+ * <p>Este adapter é responsável por fazer a ponte entre o domínio da aplicação
+ * e a camada de persistência para operações relacionadas a operações financeiras.</p>
+ * 
+ * <p><strong>Características principais:</strong></p>
+ * <ul>
+ *   <li>Implementa o padrão Adapter da arquitetura hexagonal</li>
+ *   <li>Utiliza mapper para conversão entre domain models e entities</li>
+ *   <li>Operações CRUD completas para operações</li>
+ *   <li>Buscas especializadas com filtros e paginação</li>
+ *   <li>Verificações de duplicação e dimensionamento</li>
+ * </ul>
+ * 
+ * <p><strong>Operações suportadas:</strong></p>
+ * <ul>
+ *   <li>CRUD básico de operações</li>
+ *   <li>Busca com filtros complexos e paginação</li>
+ *   <li>Verificação de existência por ID original</li>
+ *   <li>Busca de duplicatas e operações dimensionadas</li>
+ *   <li>Contagem de registros com filtros</li>
+ * </ul>
+ * 
+ * @author Rodrigo Pinheiro
+ * @since 1.0
  */
 @Component
 public class OperacaoRepositoryAdapter implements OperacaoRepository {
@@ -30,15 +53,15 @@ public class OperacaoRepositoryAdapter implements OperacaoRepository {
     
     @Override
     public Operacao save(Operacao operacao) {
-        OperacaoEntity jpaEntity = mapper.toJpaEntity(operacao);
+        OperacaoEntity jpaEntity = mapper.toEntity(operacao);
         OperacaoEntity savedEntity = jpaRepository.save(jpaEntity);
-        return mapper.toDomainEntity(savedEntity);
+        return mapper.toDomain(savedEntity);
     }
     
     @Override
     public Optional<Operacao> findById(Long id) {
         return jpaRepository.findById(id)
-                .map(mapper::toDomainEntity);
+                .map(mapper::toDomain);
     }
     
     @Override
@@ -49,7 +72,7 @@ public class OperacaoRepositoryAdapter implements OperacaoRepository {
     @Override
     public Optional<Operacao> findByIdOriginalAndUsuarioId(Long idOriginal, UsuarioId usuarioId) {
         return jpaRepository.findByIdOriginalAndUsuario_Id(idOriginal, usuarioId.value())
-                .map(mapper::toDomainEntity);
+                .map(mapper::toDomain);
     }
     
     @Override
@@ -67,7 +90,7 @@ public class OperacaoRepositoryAdapter implements OperacaoRepository {
             pageable
         );
         
-        return jpaPage.map(mapper::toDomainEntity);
+        return jpaPage.map(mapper::toDomain);
     }
     
     @Override
@@ -99,7 +122,7 @@ public class OperacaoRepositoryAdapter implements OperacaoRepository {
         
         return jpaRepository.findFirstByDataAndMovimentacaoAndProdutoAndInstituicaoAndQuantidadeAndPrecoUnitarioAndValorOperacaoAndDuplicadoAndUsuario_Id(
                 data, movimentacao, produto, instituicao, quantidade, precoUnitario, valorOperacao, duplicado, usuarioId.value()
-        ).map(mapper::toDomainEntity);
+        ).map(mapper::toDomain);
     }
     
     @Override
@@ -110,7 +133,7 @@ public class OperacaoRepositoryAdapter implements OperacaoRepository {
         Page<OperacaoEntity> page = jpaRepository.findByDimensionadoAndDuplicado(dimensionado, duplicado, pageable);
         
         return page.getContent().stream()
-                .map(mapper::toDomainEntity)
+                .map(mapper::toDomain)
                 .collect(java.util.stream.Collectors.toList());
     }
     

@@ -124,6 +124,14 @@ public interface AtivoFinanceiroRepository extends JpaRepository<AtivoFinanceiro
      */
     boolean existsByNomeAndPortfolioId(String nome, Long portfolioId);
 
+    /**
+     * Busca ativos financeiros por usuário através do portfolio
+     */
+    @Query("SELECT af FROM AtivoFinanceiroEntity af " +
+            "JOIN af.portfolio p " +
+            "WHERE p.usuario.id = :usuarioId")
+    List<AtivoFinanceiroEntity> findByUsuarioId(@Param("usuarioId") Long usuarioId);
+
     //TODO Testar
     @Query("SELECT af FROM AtivoFinanceiroEntity af " +
             "JOIN af.portfolio p " +

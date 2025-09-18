@@ -1,7 +1,7 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.usecase.rendafixa;
 
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroFixa;
-import br.dev.rodrigopinheiro.B3DataManager.domain.model.RendaFixa;
+import br.dev.rodrigopinheiro.B3DataManager.domain.model.AtivoRendaFixa;
 import br.dev.rodrigopinheiro.B3DataManager.domain.port.RendaFixaRepositoryPort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class UpdateRendaFixaUseCase {
     @Autowired
     private GetRendaFixaUseCase getRendaFixaUseCase;
 
-    public RendaFixa execute(UpdateRendaFixaRequest request) {
+    public AtivoRendaFixa execute(UpdateRendaFixaRequest request) {
         // Validações de entrada
         if (request == null) {
             throw new IllegalArgumentException("Request não pode ser nulo");
@@ -40,10 +40,10 @@ public class UpdateRendaFixaUseCase {
         }
 
         // Buscar a renda fixa existente
-        RendaFixa rendaFixa = getRendaFixaUseCase.executeOrThrow(request.getId());
+        AtivoRendaFixa rendaFixa = getRendaFixaUseCase.executeOrThrow(request.getId());
 
-        // Atualizar os dados
-        rendaFixa.setTipoAtivoFinanceiroFixa(request.getTipoAtivoFinanceiroFixa());
+        // Atualizar os dados - usando métodos corretos da classe AtivoRendaFixa
+        rendaFixa.setTipoRendaFixa(request.getTipoAtivoFinanceiroFixa());
         rendaFixa.setDataVencimento(request.getDataVencimento());
         rendaFixa.setTaxaJuros(request.getTaxaJuros());
 
@@ -97,3 +97,5 @@ public class UpdateRendaFixaUseCase {
         public void setTaxaJuros(BigDecimal taxaJuros) {
             this.taxaJuros = taxaJuros;
         }
+    }
+}

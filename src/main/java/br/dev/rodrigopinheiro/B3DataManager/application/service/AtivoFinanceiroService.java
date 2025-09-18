@@ -3,7 +3,7 @@ package br.dev.rodrigopinheiro.B3DataManager.application.service;
 import br.dev.rodrigopinheiro.B3DataManager.domain.exception.ServiceException;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoFinanceiroEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.PortfolioEntity;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
+import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.AtivoRendaVariavelEntity;
 import br.dev.rodrigopinheiro.B3DataManager.infrastructure.repository.AtivoFinanceiroRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -54,7 +54,9 @@ public class AtivoFinanceiroService {
      * @return O ativo financeiro criado.
      */
     private AtivoFinanceiroEntity criarAtivoFinanceiro(String nomeAtivo, PortfolioEntity portfolio) {
-        AtivoFinanceiroEntity novoAtivo = new AtivoFinanceiroEntity();
+        // TODO: Determinar o tipo correto baseado no contexto (Renda Fixa ou Variável)
+        // Por enquanto, usando AtivoRendaVariavelEntity como padrão
+        AtivoRendaVariavelEntity novoAtivo = new AtivoRendaVariavelEntity();
         novoAtivo.setNome(nomeAtivo);
         novoAtivo.setPortfolio(portfolio);
         novoAtivo.setDeletado(false);
@@ -167,21 +169,27 @@ public class AtivoFinanceiroService {
      * @return O preço médio ou BigDecimal.ZERO se não houver quantidade.
      */
     public BigDecimal calcularPrecoMedio(AtivoFinanceiroEntity ativo) {
-        // Supondo que o preço médio seja calculado a partir das entradas (renda variável)
-        List<RendaVariavelEntity> rendas = ativo.getRendaVariaveis();
+        // TODO: Implementar após refatoração completa da arquitetura
+        // O método getRendaVariaveis() não existe em AtivoFinanceiroEntity
+        /*
+        List<AtivoRendaVariavelEntity> rendas = ativo.getRendaVariaveis();
         if (rendas == null || rendas.isEmpty()) {
             return BigDecimal.ZERO;
         }
+        */
         BigDecimal totalInvestido = BigDecimal.ZERO;
         double quantidadeTotal = 0.0;
 
-        for (RendaVariavelEntity renda : rendas) {
-            // Para cada operação, o valor investido é dado por: preço unitário * quantidade
+        // Placeholder temporário - retorna zero até implementação completa
+        /*
+        for (AtivoRendaVariavelEntity renda : rendas) {
+            // TODO: Implementar após adicionar métodos getPrecoUnitario e getQuantidade em AtivoRendaVariavelEntity
             BigDecimal totalOperacao = renda.getPrecoUnitario()
                     .multiply(BigDecimal.valueOf(renda.getQuantidade()));
             totalInvestido = totalInvestido.add(totalOperacao);
             quantidadeTotal += renda.getQuantidade();
         }
+        */
 
         if (quantidadeTotal == 0) {
             return BigDecimal.ZERO;
@@ -218,7 +226,8 @@ public class AtivoFinanceiroService {
             return ativoExistente;
         } else {
             // Se o ativo não for encontrado, cria um novo AtivoFinanceiro com os dados mínimos.
-            AtivoFinanceiroEntity novoAtivo = new AtivoFinanceiroEntity();
+            // TODO: Determinar o tipo correto baseado no contexto (ticker, etc.)
+            AtivoRendaVariavelEntity novoAtivo = new AtivoRendaVariavelEntity();
             novoAtivo.setNome(ticker);
             novoAtivo.setPortfolio(portfolio);
 

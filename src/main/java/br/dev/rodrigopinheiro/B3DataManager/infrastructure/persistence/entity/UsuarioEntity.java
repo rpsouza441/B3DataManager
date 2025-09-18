@@ -2,6 +2,7 @@ package br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity;
 
 
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.Roles;
+import br.dev.rodrigopinheiro.B3DataManager.domain.enums.StatusConta;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -9,8 +10,30 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * Entidade que representa um usuário do sistema B3DataManager.
+ * 
+ * Centraliza todas as informações relacionadas ao usuário, incluindo:
+ * - Dados de autenticação (username, password, email)
+ * - Perfis e permissões (roles)
+ * - Relacionamentos com instituições financeiras
+ * - Portfolio pessoal de investimentos
+ * - Status da conta e controle de acesso
+ * 
+ * Características:
+ * - Validação robusta de dados com Bean Validation
+ * - Relacionamentos bidirecionais com outras entidades
+ * - Auditoria automática via AuditableEntity
+ * - Soft delete para manter integridade
+ * - Controle de status da conta
+ * - Rastreamento de último acesso
+ * 
+ * @author Rodrigo Pinheiro
+ * @since 1.0
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,7 +41,7 @@ import java.util.*;
 @ToString
 @Entity
 @Table(name = "usuario")
-public class UsuarioEntity {
+public class UsuarioEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,8 +83,12 @@ public class UsuarioEntity {
     @ToString.Exclude
     private PortfolioEntity portfolio;
 
-    @Column(name = "deletado", nullable = false)
-    private Boolean deletado = false;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status_conta", nullable = false)
+    private StatusConta statusConta = StatusConta.ATIVA;
+
+    @Column(name = "ultimo_acesso")
+    private LocalDateTime ultimoAcesso;
 
     public void associarInstituicao(InstituicaoEntity instituicao) {
             // Define explicitamente o AtivoFinanceiro na renda

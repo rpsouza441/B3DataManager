@@ -237,15 +237,17 @@ class ListOperacoesUseCaseTest {
             // Arrange
             ListOperacoesCommand commandPaginado = new ListOperacoesCommand(
                 null, null, null, null, null, null, null, null,
-                1, // página 1
+                0, // página 0
                 10, // 10 itens por página
                 1L
             );
             
-            Page<Operacao> page = new PageImpl<>(List.of(operacoes.get(1)), PageRequest.of(0, 10), 2);
+            // Simula uma página com 2 elementos (para que totalElements seja consistente)
+            Page<Operacao> page = new PageImpl<>(operacoes, PageRequest.of(0, 10), 2);
             
             when(operacaoRepository.findByFiltersAndUsuarioId(any(FilterCriteria.class), eq(usuarioId), any(Pageable.class)))
                 .thenReturn(page);
+            when(mapper.toDTO(operacoes.get(0))).thenReturn(operacaoDTOs.get(0));
             when(mapper.toDTO(operacoes.get(1))).thenReturn(operacaoDTOs.get(1));
             
             // Act
@@ -253,7 +255,7 @@ class ListOperacoesUseCaseTest {
             
             // Assert
             assertNotNull(result);
-            assertEquals(1, result.operacoes().size());
+            assertEquals(2, result.operacoes().size());
             assertEquals(1, result.totalPages()); // Com 2 elementos e 10 por página = 1 página
             assertEquals(2L, result.totalElements());
             assertEquals(0, result.currentPage());

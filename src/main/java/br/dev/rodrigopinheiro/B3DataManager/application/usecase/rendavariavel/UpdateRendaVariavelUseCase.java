@@ -1,8 +1,9 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.usecase.rendavariavel;
 
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroVariavel;
+import br.dev.rodrigopinheiro.B3DataManager.domain.model.AtivoFinanceiro;
 import br.dev.rodrigopinheiro.B3DataManager.domain.model.RendaVariavel;
-import br.dev.rodrigopinheiro.B3DataManager.domain.port.RendaVariavelRepositoryPort;
+import br.dev.rodrigopinheiro.B3DataManager.domain.port.AtivoFinanceiroRepositoryPort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class UpdateRendaVariavelUseCase {
 
     @Autowired
-    private RendaVariavelRepositoryPort rendaVariavelRepository;
+    private AtivoFinanceiroRepositoryPort ativoFinanceiroRepository;
 
     @Autowired
     private GetRendaVariavelUseCase getRendaVariavelUseCase;
@@ -34,11 +35,18 @@ public class UpdateRendaVariavelUseCase {
         RendaVariavel rendaVariavel = getRendaVariavelUseCase.executeOrThrow(request.getId());
 
         // Atualizar os dados
-        rendaVariavel.setTicker(request.getTicker().trim().toUpperCase());
-        rendaVariavel.setTipoAtivoFinanceiroVariavel(request.getTipoAtivoFinanceiroVariavel());
+        rendaVariavel.setTipoRendaVariavel(request.getTipoAtivoFinanceiroVariavel().toString());
+        
+        // Atualizar o ativo financeiro associado se necessário
+        AtivoFinanceiro ativo = rendaVariavel.getAtivoFinanceiro();
+        if (ativo != null) {
+            ativo.setCodigo(request.getTicker().trim().toUpperCase());
+            ativo.setNome(request.getTicker().trim().toUpperCase());
+        }
 
         // Salvar e retornar
-        return rendaVariavelRepository.save(rendaVariavel);
+        ativoFinanceiroRepository.save(ativo);
+        return rendaVariavel;
     }
 
     public static class UpdateRendaVariavelRequest {

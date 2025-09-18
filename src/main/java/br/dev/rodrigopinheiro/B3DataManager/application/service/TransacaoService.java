@@ -20,6 +20,27 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Service responsável pela gestão de transações financeiras do sistema.
+ * 
+ * Centraliza todas as operações relacionadas a transações, incluindo:
+ * - Criação e validação de transações
+ * - Integração com portfolios e ativos financeiros
+ * - Cálculo de lucros e prejuízos
+ * - Gestão de relacionamentos com operações
+ * - Processamento de dados de mercado
+ * 
+ * Características:
+ * - Validação robusta de dados de transação
+ * - Integração com factory patterns para criação
+ * - Suporte a diferentes tipos de transação
+ * - Transações para consistência de dados
+ * - Logging detalhado para auditoria
+ * - Integração com agregados de domínio
+ * 
+ * @author Rodrigo Pinheiro
+ * @since 1.0
+ */
 @Service
 @Slf4j
 public class TransacaoService {
@@ -79,8 +100,8 @@ public class TransacaoService {
         transacao.setAtivoFinanceiro(ativoFinanceiro);
         transacao.setInstituicao(instituicao);
 
-        // Definir a transação como não deletada
-        transacao.setDeletado(false);
+        // Definir a transação como ativa (não deletada)
+        transacao.setAtivo(true);
 
         // Salvar transação
         TransacaoEntity transacaoSalva = transacaoRepository.save(transacao);
@@ -120,8 +141,8 @@ public class TransacaoService {
                     throw new TransacaoNotFoundException(transacaoId, messageSource);
                 });
 
-        // Marcar como deletada
-        transacao.setDeletado(true);
+        // Marcar como inativa (deletada)
+        transacao.setAtivo(false);
         transacaoRepository.save(transacao);
         log.info("Transação marcada como deletada: {}", transacaoId);
     }

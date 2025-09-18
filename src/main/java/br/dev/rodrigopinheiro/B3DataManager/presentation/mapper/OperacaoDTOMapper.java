@@ -34,7 +34,7 @@ public class OperacaoDTOMapper {
             operacao.getValorOperacao().getValue(),      // Valor original da B3
             operacao.getValorCalculado().getValue(),     // Valor calculado
             operacao.getDuplicado(),
-            operacao.getDimensionado(),
+            operacao.getProcessado(),
             operacao.temDiferencaValor(),                // Indica se há diferença
             operacao.getDiferencaValor()                 // Diferença absoluta
         );

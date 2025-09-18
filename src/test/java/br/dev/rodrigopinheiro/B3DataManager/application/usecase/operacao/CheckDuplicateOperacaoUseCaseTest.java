@@ -228,49 +228,43 @@ class CheckDuplicateOperacaoUseCaseTest {
         @Test
         @DisplayName("Deve rejeitar data nula")
         void deveRejeitarDataNula() {
-            // Arrange
-            CheckDuplicateCommand commandDataNula = new CheckDuplicateCommand(
-                null, // Data nula
-                "Juros Sobre Capital Próprio",
-                "ITSA4 - ITAUSA S.A.",
-                "INTER DISTRIBUIDORA DE TITULOS E VALORES MOBILIARIOS LTDA",
-                new BigDecimal("19"),
-                new BigDecimal("0.059"),
-                new BigDecimal("0.96"),
-                usuarioId
-            );
-            
             // Act & Assert
             IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> checkDuplicateUseCase.execute(commandDataNula)
+                () -> new CheckDuplicateCommand(
+                    null, // Data nula
+                    "Juros Sobre Capital Próprio",
+                    "ITSA4 - ITAUSA S.A.",
+                    "INTER DISTRIBUIDORA DE TITULOS E VALORES MOBILIARIOS LTDA",
+                    new BigDecimal("19"),
+                    new BigDecimal("0.059"),
+                    new BigDecimal("0.96"),
+                    usuarioId
+                )
             );
             
-            assertEquals("Data é obrigatória", exception.getMessage());
+            assertEquals("Data da operação é obrigatória", exception.getMessage());
         }
         
         @Test
         @DisplayName("Deve rejeitar usuário nulo")
         void deveRejeitarUsuarioNulo() {
-            // Arrange
-            CheckDuplicateCommand commandUsuarioNulo = new CheckDuplicateCommand(
-                data,
-                "Juros Sobre Capital Próprio",
-                "ITSA4 - ITAUSA S.A.",
-                "INTER DISTRIBUIDORA DE TITULOS E VALORES MOBILIARIOS LTDA",
-                new BigDecimal("19"),
-                new BigDecimal("0.059"),
-                new BigDecimal("0.96"),
-                null // Usuário nulo
-            );
-            
             // Act & Assert
             IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> checkDuplicateUseCase.execute(commandUsuarioNulo)
+                () -> new CheckDuplicateCommand(
+                    data,
+                    "Juros Sobre Capital Próprio",
+                    "ITSA4 - ITAUSA S.A.",
+                    "INTER DISTRIBUIDORA DE TITULOS E VALORES MOBILIARIOS LTDA",
+                    new BigDecimal("19"),
+                    new BigDecimal("0.059"),
+                    new BigDecimal("0.96"),
+                    null // usuário nulo
+                )
             );
             
-            assertEquals("Usuário é obrigatório", exception.getMessage());
+            assertEquals("ID do usuário é obrigatório", exception.getMessage());
         }
         
         @Test
@@ -372,7 +366,8 @@ class CheckDuplicateOperacaoUseCaseTest {
         void deveVerificarApenasOperacoesDOMesmoUsuario() {
             // Arrange
             when(operacaoRepository.findFirstByDataAndMovimentacaoAndProdutoAndInstituicaoAndQuantidadeAndPrecoUnitarioAndValorOperacaoAndDuplicadoAndUsuarioId(
-                any(), any(), any(), any(), any(), any(), any(), eq(false), any()
+                any(LocalDate.class), any(String.class), any(String.class), any(String.class), 
+                any(BigDecimal.class), any(BigDecimal.class), any(BigDecimal.class), eq(false), any(UsuarioId.class)
             )).thenReturn(Optional.empty());
             
             // Act
@@ -380,7 +375,8 @@ class CheckDuplicateOperacaoUseCaseTest {
             
             // Assert
             verify(operacaoRepository).findFirstByDataAndMovimentacaoAndProdutoAndInstituicaoAndQuantidadeAndPrecoUnitarioAndValorOperacaoAndDuplicadoAndUsuarioId(
-                any(), any(), any(), any(), any(), any(), any(), any(),
+                any(LocalDate.class), any(String.class), any(String.class), any(String.class),
+                any(BigDecimal.class), any(BigDecimal.class), any(BigDecimal.class), eq(false),
                 eq(usuarioId) // Verifica que busca apenas operações do usuário
             );
         }
@@ -390,7 +386,8 @@ class CheckDuplicateOperacaoUseCaseTest {
         void deveCompararTodosOsCamposRelevantes() {
             // Arrange
             when(operacaoRepository.findFirstByDataAndMovimentacaoAndProdutoAndInstituicaoAndQuantidadeAndPrecoUnitarioAndValorOperacaoAndDuplicadoAndUsuarioId(
-                any(), any(), any(), any(), any(), any(), any(), eq(false), any()
+                any(LocalDate.class), any(String.class), any(String.class), any(String.class), 
+                any(BigDecimal.class), any(BigDecimal.class), any(BigDecimal.class), eq(false), any(UsuarioId.class)
             )).thenReturn(Optional.empty());
             
             // Act

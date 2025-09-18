@@ -155,7 +155,7 @@ class RegisterOperacaoUseCaseTest {
                 id, operacao.getEntradaSaida(), operacao.getData(), operacao.getMovimentacao(),
                 operacao.getProduto(), operacao.getInstituicao(), operacao.getQuantidade(),
                 operacao.getPrecoUnitario(), operacao.getValorOperacao(), operacao.getDuplicado(),
-                operacao.getDimensionado(), operacao.getIdOriginal(), operacao.getDeletado(),
+                operacao.getProcessado(), operacao.getIdOriginal(), operacao.getDeletado(),
                 operacao.getUsuarioId()
             );
             

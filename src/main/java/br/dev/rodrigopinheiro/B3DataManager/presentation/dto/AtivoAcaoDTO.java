@@ -1,7 +1,7 @@
 package br.dev.rodrigopinheiro.B3DataManager.presentation.dto;
 
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.TipoAtivoFinanceiroVariavel;
-import br.dev.rodrigopinheiro.B3DataManager.infrastructure.persistence.entity.RendaVariavelEntity;
+import br.dev.rodrigopinheiro.B3DataManager.domain.model.AtivoRendaVariavel;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -18,18 +18,18 @@ public record AtivoAcaoDTO(
         String tipoAcao          // exposto como String; mapeado do enum
 ) {
     /**
-     * Converte uma RendaVariavelEntity em AtivoAcaoDTO.
+     * Converte um AtivoRendaVariavel em AtivoAcaoDTO.
      * precoAtual e variacao ficam null (placeholder).
      */
-    public static AtivoAcaoDTO from(RendaVariavelEntity rv, BigDecimal totalQuantidadePortfolio) {
-        Objects.requireNonNull(rv, "RendaVariavelEntity não pode ser nula");
+    public static AtivoAcaoDTO from(AtivoRendaVariavel rv, BigDecimal totalQuantidadePortfolio) {
+        Objects.requireNonNull(rv, "AtivoRendaVariavel não pode ser nulo");
         // Trata nulos defensivamente
         totalQuantidadePortfolio = totalQuantidadePortfolio == null ? BigDecimal.ZERO : totalQuantidadePortfolio;
 
-        double quantidadeTotal = rv.getQuantidade(); // mantém seu tipo atual (double)
-        BigDecimal totalInvestido = rv.getTotal() == null
-                ? BigDecimal.ZERO
-                : rv.getTotal().setScale(2, RoundingMode.HALF_UP);
+        // TODO: AtivoRendaVariavel não tem getQuantidade() nem getTotal()
+        // Estes dados deveriam vir de Posicao ou ser calculados a partir de Transacoes
+        double quantidadeTotal = 0.0; // Placeholder
+        BigDecimal totalInvestido = BigDecimal.ZERO; // Placeholder
 
         BigDecimal precoMedio = quantidadeTotal > 0
                 ? totalInvestido.divide(BigDecimal.valueOf(quantidadeTotal), 2, RoundingMode.HALF_UP)
@@ -48,7 +48,7 @@ public record AtivoAcaoDTO(
                 : rv.getTipoRendaVariavel().name();
 
         return new AtivoAcaoDTO(
-                rv.getAtivoFinanceiro().getNome(),
+                rv.getNome(),
                 quantidadeTotal,
                 precoMedio,
                 null,                // precoAtual placeholder

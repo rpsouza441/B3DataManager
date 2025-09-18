@@ -9,14 +9,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Entidade que representa uma instituição financeira no sistema B3DataManager.
+ * 
+ * Centraliza todas as informações relacionadas a instituições, incluindo:
+ * - Dados básicos da instituição (nome)
+ * - Relacionamentos com usuários proprietários
+ * - Transações associadas à instituição
+ * - Controle de acesso e permissões
+ * 
+ * Características:
+ * - Relacionamento many-to-many com usuários
+ * - Relacionamento one-to-many com transações
+ * - Auditoria automática via AuditableEntity
+ * - Soft delete para manter integridade referencial
+ * - Métodos de conveniência para associações
+ * - Prevenção de loops em toString
+ * 
+ * @author Rodrigo Pinheiro
+ * @since 1.0
+ */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@ToString(callSuper = true)
 @Entity
 @Table(name = "instituicao")
-public class InstituicaoEntity {
+public class InstituicaoEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +52,6 @@ public class InstituicaoEntity {
     @OneToMany(mappedBy = "instituicao")
     @ToString.Exclude // Evita loops
     private List<TransacaoEntity> transacoes;
-
 
     public void associarUsuario(UsuarioEntity usuario) {
         // Define explicitamente o AtivoFinanceiro na renda

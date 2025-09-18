@@ -1,12 +1,16 @@
 package br.dev.rodrigopinheiro.B3DataManager.application.usecase.rendavariavel;
 
 import br.dev.rodrigopinheiro.B3DataManager.domain.model.RendaVariavel;
+import br.dev.rodrigopinheiro.B3DataManager.domain.port.AtivoFinanceiroRepositoryPort;
 import br.dev.rodrigopinheiro.B3DataManager.domain.port.RendaVariavelRepositoryPort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DeleteRendaVariavelUseCase {
+
+    @Autowired
+    private AtivoFinanceiroRepositoryPort ativoFinanceiroRepository;
 
     @Autowired
     private RendaVariavelRepositoryPort rendaVariavelRepository;
@@ -27,14 +31,12 @@ public class DeleteRendaVariavelUseCase {
         RendaVariavel rendaVariavel = getRendaVariavelUseCase.executeOrThrow(rendaVariavelId);
 
         // Verificar se possui transações associadas através do ativo financeiro
-        if (rendaVariavel.getAtivoFinanceiro() != null && 
-            rendaVariavel.getAtivoFinanceiro().getTransacoes() != null && 
-            !rendaVariavel.getAtivoFinanceiro().getTransacoes().isEmpty()) {
-            // Se possui transações, fazer exclusão lógica
-            rendaVariavel.setDeletado(true);
-            rendaVariavelRepository.save(rendaVariavel);
+        if (rendaVariavel.getAtivoFinanceiro() != null) {
+            // Fazer exclusão lógica no ativo financeiro
+            rendaVariavel.getAtivoFinanceiro().setDeletado(true);
+            ativoFinanceiroRepository.save(rendaVariavel.getAtivoFinanceiro());
         } else {
-            // Se não possui transações, pode fazer exclusão física
+            // Se não possui ativo financeiro associado, pode fazer exclusão física
             rendaVariavelRepository.deleteById(rendaVariavelId);
         }
     }
@@ -69,8 +71,10 @@ public class DeleteRendaVariavelUseCase {
         // Buscar a renda variável existente
         RendaVariavel rendaVariavel = getRendaVariavelUseCase.executeOrThrow(rendaVariavelId);
 
-        // Exclusão lógica
-        rendaVariavel.setDeletado(true);
-        rendaVariavelRepository.save(rendaVariavel);
+        // Exclusão lógica no ativo financeiro
+        if (rendaVariavel.getAtivoFinanceiro() != null) {
+            rendaVariavel.getAtivoFinanceiro().setDeletado(true);
+            ativoFinanceiroRepository.save(rendaVariavel.getAtivoFinanceiro());
+        }
     }
 }
