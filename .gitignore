@@ -61,6 +61,7 @@ pnpmfile.js
 .npmrc
 webpack.generated.js
 vite.generated.ts
+.vaadin-node-tasks.lock
 
 # Browser drivers for local integration tests
 drivers/
