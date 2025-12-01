@@ -7,15 +7,45 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
- * Domain Model - Transacao (Opção 1)
+ * Domain Model - Transacao
  * 
- * Representa o histórico completo de operações financeiras.
- * Separado da Posicao (estado atual) para otimizar consultas.
+ * Representa o histórico imutável de operações financeiras.
+ * Separado de {@link Posicao} (estado atual) seguindo padrão Event
+ * Sourcing/CQRS.
  * 
- * Princípios da Opção 1:
- * - Histórico imutável vs estado atual (Posicao)
- * - Auditoria completa de operações
- * - POJO puro sem dependências externas
+ * <h3>Princípios:</h3>
+ * <ul>
+ * <li><b>Imutabilidade:</b> Transações não devem ser alteradas após
+ * criação</li>
+ * <li><b>Auditoria:</b> Mantém histórico completo para compliance</li>
+ * <li><b>Separação:</b> Histórico (Transacao) vs Estado Atual (Posicao)</li>
+ * </ul>
+ * 
+ * <h3>Tipos de Transação:</h3>
+ * <ul>
+ * <li><b>ENTRADA:</b> Compra de ativos</li>
+ * <li><b>VENDA:</b> Venda de ativos</li>
+ * <li><b>LUCRO_DIVIDENDO:</b> Recebimento de dividendos</li>
+ * <li><b>LUCRO_JUROS:</b> Recebimento de juros (renda fixa)</li>
+ * </ul>
+ * 
+ * <h3>Cálculos Automáticos:</h3>
+ * 
+ * <pre>{@code
+ * valorTotal = quantidade × precoUnitario
+ * valorLiquido = valorTotal - taxas
+ * }</pre>
+ * 
+ * <p>
+ * <b>Importante:</b> Os setters {@link #setQuantidade},
+ * {@link #setPrecoUnitario}
+ * e {@link #setTaxas} recalculam automaticamente os valores derivados.
+ * </p>
+ * 
+ * @author Rodrigo Pinheiro
+ * @see Posicao
+ * @see Portfolio
+ * @see TipoTransacao
  */
 public class Transacao {
     private Long id;
@@ -95,9 +125,9 @@ public class Transacao {
         this.taxas = BigDecimal.ZERO;
     }
 
-    public Transacao(LocalDate dataOperacao, TipoTransacao tipoTransacao, TipoMovimentacao tipoMovimentacao, 
-                    BigDecimal quantidade, BigDecimal precoUnitario, AtivoFinanceiro ativoFinanceiro, 
-                    Portfolio portfolio, Instituicao instituicao) {
+    public Transacao(LocalDate dataOperacao, TipoTransacao tipoTransacao, TipoMovimentacao tipoMovimentacao,
+            BigDecimal quantidade, BigDecimal precoUnitario, AtivoFinanceiro ativoFinanceiro,
+            Portfolio portfolio, Instituicao instituicao) {
         this.dataOperacao = dataOperacao;
         this.tipoTransacao = tipoTransacao;
         this.tipoMovimentacao = tipoMovimentacao;
@@ -108,13 +138,13 @@ public class Transacao {
         this.instituicao = instituicao;
         this.deletado = false;
         this.taxas = BigDecimal.ZERO;
-        
+
         // Calcula valores derivados
         calcularValores();
     }
-    
+
     // Métodos de negócio
-    
+
     /**
      * Calcula valores derivados da transação
      */
@@ -124,30 +154,30 @@ public class Transacao {
             this.valorLiquido = valorTotal.subtract(taxas != null ? taxas : BigDecimal.ZERO);
         }
     }
-    
+
     /**
      * Verifica se é uma transação de compra
      */
     public boolean isCompra() {
         return TipoTransacao.ENTRADA.equals(tipoTransacao);
     }
-    
+
     /**
      * Verifica se é uma transação de venda
      */
     public boolean isVenda() {
         return TipoTransacao.VENDA.equals(tipoTransacao);
     }
-    
+
     /**
      * Verifica se é uma transação de rendimento
      */
     public boolean isRendimento() {
-        return TipoTransacao.LUCRO_DIVIDENDO.equals(tipoTransacao) || 
-               TipoTransacao.LUCRO_JUROS.equals(tipoTransacao) || 
-               TipoTransacao.LUCRO_RENDIMENTO.equals(tipoTransacao);
+        return TipoTransacao.LUCRO_DIVIDENDO.equals(tipoTransacao) ||
+                TipoTransacao.LUCRO_JUROS.equals(tipoTransacao) ||
+                TipoTransacao.LUCRO_RENDIMENTO.equals(tipoTransacao);
     }
-    
+
     /**
      * Adiciona taxas à transação e recalcula valores
      */
@@ -157,7 +187,7 @@ public class Transacao {
     }
 
     // Getters e Setters
-    
+
     public Long getId() {
         return id;
     }
@@ -194,6 +224,16 @@ public class Transacao {
         return quantidade;
     }
 
+    /**
+     * Define a quantidade de ativos na transação.
+     * <p>
+     * <b>Importante:</b> Este método recalcula automaticamente os valores
+     * derivados (valorTotal e valorLiquido).
+     * </p>
+     * 
+     * @param quantidade Quantidade de ativos (deve ser maior que zero)
+     * @see #calcularValores()
+     */
     public void setQuantidade(BigDecimal quantidade) {
         this.quantidade = quantidade;
         calcularValores();
@@ -203,6 +243,18 @@ public class Transacao {
         return precoUnitario;
     }
 
+    /**
+     * Define o preço unitário da transação.
+     * <p>
+     * <b>⚠️ Importante:</b> Este método recalcula automaticamente os valores
+     * derivados (valorTotal e valorLiquido) através de {@link #calcularValores()}.
+     * </p>
+     * 
+     * @param precoUnitario Preço por unidade do ativo
+     * @see #calcularValores()
+     * @see #getValorTotal()
+     * @see #getValorLiquido()
+     */
     public void setPrecoUnitario(BigDecimal precoUnitario) {
         this.precoUnitario = precoUnitario;
         calcularValores();
@@ -220,6 +272,18 @@ public class Transacao {
         return taxas;
     }
 
+    /**
+     * Define as taxas da transação (corretagem, custódia, etc).
+     * <p>
+     * <b>⚠️ Importante:</b> Este método recalcula automaticamente o valor
+     * líquido através de {@link #calcularValores()}.
+     * </p>
+     * 
+     * @param taxas Valor total de taxas e custos
+     * @see #calcularValores()
+     * @see #adicionarTaxas(BigDecimal)
+     * @see #getValorLiquido()
+     */
     public void setTaxas(BigDecimal taxas) {
         this.taxas = taxas;
         calcularValores();

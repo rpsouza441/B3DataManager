@@ -3,9 +3,40 @@ package br.dev.rodrigopinheiro.B3DataManager.domain.model;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.Roles;
 import br.dev.rodrigopinheiro.B3DataManager.domain.enums.StatusConta;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 
+/**
+ * Domain Model - Usuario
+ * 
+ * Representa um usuário do sistema com credenciais de autenticação e
+ * autorização.
+ * 
+ * <h3>Características:</h3>
+ * <ul>
+ * <li><b>Autenticação:</b> Username/password para login</li>
+ * <li><b>Autorização:</b> Roles para controle de acesso (RBAC)</li>
+ * <li><b>Gerenciamento:</b> StatusConta para ativação/suspensão</li>
+ * </ul>
+ * 
+ * <h3>Relacionamentos:</h3>
+ * <ul>
+ * <li><b>Portfolio:</b> 1:1 - Cada usuário possui exatamente um portfolio</li>
+ * <li><b>Instituicoes:</b> N:N - Usuário pode operar em múltiplas
+ * corretoras</li>
+ * </ul>
+ * 
+ * <h3>Segurança:</h3>
+ * <ul>
+ * <li>Senha deve ser criptografada antes de persistir (BCrypt)</li>
+ * <li>Email único para recuperação de senha</li>
+ * <li>Implementar validações na camada de application</li>
+ * </ul>
+ * 
+ * @author Rodrigo Pinheiro
+ * @see Portfolio
+ * @see Roles
+ * @see StatusConta
+ */
 public class Usuario {
 
     private Long id;
@@ -20,7 +51,8 @@ public class Usuario {
     public Usuario() {
     }
 
-    public Usuario(Long id, String username, String password, String email, Set<Roles> roles, Set<Instituicao> instituicoes, Portfolio portfolio, StatusConta statusConta) {
+    public Usuario(Long id, String username, String password, String email, Set<Roles> roles,
+            Set<Instituicao> instituicoes, Portfolio portfolio, StatusConta statusConta) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -95,6 +127,4 @@ public class Usuario {
         this.statusConta = statusConta;
     }
 
-
-    
 }

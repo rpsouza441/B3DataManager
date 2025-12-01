@@ -40,6 +40,9 @@ build/
 ### Trae ###
 .trae
 
+### Antigravity ###
+.antigravity
+
 
 /target/
 .gradle
